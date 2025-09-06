@@ -1,0 +1,14 @@
+{
+    "cmake.useCMakePresets": "always",
+    "cmake.configureOnOpen": true,
+    "cmake.generator": "Ninja",
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "C_Cpp.default.includePath": [
+        "C:/gbdk/include",
+        "C:/gbdk/include/gb",
+        "${workspaceFolder}/src"
+    ],
+    "C_Cpp.default.defines": [
+        "NDEBUG"
+    ]
+}

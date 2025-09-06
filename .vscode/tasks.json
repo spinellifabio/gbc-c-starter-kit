@@ -1,0 +1,45 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake: configure (GBDK)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-S",
+                ".",
+                "-B",
+                "build",
+                "-G",
+                "Ninja",
+                "-DCMAKE_TOOLCHAIN_FILE=cmake/gbdk-toolchain.cmake"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "CMake: build rom",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build",
+                "--target",
+                "rom",
+                "-j"
+            ],
+            "dependsOn": "CMake: configure (GBDK)",
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run in BGB",
+            "type": "shell",
+            "command": "\"C:/Users/fabio.spinelli/source/repos/personal-data/gbdk-partials/emulator/bgbw64/bgb64.exe\" \"${workspaceFolder}/rom/${workspaceFolderBasename}.gb\"",
+            "dependsOn": "CMake: build rom",
+            "problemMatcher": []
+        }
+    ]
+}

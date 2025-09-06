@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Nome che compare nel menu "Run and Debug"
+            "name": "Run ROM in BGB",
+            // Su Windows usa il debugger C++ come "launcher" di un programma esterno
+            "type": "cppvsdbg",
+            "request": "launch",
+            // Path al tuo emulatore
+            "program": "C:/Users/fabio.spinelli/source/repos/personal-data/gbdk-partials/emulator/bgbw64/bgb64.exe",
+            // Argomento: la ROM appena compilata
+            "args": [
+                "${workspaceFolder}/rom/${workspaceFolderBasename}.gb"
+            ],
+            // Cartella di lavoro: la root del repo
+            "cwd": "${workspaceFolder}",
+            // Prima di lanciare, compila la ROM
+            "preLaunchTask": "CMake: build rom",
+            // Non serve console esterna
+            "console": "integratedTerminal"
+        }
+    ]
+}

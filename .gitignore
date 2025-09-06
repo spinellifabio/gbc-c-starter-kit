@@ -1,0 +1,31 @@
+# === Build directories ===
+/build/
+/rom/
+
+# === Compilazione intermedia ===
+*.o
+*.obj
+*.lst
+*.map
+*.sym
+*.ihx
+*.rel
+*.asm
+*.adb
+*.lk
+*.noi
+
+# === ROM finali ===
+*.gb
+*.gbc
+
+# === VS Code ===
+.vscode/*
+!.vscode/c_cpp_properties.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# === OS cruft ===
+.DS_Store
+Thumbs.db

@@ -1,0 +1,31 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "ninja-gbdk",
+            "displayName": "GBDK (Ninja)",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/gbdk-toolchain.cmake",
+                "GBDK_ROOT": "C:/gbdk"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "build-rom",
+            "configurePreset": "ninja-gbdk",
+            "targets": [
+                "rom"
+            ]
+        },
+        {
+            "name": "run",
+            "configurePreset": "ninja-gbdk",
+            "targets": [
+                "run"
+            ]
+        }
+    ]
+}
