@@ -44,7 +44,7 @@ add_custom_command(
 add_custom_target(rom ALL DEPENDS "${ROM_PATH}")
 
 # Run in BGB (your path)
-set(BGB_EXE "C:/Users/fabio.spinelli/source/repos/personal-data/gbdk-partials/emulator/bgbw64/bgb64.exe")
+set(BGB_EXE "${CMAKE_CURRENT_SOURCE_DIR}/../emulator/bgbw64/bgb64.exe")
 add_custom_target(run
   COMMAND "${BGB_EXE}" "${ROM_PATH}"
   DEPENDS rom
