@@ -1,5 +1,6 @@
 # === Build directories ===
 /build/
+/CMakeFiles/
 /rom/
 
 # === Compilazione intermedia ===
@@ -21,10 +22,10 @@
 
 # === VS Code ===
 .vscode/*
-!.vscode/c_cpp_properties.json
+!.vscode/extensions.json
+!.vscode/launch.json
 !.vscode/settings.json
 !.vscode/tasks.json
-!.vscode/launch.json
 
 # === OS cruft ===
 .DS_Store

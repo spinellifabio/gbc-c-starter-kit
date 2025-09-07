@@ -37,7 +37,7 @@
         {
             "label": "Run in BGB",
             "type": "shell",
-            "command": "\"C:/Users/fabio.spinelli/source/repos/personal-data/gbdk-partials/emulator/bgbw64/bgb64.exe\" \"${workspaceFolder}/rom/${workspaceFolderBasename}.gb\"",
+            "command": "\"${workspaceFolder}/../emulator/bgbw64/bgb64.exe\" \"${workspaceFolder}/rom/${workspaceFolderBasename}.gb\"",
             "dependsOn": "CMake: build rom",
             "problemMatcher": []
         }

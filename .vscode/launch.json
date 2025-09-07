@@ -8,7 +8,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             // Path al tuo emulatore
-            "program": "C:/Users/fabio.spinelli/source/repos/personal-data/gbdk-partials/emulator/bgbw64/bgb64.exe",
+            "program": "${workspaceFolder}/../emulator/bgbw64/bgb64.exe",
             // Argomento: la ROM appena compilata
             "args": [
                 "${workspaceFolder}/rom/${workspaceFolderBasename}.gb"
