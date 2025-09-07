@@ -17,7 +17,9 @@
 #include <gb/gb.h>
 #include <gb/cgb.h>
 #include <gbdk/font.h>
+#include <gbdk/console.h>
 #include <stdint.h>
+#include <stdio.h>
 
 void enemy_stub(void) { /* placeholder to silence empty TU warning */ }
 void player_stub(void) { /* placeholder to silence empty TU warning */ }
@@ -34,28 +36,53 @@ static uint8_t running = 1;
 
 static void init(void)
 {
-    // Abilita compatibilità CGB/DMG: su DMG è no-op
     cgb_compatibility();
 
-    DISPLAY_OFF; // Cambia palette/display in modo sicuro a schermo spento
+    DISPLAY_OFF;
 
     SHOW_BKG;
     SHOW_SPRITES;
 
-    // Imposta palette BG 0 (valida solo su CGB; su DMG è ignorata)
-    // count = 1 palette da 4 colori
     set_bkg_palette(0, 1, PALETTE0);
 
-    // --- FONT ---
-    font_init();                   // Inizializza sistema font
-    font_set(font_load(font_ibm)); // Carica font "IBM" built-in
-    // Altri: font_spect, font_min — ma font_ibm è più leggibile
-
-    // // Stampa stringa a (col=2, row=8) → centro schermo circa
-    // gotoxy(2, 8); // coordinate in tile (0–19 cols, 0–17 rows)
-    // gprintf("HELLO GBC!");
+    font_init();
+    font_set(font_load(font_ibm));
 
     DISPLAY_ON;
+}
+
+static void title_screen(void)
+{
+    uint8_t frame_counter = 0;
+    uint8_t visible = 1;
+
+    while (1)
+    {
+        // Blink toggle every 30 frames
+        if (++frame_counter >= 30)
+        {
+            frame_counter = 0;
+            visible = !visible;
+
+            if (visible)
+            {
+                gotoxy(4, 8);
+                printf("PRESS START");
+            }
+            else
+            {
+                gotoxy(4, 8);
+                printf("           "); // overwrite with spaces
+            }
+        }
+
+        if (joypad() & J_START)
+            break;
+
+        wait_vbl_done();
+    }
+
+    cls(); // clear screen before exiting
 }
 
 static void update_input(void)
@@ -65,32 +92,17 @@ static void update_input(void)
         running = 0;
 }
 
-static void update_game(void)
-{
-    // logica di gioco qui (update: ≤ ~1.6 ms per 60 FPS su GBC consigliato)
-}
-
-static void draw(void)
-{
-    // aggiornamenti grafici qui (rispettare le finestre di VBlank/OAM DMA)
-}
-
 void main(void)
 {
     init();
+    title_screen();
 
-    // Loop principale a ~59.7 FPS, sincronizzato con VBlank
-    while (running)
-    {
-        update_input();
-        update_game();
-        draw();
-        wait_vbl_done(); // blocca fino a VBlank successivo (1 frame)
-    }
+    running = 0;
 
-    // Freeze pulito se si esce con START
     while (1)
-        wait_vbl_done();
+    {
+        wait_vbl_done(); // hold clean freeze
+    }
 }
 
 /*

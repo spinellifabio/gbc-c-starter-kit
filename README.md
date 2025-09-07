@@ -136,9 +136,9 @@ The repository is organized as follows:
 ```text
 gbc-c-starter-kit/
 │── .vscode/                    # VS Code configuration (tasks, launch settings)
-│   └── extensions.json         # VS Code extensions
-│   └── launch.json             # Launch configuration
-│   └── settings.json           # User settings
+│   │── extensions.json         # VS Code extensions
+│   │── launch.json             # Launch configuration
+│   │── settings.json           # User settings
 │   └── tasks.json              # CMake tasks
 │── assets/                     # Graphics, tiles, maps
 │── build/                      # Output directory (generated after compilation)
@@ -152,7 +152,7 @@ gbc-c-starter-kit/
 │── .gitignore                  # Ignored files
 │── CMakeLists.txt              # Main build configuration
 │── CMakePresets.json           # CMake presets
-│── README.md                   # Project documentation
+└── README.md                   # Project documentation
 ```
 
 This structure keeps source code, headers, and assets separated for clarity.
