@@ -10,5 +10,6 @@
     ],
     "C_Cpp.default.defines": [
         "NDEBUG"
-    ]
+    ],
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

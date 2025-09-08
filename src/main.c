@@ -20,9 +20,7 @@
 #include <gbdk/console.h>
 #include <stdint.h>
 #include <stdio.h>
-
-void enemy_stub(void) { /* placeholder to silence empty TU warning */ }
-void player_stub(void) { /* placeholder to silence empty TU warning */ }
+#include <string.h>
 
 // --- Palette in ROM (const => in ROM; nessun costo RAM) ---
 // palette_color_t è un alias 16-bit (BGR555) per CGB
@@ -34,21 +32,22 @@ static const palette_color_t PALETTE0[4] = {
 
 static uint8_t running = 1;
 
-static void init(void)
+static void show_splash(const char *text, uint16_t duration_frames)
 {
-    cgb_compatibility();
+    gotoxy((20 - strlen(text)) / 2, 9); // centrato
+    printf(text);
 
-    DISPLAY_OFF;
+    for (uint16_t f = 0; f < duration_frames; f++)
+        wait_vbl_done(); // attende per ~duration_frames / 60 secondi
 
-    SHOW_BKG;
-    SHOW_SPRITES;
+    cls();
+}
 
-    set_bkg_palette(0, 1, PALETTE0);
-
-    font_init();
-    font_set(font_load(font_ibm));
-
-    DISPLAY_ON;
+static void splash_sequence(void)
+{
+    // Esempio: due splash screen
+    show_splash("OPENAI GAMES", 120); // ~2 secondi
+    show_splash("PRESENTS", 120);     // ~2 secondi
 }
 
 static void title_screen(void)
@@ -58,31 +57,52 @@ static void title_screen(void)
 
     while (1)
     {
-        // Blink toggle every 30 frames
         if (++frame_counter >= 30)
         {
             frame_counter = 0;
             visible = !visible;
 
-            if (visible)
-            {
-                gotoxy(4, 8);
-                printf("PRESS START");
-            }
-            else
-            {
-                gotoxy(4, 8);
-                printf("           "); // overwrite with spaces
-            }
+            gotoxy(4, 8);
+            printf(visible ? "PRESS START" : "           ");
         }
 
         if (joypad() & J_START)
             break;
-
         wait_vbl_done();
     }
 
-    cls(); // clear screen before exiting
+    // flush input
+    while (joypad())
+        wait_vbl_done();
+
+    cls();
+}
+
+static void game_over_screen(void)
+{
+    cls();
+    gotoxy(6, 8);
+    printf("GAME OVER");
+
+    uint16_t frame_counter = 0;
+    uint8_t skippable = 0;
+
+    while (1)
+    {
+        wait_vbl_done();
+        frame_counter++;
+
+        // After ~210 frames (~3.5s) allow skip
+        if (frame_counter >= 210)
+            skippable = 1;
+
+        if (skippable && joypad())
+            break; // any button pressed
+    }
+
+    // flush input prima di tornare al titolo
+    while (joypad())
+        wait_vbl_done();
 }
 
 static void update_input(void)
@@ -94,14 +114,20 @@ static void update_input(void)
 
 void main(void)
 {
-    init();
-    title_screen();
+    cgb_compatibility();
+    DISPLAY_OFF;
 
-    running = 0;
+    SHOW_BKG;
+    font_init();
+    font_set(font_load(font_ibm));
+    set_bkg_palette(0, 1, PALETTE0);
+    DISPLAY_ON;
 
+    splash_sequence();
     while (1)
     {
-        wait_vbl_done(); // hold clean freeze
+        title_screen();
+        game_over_screen();
     }
 }
 
