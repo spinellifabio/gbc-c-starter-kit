@@ -22,38 +22,215 @@
 #include <stdio.h>
 #include <string.h>
 
-// --- Palette in ROM (const => in ROM; nessun costo RAM) ---
-// palette_color_t è un alias 16-bit (BGR555) per CGB
+// -------------------- Palette --------------------
 static const palette_color_t PALETTE0[4] = {
-    RGB_WHITE,
-    RGB_LIGHTGRAY,
-    RGB_DARKGRAY,
-    RGB_BLACK};
+    RGB_WHITE, RGB_LIGHTGRAY, RGB_DARKGRAY, RGB_BLACK};
 
-static uint8_t running = 1;
+// -------------------- Game Mode -----------------
+typedef enum
+{
+    MODE_RELEASE,
+    MODE_DEBUG
+} GameMode;
 
+// -------------------- Language -----------------
+typedef enum
+{
+    LANG_EN,
+    LANG_IT
+} GameLanguage;
+
+// -------------------- Global Settings ------------
+typedef struct
+{
+    uint8_t sound_on;      // 0 = off, 1 = on
+    uint8_t difficulty;    // 0 = easy, 1 = normal, 2 = hard
+    uint8_t lives;         // starting lives
+    GameMode mode;         // release or debug mode
+    GameLanguage language; // language
+
+    const char *game_name;
+    const char *version;
+} GameSettings;
+
+static GameSettings settings = {
+    1,               // sound_on
+    1,               // difficulty
+    3,               // lives
+    MODE_RELEASE,    // mode
+    LANG_IT,         // Italian
+    "GBC Prototype", // name
+    "v0.2.0"         // version
+};
+
+// -------------------- Menu System ----------------
+typedef void (*MenuChangeFn)(int dir);
+
+typedef struct
+{
+    const char *label;
+    MenuChangeFn change;
+} MenuItem;
+
+// Change functions
+static void toggle_sound(int dir) { settings.sound_on ^= 1; }
+static void cycle_difficulty(int dir)
+{
+    if (dir > 0)
+        settings.difficulty = (settings.difficulty + 1) % 3;
+    else
+        settings.difficulty = (settings.difficulty + 2) % 3;
+}
+static void cycle_lives(int dir)
+{
+    if (dir > 0)
+        settings.lives = (settings.lives % 9) + 1;
+    else
+        settings.lives = (settings.lives == 1 ? 9 : settings.lives - 1);
+}
+static void cycle_language(int dir)
+{
+    if (dir > 0)
+        settings.language = (settings.language + 1) % 2;
+    else
+        settings.language = (settings.language == 0 ? 1 : settings.language - 1);
+}
+static void toggle_mode(int dir)
+{
+    settings.mode = (settings.mode == MODE_RELEASE ? MODE_DEBUG : MODE_RELEASE);
+}
+
+// Menu items array
+static MenuItem option_items[] = {
+    {"SOUND", toggle_sound},
+    {"DIFFICULTY", cycle_difficulty},
+    {"LIVES", cycle_lives},
+    {"MODE", toggle_mode},
+    {"LANGUAGE", cycle_language}};
+#define OPTION_COUNT (sizeof(option_items) / sizeof(MenuItem))
+
+// -------------------- Utils ----------------------
+static void flush_input(void)
+{
+    while (joypad())
+        wait_vbl_done();
+}
+
+// -------------------- Splash ---------------------
 static void show_splash(const char *text, uint16_t duration_frames)
 {
-    gotoxy((20 - strlen(text)) / 2, 9); // centrato
+    gotoxy((20 - strlen(text)) / 2, 9); // center horizontally
     printf(text);
-
     for (uint16_t f = 0; f < duration_frames; f++)
-        wait_vbl_done(); // attende per ~duration_frames / 60 secondi
-
+        wait_vbl_done();
     cls();
 }
 
 static void splash_sequence(void)
 {
-    // Esempio: due splash screen
-    show_splash("OPENAI GAMES", 120); // ~2 secondi
-    show_splash("PRESENTS", 120);     // ~2 secondi
+    show_splash("OPENAI GAMES", 120); // ~2s
+    show_splash("PRESENTS", 120);     // ~2s
 }
 
+// -------------------- Options --------------------
+static void draw_options(uint8_t cursor)
+{
+    cls();
+    gotoxy(6, 1);
+    printf("OPTIONS");
+
+    gotoxy(2, 3);
+    printf("%s %s", settings.game_name, settings.version);
+
+    for (uint8_t i = 0; i < OPTION_COUNT; i++)
+    {
+        gotoxy(2, 6 + i * 2);
+        printf(i == cursor ? ">" : " ");
+        printf(" %s: ", option_items[i].label);
+
+        switch (i)
+        {
+        case 0:
+            printf(settings.sound_on ? "ON " : "OFF");
+            break;
+        case 1:
+            switch (settings.difficulty)
+            {
+            case 0:
+                printf("EASY   ");
+                break;
+            case 1:
+                printf("NORMAL ");
+                break;
+            case 2:
+                printf("HARD   ");
+                break;
+            }
+            break;
+        case 2:
+            printf("%d", settings.lives);
+            break;
+        case 3:
+            printf(settings.mode == MODE_RELEASE ? "RELEASE" : "DEBUG");
+            break;
+        case 4:
+            printf(settings.language == LANG_EN ? "EN" : "IT");
+            break;
+        }
+    }
+
+    gotoxy(2, 16);
+    printf("PRESS B TO RETURN");
+}
+
+static void options_screen(void)
+{
+    uint8_t cursor = 0;
+    draw_options(cursor);
+
+    while (1)
+    {
+        wait_vbl_done();
+        uint8_t keys = joypad();
+
+        if (keys & J_B)
+            break;
+        if (keys & J_UP && cursor > 0)
+        {
+            cursor--;
+            draw_options(cursor);
+        }
+        if (keys & J_DOWN && cursor < OPTION_COUNT - 1)
+        {
+            cursor++;
+            draw_options(cursor);
+        }
+        if (keys & J_LEFT)
+        {
+            option_items[cursor].change(-1);
+            draw_options(cursor);
+        }
+        if (keys & J_RIGHT)
+        {
+            option_items[cursor].change(1);
+            draw_options(cursor);
+        }
+    }
+    flush_input();
+    cls();
+}
+
+// -------------------- Title ----------------------
 static void title_screen(void)
 {
     uint8_t frame_counter = 0;
     uint8_t visible = 1;
+
+    cls();
+    gotoxy(5, 6);
+    printf("%s", settings.game_name);
+    gotoxy(7, 7);
+    printf("%s", settings.version);
 
     while (1)
     {
@@ -61,23 +238,24 @@ static void title_screen(void)
         {
             frame_counter = 0;
             visible = !visible;
-
-            gotoxy(4, 8);
-            printf(visible ? "PRESS START" : "           ");
+            gotoxy(4, 11);
+            printf(visible ? "START=PLAY" : "          ");
+            gotoxy(4, 13);
+            printf(visible ? "SELECT=OPTIONS" : "               ");
         }
 
-        if (joypad() & J_START)
-            break;
+        uint8_t keys = joypad();
+        if (keys & J_START)
+            break; // go to gameplay
+        if (keys & J_SELECT)
+            options_screen(); // go to options
         wait_vbl_done();
     }
-
-    // flush input
-    while (joypad())
-        wait_vbl_done();
-
+    flush_input();
     cls();
 }
 
+// -------------------- Game Over ------------------
 static void game_over_screen(void)
 {
     cls();
@@ -91,27 +269,16 @@ static void game_over_screen(void)
     {
         wait_vbl_done();
         frame_counter++;
-
-        // After ~210 frames (~3.5s) allow skip
         if (frame_counter >= 210)
-            skippable = 1;
-
+            skippable = 1; // ~3.5s
         if (skippable && joypad())
-            break; // any button pressed
+            break;
     }
-
-    // flush input prima di tornare al titolo
-    while (joypad())
-        wait_vbl_done();
+    flush_input();
+    cls();
 }
 
-static void update_input(void)
-{
-    // Nota: joypad() legge lo stato corrente; per edge-detect usare joypad_ex()
-    if (joypad() & J_START)
-        running = 0;
-}
-
+// -------------------- Main -----------------------
 void main(void)
 {
     cgb_compatibility();
@@ -124,9 +291,11 @@ void main(void)
     DISPLAY_ON;
 
     splash_sequence();
+
     while (1)
     {
         title_screen();
+        // TODO: replace with real gameplay in the future
         game_over_screen();
     }
 }
