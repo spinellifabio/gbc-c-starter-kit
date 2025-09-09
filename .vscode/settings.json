@@ -11,5 +11,8 @@
     "C_Cpp.default.defines": [
         "NDEBUG"
     ],
-    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "files.associations": {
+        "gb.h": "c"
+    }
 }

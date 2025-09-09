@@ -8,7 +8,7 @@
  *    \$$$$$$  |$$$$$$$  |\$$$$$$  |      \$$$$$$  |      \$$$$$$  |  \$$$$  |\$$$$$$$ |$$ |       \$$$$  |\$$$$$$$\ $$ |            $$ | \$$\ $$ |  \$$$$  |
  *     \______/ \_______/  \______/        \______/        \______/    \____/  \_______|\__|        \____/  \_______|\__|            \__|  \__|\__|   \____/
  *
- *                                                                                                           v1.0.0 - Code assembled in spare time by Fabio
+ *                                                                                                           v0.1.0 - Code assembled in spare time by Fabio
  */
 
 // main.c - Template minimo con game loop + VBlank (compatibile con SDCC/GBDK)
@@ -54,14 +54,13 @@ typedef struct
 } GameSettings;
 
 static GameSettings settings = {
-    1,               // sound_on
-    1,               // difficulty
-    3,               // lives
-    MODE_RELEASE,    // mode
-    LANG_IT,         // Italian
-    "GBC Prototype", // name
-    "v0.1.0"         // version
-};
+    1,
+    1,
+    3,
+    MODE_RELEASE,
+    LANG_IT,
+    "GBC Prototype",
+    "v0.1.0"};
 
 // -------------------- Menu System ----------------
 typedef void (*MenuChangeFn)(int dir);
@@ -109,11 +108,23 @@ static MenuItem option_items[] = {
     {"LANGUAGE", cycle_language}};
 #define OPTION_COUNT (sizeof(option_items) / sizeof(MenuItem))
 
+// -------------------- Input State ----------------
+static uint8_t old_keys = 0; // Edge detection buffer
+
+static uint8_t get_pressed(void)
+{
+    uint8_t keys = joypad();
+    uint8_t pressed = keys & ~old_keys;
+    old_keys = keys;
+    return pressed;
+}
+
 // -------------------- Utils ----------------------
 static void flush_input(void)
 {
     while (joypad())
         wait_vbl_done();
+    old_keys = 0;
 }
 
 // -------------------- Splash ---------------------
@@ -133,6 +144,43 @@ static void splash_sequence(void)
 }
 
 // -------------------- Options --------------------
+static void draw_option_line(uint8_t i, uint8_t cursor)
+{
+    gotoxy(2, 6 + i * 2);
+    printf(i == cursor ? ">" : " ");
+    printf(" %s: ", option_items[i].label);
+
+    switch (i)
+    {
+    case 0:
+        printf(settings.sound_on ? "ON " : "OFF");
+        break;
+    case 1:
+        switch (settings.difficulty)
+        {
+        case 0:
+            printf("EASY   ");
+            break;
+        case 1:
+            printf("NORMAL ");
+            break;
+        case 2:
+            printf("HARD   ");
+            break;
+        }
+        break;
+    case 2:
+        printf("%d", settings.lives);
+        break;
+    case 3:
+        printf(settings.mode == MODE_RELEASE ? "RELEASE" : "DEBUG");
+        break;
+    case 4:
+        printf(settings.language == LANG_EN ? "EN" : "IT");
+        break;
+    }
+}
+
 static void draw_options(uint8_t cursor)
 {
     cls();
@@ -144,39 +192,7 @@ static void draw_options(uint8_t cursor)
 
     for (uint8_t i = 0; i < OPTION_COUNT; i++)
     {
-        gotoxy(2, 6 + i * 2);
-        printf(i == cursor ? ">" : " ");
-        printf(" %s: ", option_items[i].label);
-
-        switch (i)
-        {
-        case 0:
-            printf(settings.sound_on ? "ON " : "OFF");
-            break;
-        case 1:
-            switch (settings.difficulty)
-            {
-            case 0:
-                printf("EASY   ");
-                break;
-            case 1:
-                printf("NORMAL ");
-                break;
-            case 2:
-                printf("HARD   ");
-                break;
-            }
-            break;
-        case 2:
-            printf("%d", settings.lives);
-            break;
-        case 3:
-            printf(settings.mode == MODE_RELEASE ? "RELEASE" : "DEBUG");
-            break;
-        case 4:
-            printf(settings.language == LANG_EN ? "EN" : "IT");
-            break;
-        }
+        draw_option_line(i, cursor);
     }
 
     gotoxy(2, 16);
@@ -191,29 +207,33 @@ static void options_screen(void)
     while (1)
     {
         wait_vbl_done();
-        uint8_t keys = joypad();
+        uint8_t pressed = get_pressed();
 
-        if (keys & J_B)
+        if (pressed & J_B)
             break;
-        if (keys & J_UP && cursor > 0)
+        if (pressed & J_UP && cursor > 0)
         {
+            uint8_t old_cursor = cursor;
             cursor--;
-            draw_options(cursor);
+            draw_option_line(old_cursor, cursor);
+            draw_option_line(cursor, cursor);
         }
-        if (keys & J_DOWN && cursor < OPTION_COUNT - 1)
+        if (pressed & J_DOWN && cursor < OPTION_COUNT - 1)
         {
+            uint8_t old_cursor = cursor;
             cursor++;
-            draw_options(cursor);
+            draw_option_line(old_cursor, cursor);
+            draw_option_line(cursor, cursor);
         }
-        if (keys & J_LEFT)
+        if (pressed & J_LEFT)
         {
             option_items[cursor].change(-1);
-            draw_options(cursor);
+            draw_option_line(cursor, cursor);
         }
-        if (keys & J_RIGHT)
+        if (pressed & J_RIGHT)
         {
             option_items[cursor].change(1);
-            draw_options(cursor);
+            draw_option_line(cursor, cursor);
         }
     }
     flush_input();
@@ -227,10 +247,8 @@ static void title_screen(void)
     uint8_t visible = 1;
 
     cls();
-    gotoxy(5, 6);
-    printf("%s", settings.game_name);
-    gotoxy(7, 7);
-    printf("%s", settings.version);
+    set_bkg_tiles(5, 6, strlen(settings.game_name), 1, (uint8_t *)settings.game_name);
+    set_bkg_tiles(7, 7, strlen(settings.version), 1, (uint8_t *)settings.version);
 
     while (1)
     {
@@ -244,11 +262,11 @@ static void title_screen(void)
             printf(visible ? "SELECT=OPTIONS" : "               ");
         }
 
-        uint8_t keys = joypad();
-        if (keys & J_START)
-            break; // go to gameplay
-        if (keys & J_SELECT)
-            options_screen(); // go to options
+        uint8_t pressed = get_pressed();
+        if (pressed & J_START)
+            break;
+        if (pressed & J_SELECT)
+            options_screen();
         wait_vbl_done();
     }
     flush_input();
@@ -288,6 +306,7 @@ void main(void)
     font_init();
     font_set(font_load(font_ibm));
     set_bkg_palette(0, 1, PALETTE0);
+    set_sprite_palette(0, 1, PALETTE0); // add sprite palette too
     DISPLAY_ON;
 
     splash_sequence();

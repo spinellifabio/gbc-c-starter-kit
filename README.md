@@ -144,6 +144,7 @@ gbc-c-starter-kit/
 │── build/                      # Output directory (generated after compilation)
 │── cmake/                      # CMake scripts
 │   └── gbdk-toolchain.cmake    # Toolchain configuration
+│── docs/                       # Project documentation
 │── include/                    # Header files
 │── res/                        # Resource files
 │── rom/                        # Compiled ROMs
@@ -182,6 +183,7 @@ gameboy-color, gbc, gbdk-2020, cmake, ninja, c-programming, starter-kit, templat
 - [Ninja Build System](https://ninja-build.org/) – Documentation for the build tool
 - [CMake Documentation](https://cmake.org/cmake/help/latest/) – Full reference for CMake commands and usage
 - [bgbw64 Emulator](https://bgb.bircd.org/) – Official emulator for testing Game Boy / Game Boy Color ROMs
+- [Free Game Boy / Game Boy Color Assets](https://itch.io/game-assets/free/tag-gameboy/tag-pixel-art/tag-retro) – Free game assets for Game Boy / Game Boy Color homebrew development
 
 ## Credits
 
