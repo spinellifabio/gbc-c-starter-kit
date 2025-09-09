@@ -60,7 +60,7 @@ static GameSettings settings = {
     MODE_RELEASE,    // mode
     LANG_IT,         // Italian
     "GBC Prototype", // name
-    "v0.2.0"         // version
+    "v0.1.0"         // version
 };
 
 // -------------------- Menu System ----------------
