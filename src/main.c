@@ -11,8 +11,8 @@
  *                                                                                                           v0.1.0 - Code assembled in spare time by Fabio
  */
 
-// main.c - Template minimo con game loop + VBlank (compatibile con SDCC/GBDK)
-// Compila con gbdk-2020; evita C99 compound literals (non supportati da sdcc).
+ // main.c - Template minimo con game loop + VBlank (compatibile con SDCC/GBDK)
+ // Compila con gbdk-2020; evita C99 compound literals (non supportati da sdcc).
 
 #include <gb/gb.h>
 #include <gb/cgb.h>
@@ -24,33 +24,30 @@
 
 // -------------------- Palette --------------------
 static const palette_color_t PALETTE0[4] = {
-    RGB_WHITE, RGB_LIGHTGRAY, RGB_DARKGRAY, RGB_BLACK};
+    RGB_WHITE, RGB_LIGHTGRAY, RGB_DARKGRAY, RGB_BLACK };
 
 // -------------------- Game Mode -----------------
-typedef enum
-{
+typedef enum {
     MODE_RELEASE,
     MODE_DEBUG
 } GameMode;
 
 // -------------------- Language -----------------
-typedef enum
-{
+typedef enum {
     LANG_EN,
     LANG_IT
 } GameLanguage;
 
 // -------------------- Global Settings ------------
-typedef struct
-{
+typedef struct {
     uint8_t sound_on;      // 0 = off, 1 = on
     uint8_t difficulty;    // 0 = easy, 1 = normal, 2 = hard
     uint8_t lives;         // starting lives
     GameMode mode;         // release or debug mode
     GameLanguage language; // language
 
-    const char *game_name;
-    const char *version;
+    const char* game_name;
+    const char* version;
 } GameSettings;
 
 static GameSettings settings = {
@@ -60,42 +57,37 @@ static GameSettings settings = {
     MODE_RELEASE,
     LANG_IT,
     "GBC Prototype",
-    "v0.1.0"};
+    "v0.1.0" };
 
 // -------------------- Menu System ----------------
 typedef void (*MenuChangeFn)(int dir);
 
-typedef struct
-{
-    const char *label;
+typedef struct {
+    const char* label;
     MenuChangeFn change;
 } MenuItem;
 
 // Change functions
 static void toggle_sound(int dir) { settings.sound_on ^= 1; }
-static void cycle_difficulty(int dir)
-{
+static void cycle_difficulty(int dir) {
     if (dir > 0)
         settings.difficulty = (settings.difficulty + 1) % 3;
     else
         settings.difficulty = (settings.difficulty + 2) % 3;
 }
-static void cycle_lives(int dir)
-{
+static void cycle_lives(int dir) {
     if (dir > 0)
         settings.lives = (settings.lives % 9) + 1;
     else
         settings.lives = (settings.lives == 1 ? 9 : settings.lives - 1);
 }
-static void cycle_language(int dir)
-{
+static void cycle_language(int dir) {
     if (dir > 0)
         settings.language = (settings.language + 1) % 2;
     else
         settings.language = (settings.language == 0 ? 1 : settings.language - 1);
 }
-static void toggle_mode(int dir)
-{
+static void toggle_mode(int dir) {
     settings.mode = (settings.mode == MODE_RELEASE ? MODE_DEBUG : MODE_RELEASE);
 }
 
@@ -105,14 +97,13 @@ static MenuItem option_items[] = {
     {"DIFFICULTY", cycle_difficulty},
     {"LIVES", cycle_lives},
     {"MODE", toggle_mode},
-    {"LANGUAGE", cycle_language}};
+    {"LANGUAGE", cycle_language} };
 #define OPTION_COUNT (sizeof(option_items) / sizeof(MenuItem))
 
 // -------------------- Input State ----------------
 static uint8_t old_keys = 0; // Edge detection buffer
 
-static uint8_t get_pressed(void)
-{
+static uint8_t get_pressed(void) {
     uint8_t keys = joypad();
     uint8_t pressed = keys & ~old_keys;
     old_keys = keys;
@@ -120,16 +111,14 @@ static uint8_t get_pressed(void)
 }
 
 // -------------------- Utils ----------------------
-static void flush_input(void)
-{
+static void flush_input(void) {
     while (joypad())
         wait_vbl_done();
     old_keys = 0;
 }
 
 // -------------------- Splash ---------------------
-static void show_splash(const char *text, uint16_t duration_frames)
-{
+static void show_splash(const char* text, uint16_t duration_frames) {
     gotoxy((20 - strlen(text)) / 2, 9); // center horizontally
     printf(text);
     for (uint16_t f = 0; f < duration_frames; f++)
@@ -137,27 +126,23 @@ static void show_splash(const char *text, uint16_t duration_frames)
     cls();
 }
 
-static void splash_sequence(void)
-{
+static void splash_sequence(void) {
     show_splash("OPENAI GAMES", 120); // ~2s
     show_splash("PRESENTS", 120);     // ~2s
 }
 
 // -------------------- Options --------------------
-static void draw_option_line(uint8_t i, uint8_t cursor)
-{
+static void draw_option_line(uint8_t i, uint8_t cursor) {
     gotoxy(2, 6 + i * 2);
     printf(i == cursor ? ">" : " ");
     printf(" %s: ", option_items[i].label);
 
-    switch (i)
-    {
+    switch (i) {
     case 0:
         printf(settings.sound_on ? "ON " : "OFF");
         break;
     case 1:
-        switch (settings.difficulty)
-        {
+        switch (settings.difficulty) {
         case 0:
             printf("EASY   ");
             break;
@@ -181,8 +166,7 @@ static void draw_option_line(uint8_t i, uint8_t cursor)
     }
 }
 
-static void draw_options(uint8_t cursor)
-{
+static void draw_options(uint8_t cursor) {
     cls();
     gotoxy(6, 1);
     printf("OPTIONS");
@@ -190,8 +174,7 @@ static void draw_options(uint8_t cursor)
     gotoxy(2, 3);
     printf("%s %s", settings.game_name, settings.version);
 
-    for (uint8_t i = 0; i < OPTION_COUNT; i++)
-    {
+    for (uint8_t i = 0; i < OPTION_COUNT; i++) {
         draw_option_line(i, cursor);
     }
 
@@ -199,39 +182,33 @@ static void draw_options(uint8_t cursor)
     printf("PRESS B TO RETURN");
 }
 
-static void options_screen(void)
-{
+static void options_screen(void) {
     uint8_t cursor = 0;
     draw_options(cursor);
 
-    while (1)
-    {
+    while (1) {
         wait_vbl_done();
         uint8_t pressed = get_pressed();
 
         if (pressed & J_B)
             break;
-        if (pressed & J_UP && cursor > 0)
-        {
+        if (pressed & J_UP && cursor > 0) {
             uint8_t old_cursor = cursor;
             cursor--;
             draw_option_line(old_cursor, cursor);
             draw_option_line(cursor, cursor);
         }
-        if (pressed & J_DOWN && cursor < OPTION_COUNT - 1)
-        {
+        if (pressed & J_DOWN && cursor < OPTION_COUNT - 1) {
             uint8_t old_cursor = cursor;
             cursor++;
             draw_option_line(old_cursor, cursor);
             draw_option_line(cursor, cursor);
         }
-        if (pressed & J_LEFT)
-        {
+        if (pressed & J_LEFT) {
             option_items[cursor].change(-1);
             draw_option_line(cursor, cursor);
         }
-        if (pressed & J_RIGHT)
-        {
+        if (pressed & J_RIGHT) {
             option_items[cursor].change(1);
             draw_option_line(cursor, cursor);
         }
@@ -241,19 +218,16 @@ static void options_screen(void)
 }
 
 // -------------------- Title ----------------------
-static void title_screen(void)
-{
+static void title_screen(void) {
     uint8_t frame_counter = 0;
     uint8_t visible = 1;
 
     cls();
-    set_bkg_tiles(5, 6, strlen(settings.game_name), 1, (uint8_t *)settings.game_name);
-    set_bkg_tiles(7, 7, strlen(settings.version), 1, (uint8_t *)settings.version);
+    set_bkg_tiles(5, 6, strlen(settings.game_name), 1, (uint8_t*)settings.game_name);
+    set_bkg_tiles(7, 7, strlen(settings.version), 1, (uint8_t*)settings.version);
 
-    while (1)
-    {
-        if (++frame_counter >= 30)
-        {
+    while (1) {
+        if (++frame_counter >= 30) {
             frame_counter = 0;
             visible = !visible;
             gotoxy(4, 11);
@@ -274,17 +248,25 @@ static void title_screen(void)
 }
 
 // -------------------- Game Over ------------------
-static void game_over_screen(void)
-{
+static const char* game_over_msgs[] = {
+    "GAME OVER",
+    "FELL INTO A HOLE",
+    "DEFEATED BY ENEMY" };
+
+static void game_over_screen(uint8_t reason) {
     cls();
-    gotoxy(6, 8);
-    printf("GAME OVER");
+    gotoxy(2, 8);
+
+    // Safe: reason limitato al numero di messaggi disponibili
+    if (reason >= sizeof(game_over_msgs) / sizeof(char*)) {
+        reason = 0;
+    }
+    printf(game_over_msgs[reason]);
 
     uint16_t frame_counter = 0;
     uint8_t skippable = 0;
 
-    while (1)
-    {
+    while (1) {
         wait_vbl_done();
         frame_counter++;
         if (frame_counter >= 210)
@@ -296,9 +278,30 @@ static void game_over_screen(void)
     cls();
 }
 
+// -------------------- Gameplay -------------------
+static void gameplay_screen(void) {
+    cls();
+    gotoxy(4, 8);
+    printf("GAMEPLAY START");
+
+    // Dummy loop: attende START per "morire"
+    while (1) {
+        wait_vbl_done();
+        uint8_t pressed = get_pressed();
+        if (pressed & J_START) {
+            game_over_screen(1); // usa messaggio "FELL INTO A HOLE"
+            break;
+        }
+        if (pressed & J_SELECT) {
+            game_over_screen(2); // usa messaggio "DEFEATED BY ENEMY"
+            break;
+        }
+    }
+    flush_input();
+}
+
 // -------------------- Main -----------------------
-void main(void)
-{
+void main(void) {
     cgb_compatibility();
     DISPLAY_OFF;
 
@@ -311,11 +314,10 @@ void main(void)
 
     splash_sequence();
 
-    while (1)
-    {
+    while (1) {
         title_screen();
         // TODO: replace with real gameplay in the future
-        game_over_screen();
+        gameplay_screen();
     }
 }
 

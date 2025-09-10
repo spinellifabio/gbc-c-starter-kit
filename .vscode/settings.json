@@ -12,6 +12,8 @@
         "NDEBUG"
     ],
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.formatting": "vcFormat",
+    "C_Cpp.vcFormat.newLine.scopeBracesOnSeparateLines": false,
     "files.associations": {
         "gb.h": "c"
     }

@@ -10,7 +10,7 @@ Questa roadmap definisce i passi per completare il prototipo testuale su GameBoy
 - [x] Schermata titolo con START e SELECT → opzioni
 - [x] Menu opzioni dinamico con cursore, LEFT/RIGHT per cambiare valori
 - [x] Global settings consolidati: sound, difficulty, lives, mode, language, game_name, version
-- [ ] Verifica input flush per evitare tasti appiccicati
+- [x] Verifica input flush per evitare tasti appiccicati
 
 ## 2. Game Over
 
