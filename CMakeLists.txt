@@ -31,6 +31,7 @@ endif()
 # Flags
 set(LCC_FLAGS "${GBDK_CFLAGS}")
 list(APPEND LCC_FLAGS "-I${GBDK_INCLUDE_DIR}")
+list(APPEND LCC_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 # Build output
 add_custom_command(

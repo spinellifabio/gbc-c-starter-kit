@@ -1,10 +1,15 @@
 # GBC C Starter Kit
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/spinellifabio/gbc-c-starter-kit)
-![GitHub Issues](https://img.shields.io/github/issues/spinellifabio/gbc-c-starter-kit)
-![GitHub last commit](https://img.shields.io/github/last-commit/spinellifabio/gbc-c-starter-kit)
+![Last Commit](https://img.shields.io/github/last-commit/spinellifabio/gbc-c-starter-kit)
+![Issues](https://img.shields.io/github/issues/spinellifabio/gbc-c-starter-kit)
+
+<!-- Linguaggio -->
+![C](https://img.shields.io/badge/language-C-555.svg)
 ![Windows](https://img.shields.io/badge/OS-Windows-blue.svg)
 ![VS Code](https://img.shields.io/badge/Editor-VS%20Code-blue.svg)
+![coverage](https://img.shields.io/badge/coverage-15%25-red)
+![version](https://img.shields.io/badge/version-0.1.0-blue)
 
 A starter kit for developing **Game Boy Color** games in **C**, powered by **gbdk-2020**, **CMake**, and **Ninja**.
 Provides a clean project structure and build setup to jumpstart your homebrew development.
