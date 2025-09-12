@@ -4,7 +4,7 @@ project(gbc-c-starter-kit VERSION 1.0 LANGUAGES NONE)
 # Output ROM directory
 set(ROM_DIR "${CMAKE_CURRENT_SOURCE_DIR}/rom")
 file(MAKE_DIRECTORY "${ROM_DIR}")
-set(ROM_NAME "${PROJECT_NAME}.gb")
+set(ROM_NAME "${PROJECT_NAME}.gbc")
 set(ROM_PATH "${ROM_DIR}/${ROM_NAME}")
 
 # Source files

@@ -1,0 +1,53 @@
+flowchart TD
+  %% Classes to distinguish IMPLEMENTED vs PLANNED screens
+  classDef Impl fill:#C6F6D5,stroke:#2F855A,stroke-width:1px,color:#1A202C;
+  classDef Planned fill:#FED7D7,stroke:#C53030,stroke-width:1px,color:#1A202C;
+  classDef Note fill:#EDF2F7,stroke:#718096,stroke-dasharray: 2 2,color:#1A202C;
+
+  %% IMPLEMENTED SCREENS (from current main.c)
+  SPL["Splash Screens"]:::Impl
+  INTRO["Intro Cutscene (text + typewriter)"]:::Impl
+  TITLE["Title Screen"]:::Impl
+  OPTIONS["Options Menu (multilingual, live switch)"]:::Impl
+  GAMEPLAY["Gameplay Screen (test loop)"]:::Impl
+  GAMEOVER["Game Over Screen (delay, skippable)"]:::Impl
+
+  %% PLANNED SCREENS / ENHANCEMENTS (from roadmap)
+  SLOT["Save Slots (3) / Continue"]:::Planned
+  ADV_INTRO["Animated Intro / Cutscene"]:::Planned
+  ADV_TITLE["Advanced Title (logo, polish)"]:::Planned
+  CREDITS["Credits Screen"]:::Planned
+
+  %% FLOW (implemented path is solid; planned enhancements dashed)
+  SPL --> INTRO
+  INTRO --> TITLE
+
+  %% Title transitions
+  TITLE -- "SELECT → Options" --> OPTIONS
+  OPTIONS -- "B → Back" --> TITLE
+
+  %% Implemented START behavior
+  TITLE -- "START → Play (current)" --> GAMEPLAY
+
+  %% Planned START behavior (slot select / continue)
+  TITLE -. "START → Slot Select (future)" .-> SLOT
+  SLOT -. "Continue (valid slot)" .-> GAMEPLAY
+  SLOT -. "New Game / Overwrite" .-> GAMEPLAY
+  SLOT -. "Erase Slot" .-> SLOT
+
+  %% Gameplay outcomes
+  GAMEPLAY -- "START → Reason #1" --> GAMEOVER
+  GAMEPLAY -- "SELECT → Reason #2" --> GAMEOVER
+  GAMEOVER -- "After delay + any key" --> TITLE
+
+  %% Planned branches
+  INTRO -. "Upgrade path" .-> ADV_INTRO
+  TITLE -. "Polish pass" .-> ADV_TITLE
+  GAMEPLAY -. "Completion" .-> CREDITS
+  CREDITS -. "Back to title" .-> TITLE
+
+  %% Legend
+  subgraph LEGEND["Legend"]
+    L1["Implemented"]:::Impl
+    L2["Planned"]:::Planned
+  end

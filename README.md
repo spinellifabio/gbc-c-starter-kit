@@ -164,6 +164,12 @@ gbc-c-starter-kit/
 This structure keeps source code, headers, and assets separated for clarity.
 The `build/`, `CMakeFiles/`, and `rom/` directories are ignored by version control and only contain generated files.
 
+### Screens Flow
+
+The following diagram shows the screen flow for the GBC prototype. Nodes styled in green are **implemented**; nodes in red are **planned** in the roadmap.
+
+![Screens Flow](docs/screens-flow.png)
+
 ## Goal
 
 The goal of this starter kit is to provide a **solid foundation for Game Boy Color homebrew development**.
@@ -176,6 +182,8 @@ It is designed for developers who want to:
 - Have a clean and organized project structure that can scale for larger projects
 
 This template is meant to reduce setup time, allowing developers to focus on **creating games** rather than configuring the build environment.
+
+See the **[Roadmap](docs/roadmap.md)** for planned features and updates.
 
 ## Keywords
 
