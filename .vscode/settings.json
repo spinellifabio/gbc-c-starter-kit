@@ -6,7 +6,9 @@
     "C_Cpp.default.includePath": [
         "C:/gbdk/include",
         "C:/gbdk/include/gb",
-        "${workspaceFolder}/src"
+        "${workspaceFolder}/src",
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/res"
     ],
     "C_Cpp.default.defines": [
         "NDEBUG"

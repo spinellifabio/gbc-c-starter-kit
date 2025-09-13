@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "lang.h"
+#include "gameplay.h"
 
 /* -------------------- Palette -------------------- */
 static const palette_color_t PALETTE0[4] = {
@@ -320,41 +321,6 @@ static void title_screen(void) {
     }
     flush_input();
     cls();
-}
-
-/* -------------------- Game Over ------------------ */
-static void game_over_screen(uint8_t reason) {
-    cls();
-    gotoxy(2, 8);
-    LangStringId msg_id = STR_GAMEOVER_TITLE;
-    if (reason == 1u)      msg_id = STR_GAMEOVER_REASON_HOLE;
-    else if (reason == 2u) msg_id = STR_GAMEOVER_REASON_ENEMY;
-    printf("%s", lang_str(msg_id));
-
-    uint16_t frame_counter = 0;
-    uint8_t  skippable = 0;
-    while (1) {
-        wait_vbl_done();
-        frame_counter++;
-        if (frame_counter >= 210u) skippable = 1;
-        if (skippable && joypad()) break;
-    }
-    flush_input();
-    cls();
-}
-
-/* -------------------- Gameplay ------------------- */
-static void gameplay_screen(void) {
-    cls();
-    gotoxy(4, 8);
-    printf("%s", lang_str(STR_GAMEPLAY_START));
-    while (1) {
-        wait_vbl_done();
-        uint8_t pressed = get_pressed();
-        if (pressed & J_START) { game_over_screen(1); break; }
-        if (pressed & J_SELECT) { game_over_screen(2); break; }
-    }
-    flush_input();
 }
 
 /* -------------------- Main ----------------------- */

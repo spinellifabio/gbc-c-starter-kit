@@ -146,12 +146,15 @@ gbc-c-starter-kit/
 │   │── settings.json           # User settings
 │   └── tasks.json              # CMake tasks
 │── assets/                     # Graphics, tiles, maps
+│   └── sprites                 # Sprite graphics
 │── build/                      # Output directory (generated after compilation)
 │── cmake/                      # CMake scripts
 │   └── gbdk-toolchain.cmake    # Toolchain configuration
 │── docs/                       # Project documentation
 │── include/                    # Header files
+│   └── sprites.h               # Sprite graphics
 │── res/                        # Resource files
+│   └── sprites/                # Sprite graphics
 │── rom/                        # Compiled ROMs
 │── src/                        # C source code
 │   └── main.c                  # Minimal working example
@@ -191,12 +194,14 @@ gameboy-color, gbc, gbdk-2020, cmake, ninja, c-programming, starter-kit, templat
 
 ## Resources / Documentation
 
+- [Game Boy History](https://laroldsretrogameyard.com/articles/long-live-the-nintendo-game-boy/) – A detailed history of the Game Boy
 - [GBDK-2020 Official Documentation](https://gbdk-2020.github.io/gbdk-2020/) – Reference for Game Boy / Game Boy Color development in C
 - [Game Boy Development Wiki](https://gbdev.io/) – Guides and technical details about the hardware
 - [Ninja Build System](https://ninja-build.org/) – Documentation for the build tool
 - [CMake Documentation](https://cmake.org/cmake/help/latest/) – Full reference for CMake commands and usage
 - [bgbw64 Emulator](https://bgb.bircd.org/) – Official emulator for testing Game Boy / Game Boy Color ROMs
 - [Free Game Boy / Game Boy Color Assets](https://itch.io/game-assets/free/tag-gameboy/tag-pixel-art/tag-retro) – Free game assets for Game Boy / Game Boy Color homebrew development
+- [PNG to GB Asset Converter](https://laroldsretrogameyard.com/tutorials/gb/png2asset-graphics-creation-for-gbdk-2020/)
 
 ## Credits
 
