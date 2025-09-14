@@ -8,22 +8,22 @@
 
 #define Alex_run_16x16_TILE_ORIGIN 0
 #define Alex_run_16x16_TILE_W 8
-#define Alex_run_16x16_TILE_H 8
-#define Alex_run_16x16_WIDTH 384
-#define Alex_run_16x16_HEIGHT 32
-#define Alex_run_16x16_TILE_COUNT 36
-#define Alex_run_16x16_PALETTE_COUNT 1
+#define Alex_run_16x16_TILE_H 16
+#define Alex_run_16x16_WIDTH 16
+#define Alex_run_16x16_HEIGHT 16
+#define Alex_run_16x16_TILE_COUNT 80
+#define Alex_run_16x16_PALETTE_COUNT 2
 #define Alex_run_16x16_COLORS_PER_PALETTE 4
-#define Alex_run_16x16_TOTAL_COLORS 4
-#define Alex_run_16x16_PIVOT_X 192
-#define Alex_run_16x16_PIVOT_Y 16
-#define Alex_run_16x16_PIVOT_W 384
-#define Alex_run_16x16_PIVOT_H 32
-extern const metasprite_t* const Alex_run_16x16_metasprites[1];
+#define Alex_run_16x16_TOTAL_COLORS 8
+#define Alex_run_16x16_PIVOT_X 8
+#define Alex_run_16x16_PIVOT_Y 8
+#define Alex_run_16x16_PIVOT_W 16
+#define Alex_run_16x16_PIVOT_H 16
+extern const metasprite_t* const Alex_run_16x16_metasprites[48];
 
 BANKREF_EXTERN(Alex_run_16x16)
 
-extern const palette_color_t Alex_run_16x16_palettes[4];
-extern const uint8_t Alex_run_16x16_tiles[576];
+extern const palette_color_t Alex_run_16x16_palettes[8];
+extern const uint8_t Alex_run_16x16_tiles[1280];
 
 #endif

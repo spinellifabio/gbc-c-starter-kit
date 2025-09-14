@@ -8,22 +8,22 @@
 
 #define Alex_idle_16x16_TILE_ORIGIN 0
 #define Alex_idle_16x16_TILE_W 8
-#define Alex_idle_16x16_TILE_H 8
-#define Alex_idle_16x16_WIDTH 64
+#define Alex_idle_16x16_TILE_H 16
+#define Alex_idle_16x16_WIDTH 16
 #define Alex_idle_16x16_HEIGHT 32
-#define Alex_idle_16x16_TILE_COUNT 12
+#define Alex_idle_16x16_TILE_COUNT 20
 #define Alex_idle_16x16_PALETTE_COUNT 1
 #define Alex_idle_16x16_COLORS_PER_PALETTE 4
 #define Alex_idle_16x16_TOTAL_COLORS 4
-#define Alex_idle_16x16_PIVOT_X 32
+#define Alex_idle_16x16_PIVOT_X 8
 #define Alex_idle_16x16_PIVOT_Y 16
-#define Alex_idle_16x16_PIVOT_W 64
+#define Alex_idle_16x16_PIVOT_W 16
 #define Alex_idle_16x16_PIVOT_H 32
-extern const metasprite_t* const Alex_idle_16x16_metasprites[1];
+extern const metasprite_t* const Alex_idle_16x16_metasprites[4];
 
 BANKREF_EXTERN(Alex_idle_16x16)
 
 extern const palette_color_t Alex_idle_16x16_palettes[4];
-extern const uint8_t Alex_idle_16x16_tiles[192];
+extern const uint8_t Alex_idle_16x16_tiles[320];
 
 #endif

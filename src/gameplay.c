@@ -10,59 +10,41 @@
 #include "gameplay.h"
 #include "sprites.h"
 
-// === Player state ===
-static uint8_t px = 80;       // start X
-static uint8_t py = 72;       // start Y
-static uint8_t facing = 0;    // 0=down,1=left,2=right,3=up
-static uint8_t animframe = 0; // cycles run animation
+#define FRAME_RIGHT 0
+#define FRAME_BACK  1
+#define FRAME_LEFT  2
+#define FRAME_FRONT 3
 
-// === Gameplay loop ===
+// === Gameplay screen (solo sprite frontale, centrata) ===
 void gameplay_screen(void) {
-    cls();
+    uint8_t frame_index = FRAME_FRONT;
 
-    // Carica tiles in VRAM
+    // Carica tileset dello sprite a partire dall'indice 0
     set_sprite_data(0, Alex_idle_16x16_TILE_COUNT, Alex_idle_16x16_tiles);
-    set_sprite_data(Alex_idle_16x16_TILE_COUNT,
-        Alex_run_16x16_TILE_COUNT,
-        Alex_run_16x16_tiles);
 
-    SHOW_SPRITES;
-    SPRITES_8x8;
+    // Mostra lo sprite "davanti" (di solito è l'ultimo frame, ma dipende dall'ordine nel PNG)
+    // Supponiamo sia l'indice 3
+    uint8_t metasprite_index = 3;
 
     while (1) {
-        wait_vbl_done();
         uint8_t pressed = joypad();
 
-        int8_t dx = 0, dy = 0;
+        if (pressed & J_DOWN)  frame_index = FRAME_FRONT;
+        if (pressed & J_UP)    frame_index = FRAME_BACK;
+        if (pressed & J_LEFT)  frame_index = FRAME_LEFT;
+        if (pressed & J_RIGHT) frame_index = FRAME_RIGHT;
 
-        // Movimento + direzione
-        if (pressed & J_LEFT) { dx = -1; facing = 1; }
-        if (pressed & J_RIGHT) { dx = +1; facing = 2; }
-        if (pressed & J_UP) { dy = -1; facing = 3; }
-        if (pressed & J_DOWN) { dy = +1; facing = 0; }
 
-        px += dx;
-        py += dy;
+        // Centra il personaggio
+        move_metasprite(
+            Alex_idle_16x16_metasprites[frame_index],
+            0,  // tile base index
+            0,  // OAM base index
+            80, // centro X
+            72  // centro Y
+        );
 
-        // Animazione
-        if (dx || dy) {
-            animframe++;
-            if (animframe >= 16) animframe = 0;
-            uint8_t frame = (animframe >> 3); // 0 o 1
-
-            // Usa direttamente l’array generato
-            move_metasprite(
-                Alex_run_16x16_metasprites[facing * 2 + frame],
-                Alex_idle_16x16_TILE_COUNT, // run tiles dopo idle
-                0, px, py
-            );
-        } else {
-            move_metasprite(
-                Alex_idle_16x16_metasprites[0], // un solo frame idle
-                0, // idle usa i primi tile
-                0, px, py
-            );
-        }
+        wait_vbl_done(); // sincronizza al VBlank (60 FPS)
 
         // Exit conditions
         if (pressed & J_START) { game_over_screen(1); break; }

@@ -326,6 +326,9 @@ static void title_screen(void) {
 /* -------------------- Main ----------------------- */
 void main(void) {
     cgb_compatibility();
+
+    SPRITES_8x16;
+    SHOW_SPRITES;
     DISPLAY_OFF;
 
     SHOW_BKG;

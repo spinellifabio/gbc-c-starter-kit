@@ -63,7 +63,7 @@ foreach(png ${SPRITE_PNGS})
     add_custom_command(
         OUTPUT "${out_c}" "${out_h}"
         COMMAND "${PNG2ASSET}" "${png}"
-            -spr8x8 -bpp 2
+            -spr8x16 -bpp 2
             -out "${out_base}"
         DEPENDS "${png}"
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
