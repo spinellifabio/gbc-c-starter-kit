@@ -10,48 +10,91 @@
 #include "gameplay.h"
 #include "sprites.h"
 
-#define FRAME_RIGHT 0
-#define FRAME_BACK  1
-#define FRAME_LEFT  2
-#define FRAME_FRONT 3
+#define DIR_RIGHT 0
+#define DIR_BACK  1
+#define DIR_LEFT  2
+#define DIR_FRONT 3
 
-// === Gameplay screen (solo sprite frontale, centrata) ===
+#define SCREEN_CENTER_X 80
+#define SCREEN_CENTER_Y 72
+
+#define RUN_FRAMES_PER_DIR 6
+
 void gameplay_screen(void) {
-    uint8_t frame_index = FRAME_FRONT;
+    uint16_t world_x = 80, world_y = 72;
+    uint8_t dir = DIR_FRONT;
+    uint8_t run_frame = 0;
+    uint8_t anim_tick = 0;
 
-    // Carica tileset dello sprite a partire dall'indice 0
+    // Carica tiles di Idle e Run consecutivi in VRAM
     set_sprite_data(0, Alex_idle_16x16_TILE_COUNT, Alex_idle_16x16_tiles);
+    set_sprite_data(Alex_idle_16x16_TILE_COUNT,
+        Alex_run_16x16_TILE_COUNT, Alex_run_16x16_tiles);
 
-    // Mostra lo sprite "davanti" (di solito è l'ultimo frame, ma dipende dall'ordine nel PNG)
-    // Supponiamo sia l'indice 3
-    uint8_t metasprite_index = 3;
+    SHOW_SPRITES;
+    DISPLAY_ON;
 
     while (1) {
-        uint8_t pressed = joypad();
+        uint8_t keys = joypad();
+        uint8_t is_moving = 0;
 
-        if (pressed & J_DOWN)  frame_index = FRAME_FRONT;
-        if (pressed & J_UP)    frame_index = FRAME_BACK;
-        if (pressed & J_LEFT)  frame_index = FRAME_LEFT;
-        if (pressed & J_RIGHT) frame_index = FRAME_RIGHT;
+        if (keys & J_UP) {
+            keys &= ~(J_LEFT | J_RIGHT);
+        } else if (keys & J_DOWN) {
+            keys &= ~(J_LEFT | J_RIGHT);
+        }
 
+        if (keys == J_DOWN) {
+            dir = DIR_FRONT;
+            world_y++;
+            is_moving = 1;
+        } else if (keys == J_UP) {
+            dir = DIR_BACK;
+            world_y--;
+            is_moving = 1;
+        } else if (keys == J_LEFT) {
+            dir = DIR_LEFT;
+            world_x--;
+            is_moving = 1;
+        } else if (keys == J_RIGHT) {
+            dir = DIR_RIGHT;
+            world_x++;
+            is_moving = 1;
+        }
 
-        // Centra il personaggio
-        move_metasprite(
-            Alex_idle_16x16_metasprites[frame_index],
-            0,  // tile base index
-            0,  // OAM base index
-            80, // centro X
-            72  // centro Y
-        );
+        if (is_moving) {
+            anim_tick++;
+            if (anim_tick >= 8) {
+                anim_tick = 0;
+                run_frame++;
+                if (run_frame >= RUN_FRAMES_PER_DIR) run_frame = 0;
+            }
 
-        wait_vbl_done(); // sincronizza al VBlank (60 FPS)
+            uint8_t sprite_index = dir * RUN_FRAMES_PER_DIR + run_frame;
+            move_metasprite(
+                Alex_run_16x16_metasprites[sprite_index],
+                0, 0,
+                SCREEN_CENTER_X, SCREEN_CENTER_Y
+            );
+        } else {
+            move_metasprite(
+                Alex_idle_16x16_metasprites[dir],
+                0, 0,
+                SCREEN_CENTER_X, SCREEN_CENTER_Y
+            );
 
-        // Exit conditions
-        if (pressed & J_START) { game_over_screen(1); break; }
-        if (pressed & J_SELECT) { game_over_screen(2); break; }
+            run_frame = 0;
+            anim_tick = 0;
+        }
+
+        SCX_REG = (uint8_t)(world_x - SCREEN_CENTER_X);
+        SCY_REG = (uint8_t)(world_y - SCREEN_CENTER_Y);
+
+        wait_vbl_done();
+
+        if (keys & J_START) { game_over_screen(1); break; }
+        if (keys & J_SELECT) { game_over_screen(2); break; }
     }
-
-    // flush_input(); // TODO: Restore.
 }
 
 void game_over_screen(uint8_t reason) {

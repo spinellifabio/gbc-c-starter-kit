@@ -327,8 +327,6 @@ static void title_screen(void) {
 void main(void) {
     cgb_compatibility();
 
-    SPRITES_8x16;
-    SHOW_SPRITES;
     DISPLAY_OFF;
 
     SHOW_BKG;
@@ -336,6 +334,10 @@ void main(void) {
     font_set(font_load(font_ibm));
     set_bkg_palette(0, 1, PALETTE0);
     set_sprite_palette(0, 1, PALETTE0);
+
+    SPRITES_8x16;
+    SHOW_SPRITES;
+    SHOW_BKG;
     DISPLAY_ON;
 
     lang_init(settings.language);
