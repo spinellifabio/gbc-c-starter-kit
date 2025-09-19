@@ -26,6 +26,9 @@ void gameplay_screen(void) {
     uint8_t run_frame = 0;
     uint8_t anim_tick = 0;
 
+    // Track OAM index for current metasprite
+    uint8_t oam_idx = 0;
+
     // Carica tiles di Idle e Run consecutivi in VRAM
     set_sprite_data(0, Alex_idle_16x16_TILE_COUNT, Alex_idle_16x16_tiles);
     set_sprite_data(Alex_idle_16x16_TILE_COUNT,
@@ -71,13 +74,16 @@ void gameplay_screen(void) {
             }
 
             uint8_t sprite_index = dir * RUN_FRAMES_PER_DIR + run_frame;
-            move_metasprite(
+            printf("%d\n", sprite_index);
+
+            oam_idx = move_metasprite(
                 Alex_run_16x16_metasprites[sprite_index],
                 0, 0,
                 SCREEN_CENTER_X, SCREEN_CENTER_Y
             );
         } else {
-            move_metasprite(
+            // Then draw idle frame
+            oam_idx = move_metasprite(
                 Alex_idle_16x16_metasprites[dir],
                 0, 0,
                 SCREEN_CENTER_X, SCREEN_CENTER_Y
@@ -87,8 +93,8 @@ void gameplay_screen(void) {
             anim_tick = 0;
         }
 
-        SCX_REG = (uint8_t)(world_x - SCREEN_CENTER_X);
-        SCY_REG = (uint8_t)(world_y - SCREEN_CENTER_Y);
+        // SCX_REG = (uint8_t)(world_x - SCREEN_CENTER_X);
+        // SCY_REG = (uint8_t)(world_y - SCREEN_CENTER_Y);
 
         wait_vbl_done();
 
