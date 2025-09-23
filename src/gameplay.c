@@ -27,6 +27,41 @@
 // Speed
 #define MOVE_SPEED 2 // px/frame
 
+// Map dimensions in tiles
+#define MAP_WIDTH  32
+#define MAP_HEIGHT 32
+#define TILE_SIZE   8
+
+// Simple collision map: 0 = walkable, 1 = solid
+uint8_t map[MAP_WIDTH * MAP_HEIGHT] = { 0 };
+
+void init_map(void) {
+    // Fill border with 1 (solid wall)
+    uint8_t x, y;
+
+    for (x = 0; x < MAP_WIDTH; x++) {
+        map[x] = 1;                                 // top row
+        map[(MAP_HEIGHT - 1) * MAP_WIDTH + x] = 1;  // bottom row
+    }
+
+    for (y = 0; y < MAP_HEIGHT; y++) {
+        map[y * MAP_WIDTH] = 1;                     // left column
+        map[y * MAP_WIDTH + (MAP_WIDTH - 1)] = 1;   // right column
+    }
+}
+
+// Check if position (in pixels) is inside walkable area
+static uint8_t can_walk(uint16_t x, uint16_t y) {
+    // Player feet: align to bottom center
+    uint16_t px = x / TILE_SIZE;
+    uint16_t py = y / TILE_SIZE;
+
+    if (px >= MAP_WIDTH || py >= MAP_HEIGHT) return 0; // out of map
+
+    uint8_t tile = map[py * MAP_WIDTH + px];
+    return (tile == 0); // 0 = walkable
+}
+
 void gameplay_screen(void) {
     uint16_t world_x = SCREEN_CENTER_X;
     uint16_t world_y = SCREEN_CENTER_Y;
@@ -39,29 +74,41 @@ void gameplay_screen(void) {
     set_sprite_data(0, Alex_idle_16x16_TILE_COUNT, Alex_idle_16x16_tiles);
     set_sprite_data(Alex_idle_16x16_TILE_COUNT, Alex_run_16x16_TILE_COUNT, Alex_run_16x16_tiles);
 
+    init_map();
+
     while (1) {
         uint8_t keys = joypad();
         uint8_t is_moving = 0;
+        int16_t next_x = world_x;
+        int16_t next_y = world_y;
 
         if (keys & J_UP)   keys &= ~(J_LEFT | J_RIGHT);
         if (keys & J_DOWN) keys &= ~(J_LEFT | J_RIGHT);
 
         if (keys == J_DOWN) {
             dir = DIR_FRONT;
-            world_y += MOVE_SPEED;
+            next_y += MOVE_SPEED;
             is_moving = 1;
         } else if (keys == J_UP) {
             dir = DIR_BACK;
-            world_y -= MOVE_SPEED;
+            next_y -= MOVE_SPEED;
             is_moving = 1;
         } else if (keys == J_LEFT) {
             dir = DIR_LEFT;
-            world_x -= MOVE_SPEED;
+            next_x -= MOVE_SPEED;
             is_moving = 1;
         } else if (keys == J_RIGHT) {
             dir = DIR_RIGHT;
-            world_x += MOVE_SPEED;
+            next_x += MOVE_SPEED;
             is_moving = 1;
+        }
+
+        // Collision check: only update if walkable
+        if (is_moving && can_walk(next_x, next_y + PLAYER_OFFSET_Y)) {
+            world_x = next_x;
+            world_y = next_y;
+        } else {
+            is_moving = 0;
         }
 
         if (is_moving) {
@@ -95,6 +142,7 @@ void gameplay_screen(void) {
             anim_tick = 0;
         }
 
+        // Camera scroll
         SCX_REG = (uint8_t)(world_x - SCREEN_CENTER_X);
         SCY_REG = (uint8_t)(world_y - SCREEN_CENTER_Y);
 
