@@ -16,7 +16,7 @@
 #define Alex_idle_16x16_COLORS_PER_PALETTE 4
 #define Alex_idle_16x16_TOTAL_COLORS 4
 #define Alex_idle_16x16_PIVOT_X 8
-#define Alex_idle_16x16_PIVOT_Y 16
+#define Alex_idle_16x16_PIVOT_Y 32
 #define Alex_idle_16x16_PIVOT_W 16
 #define Alex_idle_16x16_PIVOT_H 32
 extern const metasprite_t* const Alex_idle_16x16_metasprites[4];

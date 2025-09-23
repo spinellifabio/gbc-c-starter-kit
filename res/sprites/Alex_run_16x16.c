@@ -377,7 +377,7 @@ const uint8_t Alex_run_16x16_tiles[1280] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite0[] = {
-	METASPR_ITEM(-16, -8, 0, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 0, S_PAL(0)),
 	METASPR_ITEM(0, 8, 2, S_PAL(0)),
 	METASPR_ITEM(16, -8, 4, S_PAL(0)),
 	METASPR_ITEM(0, 8, 6, S_PAL(0)),
@@ -385,7 +385,7 @@ const metasprite_t Alex_run_16x16_metasprite0[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite1[] = {
-	METASPR_ITEM(-16, -8, 8, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 8, S_PAL(0)),
 	METASPR_ITEM(0, 8, 10, S_PAL(0)),
 	METASPR_ITEM(16, -8, 12, S_PAL(0)),
 	METASPR_ITEM(0, 8, 14, S_PAL(0)),
@@ -393,7 +393,7 @@ const metasprite_t Alex_run_16x16_metasprite1[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite2[] = {
-	METASPR_ITEM(-16, -8, 0, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 0, S_PAL(0)),
 	METASPR_ITEM(0, 8, 2, S_PAL(0)),
 	METASPR_ITEM(16, -8, 16, S_PAL(0)),
 	METASPR_ITEM(0, 8, 18, S_PAL(0)),
@@ -401,7 +401,7 @@ const metasprite_t Alex_run_16x16_metasprite2[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite3[] = {
-	METASPR_ITEM(-16, -8, 0, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 0, S_PAL(0)),
 	METASPR_ITEM(0, 8, 2, S_PAL(0)),
 	METASPR_ITEM(16, -8, 20, S_PAL(0)),
 	METASPR_ITEM(0, 8, 22, S_PAL(0)),
@@ -409,7 +409,7 @@ const metasprite_t Alex_run_16x16_metasprite3[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite4[] = {
-	METASPR_ITEM(-16, -8, 8, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 8, S_PAL(0)),
 	METASPR_ITEM(0, 8, 10, S_PAL(0)),
 	METASPR_ITEM(16, -8, 24, S_PAL(0)),
 	METASPR_ITEM(0, 8, 26, S_PAL(0)),
@@ -417,7 +417,7 @@ const metasprite_t Alex_run_16x16_metasprite4[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite5[] = {
-	METASPR_ITEM(-16, -8, 0, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 0, S_PAL(0)),
 	METASPR_ITEM(0, 8, 2, S_PAL(0)),
 	METASPR_ITEM(16, -8, 16, S_PAL(0)),
 	METASPR_ITEM(0, 8, 18, S_PAL(0)),
@@ -425,7 +425,7 @@ const metasprite_t Alex_run_16x16_metasprite5[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite6[] = {
-	METASPR_ITEM(-16, -8, 28, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 28, S_PAL(0)),
 	METASPR_ITEM(0, 8, 30, S_PAL(0)),
 	METASPR_ITEM(16, -8, 32, S_PAL(0)),
 	METASPR_ITEM(0, 8, 34, S_PAL(1)),
@@ -433,7 +433,7 @@ const metasprite_t Alex_run_16x16_metasprite6[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite7[] = {
-	METASPR_ITEM(-16, -8, 36, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 36, S_PAL(0)),
 	METASPR_ITEM(0, 8, 38, S_PAL(0)),
 	METASPR_ITEM(16, -8, 40, S_PAL(0)),
 	METASPR_ITEM(0, 8, 42, S_PAL(0)),
@@ -441,7 +441,7 @@ const metasprite_t Alex_run_16x16_metasprite7[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite8[] = {
-	METASPR_ITEM(-16, -8, 28, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 28, S_PAL(0)),
 	METASPR_ITEM(0, 8, 30, S_PAL(0)),
 	METASPR_ITEM(16, -8, 44, S_PAL(0)),
 	METASPR_ITEM(0, 8, 34, S_PAL(1)),
@@ -449,7 +449,7 @@ const metasprite_t Alex_run_16x16_metasprite8[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite9[] = {
-	METASPR_ITEM(-16, -8, 28, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 28, S_PAL(0)),
 	METASPR_ITEM(0, 8, 30, S_PAL(0)),
 	METASPR_ITEM(16, -8, 46, S_PAL(1)),
 	METASPR_ITEM(0, 8, 48, S_PAL(0)),
@@ -457,7 +457,7 @@ const metasprite_t Alex_run_16x16_metasprite9[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite10[] = {
-	METASPR_ITEM(-16, -8, 36, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 36, S_PAL(0)),
 	METASPR_ITEM(0, 8, 38, S_PAL(0)),
 	METASPR_ITEM(16, -8, 50, S_PAL(0)),
 	METASPR_ITEM(0, 8, 52, S_PAL(0)),
@@ -465,7 +465,7 @@ const metasprite_t Alex_run_16x16_metasprite10[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite11[] = {
-	METASPR_ITEM(-16, -8, 28, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 28, S_PAL(0)),
 	METASPR_ITEM(0, 8, 30, S_PAL(0)),
 	METASPR_ITEM(16, -8, 46, S_PAL(1)),
 	METASPR_ITEM(0, 8, 54, S_PAL(0)),
@@ -473,7 +473,7 @@ const metasprite_t Alex_run_16x16_metasprite11[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite12[] = {
-	METASPR_ITEM(-16, -8, 2, S_PAL(0) | S_FLIPX),
+	METASPR_ITEM(-32, -8, 2, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 0, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(16, -8, 6, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 4, S_PAL(0) | S_FLIPX),
@@ -481,7 +481,7 @@ const metasprite_t Alex_run_16x16_metasprite12[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite13[] = {
-	METASPR_ITEM(-16, -8, 10, S_PAL(0) | S_FLIPX),
+	METASPR_ITEM(-32, -8, 10, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 8, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(16, -8, 14, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 12, S_PAL(0) | S_FLIPX),
@@ -489,7 +489,7 @@ const metasprite_t Alex_run_16x16_metasprite13[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite14[] = {
-	METASPR_ITEM(-16, -8, 2, S_PAL(0) | S_FLIPX),
+	METASPR_ITEM(-32, -8, 2, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 0, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(16, -8, 18, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 16, S_PAL(0) | S_FLIPX),
@@ -497,7 +497,7 @@ const metasprite_t Alex_run_16x16_metasprite14[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite15[] = {
-	METASPR_ITEM(-16, -8, 2, S_PAL(0) | S_FLIPX),
+	METASPR_ITEM(-32, -8, 2, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 0, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(16, -8, 22, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 20, S_PAL(0) | S_FLIPX),
@@ -505,7 +505,7 @@ const metasprite_t Alex_run_16x16_metasprite15[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite16[] = {
-	METASPR_ITEM(-16, -8, 10, S_PAL(0) | S_FLIPX),
+	METASPR_ITEM(-32, -8, 10, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 8, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(16, -8, 26, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 24, S_PAL(0) | S_FLIPX),
@@ -513,7 +513,7 @@ const metasprite_t Alex_run_16x16_metasprite16[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite17[] = {
-	METASPR_ITEM(-16, -8, 2, S_PAL(0) | S_FLIPX),
+	METASPR_ITEM(-32, -8, 2, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 0, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(16, -8, 18, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 16, S_PAL(0) | S_FLIPX),
@@ -521,7 +521,7 @@ const metasprite_t Alex_run_16x16_metasprite17[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite18[] = {
-	METASPR_ITEM(-16, -8, 36, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 36, S_PAL(0)),
 	METASPR_ITEM(0, 8, 38, S_PAL(0)),
 	METASPR_ITEM(16, -8, 56, S_PAL(0)),
 	METASPR_ITEM(0, 8, 58, S_PAL(0)),
@@ -529,7 +529,7 @@ const metasprite_t Alex_run_16x16_metasprite18[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite19[] = {
-	METASPR_ITEM(-16, -8, 28, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 28, S_PAL(0)),
 	METASPR_ITEM(0, 8, 30, S_PAL(0)),
 	METASPR_ITEM(16, -8, 60, S_PAL(0)),
 	METASPR_ITEM(0, 8, 62, S_PAL(0)),
@@ -537,7 +537,7 @@ const metasprite_t Alex_run_16x16_metasprite19[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite20[] = {
-	METASPR_ITEM(-16, -8, 36, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 36, S_PAL(0)),
 	METASPR_ITEM(0, 8, 38, S_PAL(0)),
 	METASPR_ITEM(16, -8, 64, S_PAL(0)),
 	METASPR_ITEM(0, 8, 66, S_PAL(0)),
@@ -545,7 +545,7 @@ const metasprite_t Alex_run_16x16_metasprite20[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite21[] = {
-	METASPR_ITEM(-16, -8, 36, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 36, S_PAL(0)),
 	METASPR_ITEM(0, 8, 38, S_PAL(0)),
 	METASPR_ITEM(16, -8, 68, S_PAL(0)),
 	METASPR_ITEM(0, 8, 70, S_PAL(0)),
@@ -553,7 +553,7 @@ const metasprite_t Alex_run_16x16_metasprite21[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite22[] = {
-	METASPR_ITEM(-16, -8, 28, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 28, S_PAL(0)),
 	METASPR_ITEM(0, 8, 30, S_PAL(0)),
 	METASPR_ITEM(16, -8, 72, S_PAL(0)),
 	METASPR_ITEM(0, 8, 74, S_PAL(0)),
@@ -561,7 +561,7 @@ const metasprite_t Alex_run_16x16_metasprite22[] = {
 };
 
 const metasprite_t Alex_run_16x16_metasprite23[] = {
-	METASPR_ITEM(-16, -8, 36, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 36, S_PAL(0)),
 	METASPR_ITEM(0, 8, 38, S_PAL(0)),
 	METASPR_ITEM(16, -8, 76, S_PAL(0)),
 	METASPR_ITEM(0, 8, 78, S_PAL(0)),

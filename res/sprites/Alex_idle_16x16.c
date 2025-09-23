@@ -105,7 +105,7 @@ const uint8_t Alex_idle_16x16_tiles[320] = {
 };
 
 const metasprite_t Alex_idle_16x16_metasprite0[] = {
-	METASPR_ITEM(-16, -8, 0, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 0, S_PAL(0)),
 	METASPR_ITEM(0, 8, 2, S_PAL(0)),
 	METASPR_ITEM(16, -8, 4, S_PAL(0)),
 	METASPR_ITEM(0, 8, 6, S_PAL(0)),
@@ -113,7 +113,7 @@ const metasprite_t Alex_idle_16x16_metasprite0[] = {
 };
 
 const metasprite_t Alex_idle_16x16_metasprite1[] = {
-	METASPR_ITEM(-16, -8, 8, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 8, S_PAL(0)),
 	METASPR_ITEM(0, 8, 10, S_PAL(0)),
 	METASPR_ITEM(16, -8, 12, S_PAL(0)),
 	METASPR_ITEM(0, 8, 14, S_PAL(0)),
@@ -121,7 +121,7 @@ const metasprite_t Alex_idle_16x16_metasprite1[] = {
 };
 
 const metasprite_t Alex_idle_16x16_metasprite2[] = {
-	METASPR_ITEM(-16, -8, 2, S_PAL(0) | S_FLIPX),
+	METASPR_ITEM(-32, -8, 2, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 0, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(16, -8, 6, S_PAL(0) | S_FLIPX),
 	METASPR_ITEM(0, 8, 4, S_PAL(0) | S_FLIPX),
@@ -129,7 +129,7 @@ const metasprite_t Alex_idle_16x16_metasprite2[] = {
 };
 
 const metasprite_t Alex_idle_16x16_metasprite3[] = {
-	METASPR_ITEM(-16, -8, 8, S_PAL(0)),
+	METASPR_ITEM(-32, -8, 8, S_PAL(0)),
 	METASPR_ITEM(0, 8, 10, S_PAL(0)),
 	METASPR_ITEM(16, -8, 16, S_PAL(0)),
 	METASPR_ITEM(0, 8, 18, S_PAL(0)),
