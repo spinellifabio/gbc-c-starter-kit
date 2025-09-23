@@ -7,8 +7,9 @@ file(MAKE_DIRECTORY "${ROM_DIR}")
 set(ROM_NAME "${PROJECT_NAME}.gbc")
 set(ROM_PATH "${ROM_DIR}/${ROM_NAME}")
 
-# === Source files (.c in src/) ===
+# === Source files (.c in src/ and .c in res/sprites) ===
 file(GLOB SRC_FILES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
+file(GLOB SPRITE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/res/sprites/*.c")
 
 # === Locate tools (from GBDK_ROOT) ===
 set(LCC_DEFAULT "${GBDK_ROOT}/bin/lcc.exe")
@@ -42,43 +43,18 @@ if(NOT EXISTS "${PNG2ASSET}")
 endif()
 
 # === Flags ===
-set(LCC_FLAGS "${GBDK_CFLAGS}")
-list(APPEND LCC_FLAGS "-I${GBDK_INCLUDE_DIR}")
-list(APPEND LCC_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/include")
-list(APPEND LCC_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/res/sprites")
+set(LCC_FLAGS "")
+list(APPEND LCC_FLAGS ${GBDK_CFLAGS})
+list(APPEND LCC_FLAGS -I${GBDK_INCLUDE_DIR})
+list(APPEND LCC_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/include)
+list(APPEND LCC_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/res/sprites)
 
-# === Sprite auto-generation ===
-file(GLOB SPRITE_PNGS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/assets/sprites/*.png")
-set(SPRITE_SRC_FILES "")
-
-foreach(png ${SPRITE_PNGS})
-    get_filename_component(name ${png} NAME_WE)
-    set(out_base "${CMAKE_CURRENT_SOURCE_DIR}/res/sprites/${name}")
-    set(out_c "${out_base}.c")
-    set(out_h "${out_base}.h")
-
-    # Assicuriamoci che la cartella res/sprites esista
-    file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/res/sprites")
-
-    add_custom_command(
-        OUTPUT "${out_c}" "${out_h}"
-        COMMAND "${PNG2ASSET}" "${png}"
-            -spr8x16 -bpp 2
-            -out "${out_base}"
-        DEPENDS "${png}"
-        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        COMMENT "Converting ${png} -> ${out_c}, ${out_h}"
-        VERBATIM
-    )
-
-    list(APPEND SPRITE_SRC_FILES "${out_c}")
-endforeach()
 
 # === Build ROM ===
 add_custom_command(
   OUTPUT "${ROM_PATH}"
-  COMMAND "${LCC}" ${LCC_FLAGS} -o "${ROM_PATH}" ${SRC_FILES} ${SPRITE_SRC_FILES}
-  DEPENDS ${SRC_FILES} ${SPRITE_SRC_FILES}
+  COMMAND "${LCC}" ${LCC_FLAGS} -o "${ROM_PATH}" ${SRC_FILES} ${SPRITE_SOURCES}
+  DEPENDS ${SRC_FILES} ${SPRITE_SOURCES}
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
   COMMENT "Building ${ROM_NAME} with ${LCC}"
   VERBATIM

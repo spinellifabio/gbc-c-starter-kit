@@ -40,6 +40,13 @@
             "command": "\"${workspaceFolder}/../emulator/bgbw64/bgb64.exe\" \"${workspaceFolder}/rom/${workspaceFolderBasename}.gbc\"",
             "dependsOn": "CMake: build rom",
             "problemMatcher": []
+        },
+        {
+            "label": "Run in BGB with VRAM",
+            "type": "shell",
+            "command": "\"${workspaceFolder}/../emulator/bgbw64/bgb64.exe\" -c \"${workspaceFolder}/../emulator/bgb_debug.ini\" \"${workspaceFolder}/rom/${workspaceFolderBasename}.gbc\"",
+            "dependsOn": "CMake: build rom",
+            "problemMatcher": []
         }
     ]
 }
