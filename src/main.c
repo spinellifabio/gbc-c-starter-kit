@@ -329,7 +329,6 @@ void main(void) {
 
     DISPLAY_OFF;
 
-    SHOW_BKG;
     font_init();
     font_set(font_load(font_ibm));
     set_bkg_palette(0, 1, PALETTE0);
