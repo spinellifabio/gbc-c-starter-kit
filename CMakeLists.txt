@@ -9,7 +9,9 @@ set(ROM_PATH "${ROM_DIR}/${ROM_NAME}")
 
 # === Source files (.c in src/ and .c in res/sprites) ===
 file(GLOB SRC_FILES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
-file(GLOB SPRITE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/res/sprites/*.c")
+file(GLOB RES_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/res/**/*.c")
+# file(GLOB SPRITE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/res/sprites/*.c")
+# file(GLOB TILESET_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/res/tiles/*.c")
 
 # === Locate tools (from GBDK_ROOT) ===
 set(LCC_DEFAULT "${GBDK_ROOT}/bin/lcc.exe")
@@ -48,13 +50,23 @@ list(APPEND LCC_FLAGS ${GBDK_CFLAGS})
 list(APPEND LCC_FLAGS -I${GBDK_INCLUDE_DIR})
 list(APPEND LCC_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/include)
 list(APPEND LCC_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/res/sprites)
+list(APPEND LCC_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/res/tiles)
 
+# --- ROM banking ---
+list(APPEND LCC_FLAGS -Wm-yo8)   # 8 ROM banks = 128 KB
+# list(APPEND LCC_FLAGS -Wm-yo16)  # 16 ROM banks = 256 KB
+# list(APPEND LCC_FLAGS -Wm-yo32)  # 32 ROM banks = 512 KB
+# list(APPEND LCC_FLAGS -Wm-yo64)  # 64 ROM banks = 1 MB
+# list(APPEND LCC_FLAGS -Wm-yo128) # 128 ROM banks = 2 MB
+list(APPEND LCC_FLAGS -Wm-yc5)   # Usa MBC5 nel header
+list(APPEND LCC_FLAGS -Wm-yc5)    # header: cart type = MBC5
+list(APPEND LCC_FLAGS -Wl-yt5)    # linker: forza cart type = 0x19 (MBC5, no RAM, no batt)
 
 # === Build ROM ===
 add_custom_command(
   OUTPUT "${ROM_PATH}"
-  COMMAND "${LCC}" ${LCC_FLAGS} -o "${ROM_PATH}" ${SRC_FILES} ${SPRITE_SOURCES}
-  DEPENDS ${SRC_FILES} ${SPRITE_SOURCES}
+  COMMAND "${LCC}" ${LCC_FLAGS} -o "${ROM_PATH}" ${SRC_FILES} ${RES_SOURCES}
+  DEPENDS ${SRC_FILES} ${RES_SOURCES}
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
   COMMENT "Building ${ROM_NAME} with ${LCC}"
   VERBATIM
