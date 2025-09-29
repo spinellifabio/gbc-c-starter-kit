@@ -428,9 +428,6 @@ static void gameplay_screen(void) {
 
     init_map();
 
-    // Carica tile
-    set_bkg_data(0, tileset_TILE_COUNT, tileset_tiles);
-
     // Imposta palette (associa tile 0=water, 1=sand, 2=grass)
     set_bkg_palette(0, 1, pal_water);
     set_bkg_palette(1, 1, pal_sand);
@@ -547,6 +544,9 @@ void main(void) {
     font_set(font_load(font_ibm));
     set_bkg_palette(0, 1, PALETTE0);
     set_sprite_palette(0, 1, PALETTE0);
+
+    VBK_REG = 0;
+    set_bkg_data(0, tileset_TILE_COUNT, tileset_tiles);
 
     SPRITES_8x16;
     SHOW_SPRITES;
