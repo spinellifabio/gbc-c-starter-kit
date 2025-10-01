@@ -56,6 +56,8 @@
 #define TILE_SAND    1
 #define TILE_GRASS   2
 
+#define FONT_OFFSET 100
+
 static void game_over_screen(uint8_t reason);
 
 // Simple collision map: 0 = walkable, 1 = solid
@@ -64,10 +66,10 @@ static uint8_t map[MAP_WIDTH * MAP_HEIGHT];
 // Palette GBC (4 colori ciascuna, 15-bit RGB 0RRRRRGGGGGBBBBB)
 
 /* -------------------- Palette -------------------- */
-static const palette_color_t PALETTE0[4] = { RGB_WHITE, RGB_LIGHTGRAY, RGB_DARKGRAY, RGB_BLACK };
-static const palette_color_t pal_water[] = { RGB(0,0,31), RGB(0,0,16), RGB(0,0,8), RGB(0,0,0) };    // blu
-static const palette_color_t pal_sand[] = { RGB(31,31,0), RGB(20,20,0), RGB(12,12,0), RGB(0,0,0) }; // giallo
-static const palette_color_t pal_grass[] = { RGB(0,31,0),  RGB(0,20,0),  RGB(0,12,0),  RGB(0,0,0) }; // verde
+// static const palette_color_t PALETTE0[4] = { RGB_WHITE, RGB_LIGHTGRAY, RGB_DARKGRAY, RGB_BLACK };
+// static const palette_color_t pal_water[] = { RGB(0,0,31), RGB(0,0,16), RGB(0,0,8), RGB(0,0,0) };    // blu
+// static const palette_color_t pal_sand[] = { RGB(31,31,0), RGB(20,20,0), RGB(12,12,0), RGB(0,0,0) }; // giallo
+// static const palette_color_t pal_grass[] = { RGB(0,31,0),  RGB(0,20,0),  RGB(0,12,0),  RGB(0,0,0) }; // verde
 
 /* -------------------- Game Mode ----------------- */
 typedef enum {
@@ -382,12 +384,12 @@ static void init_map(void) {
                 // Bordo sabbia, interno erba
                 if ((dx * dx) * (ry * ry) + (dy * dy) * (rx * rx) >
                     (rx - 2) * (rx - 2) * (ry - 2) * (ry - 2)) {
-                    map[y * MAP_WIDTH + x] = TILE_SAND;
+                    map[y * MAP_WIDTH + x] = TILE_SAND + FONT_OFFSET;
                 } else {
-                    map[y * MAP_WIDTH + x] = TILE_GRASS;
+                    map[y * MAP_WIDTH + x] = TILE_GRASS + FONT_OFFSET;
                 }
             } else {
-                map[y * MAP_WIDTH + x] = TILE_WATER;
+                map[y * MAP_WIDTH + x] = TILE_WATER + FONT_OFFSET;
             }
         }
     }
@@ -423,15 +425,12 @@ static void gameplay_screen(void) {
 
     uint8_t oam_idx = 0;
 
-    set_sprite_data(0, Alex_idle_16x16_TILE_COUNT, Alex_idle_16x16_tiles);
-    set_sprite_data(Alex_idle_16x16_TILE_COUNT, Alex_run_16x16_TILE_COUNT, Alex_run_16x16_tiles);
-
     init_map();
 
-    // Imposta palette (associa tile 0=water, 1=sand, 2=grass)
-    set_bkg_palette(0, 1, pal_water);
-    set_bkg_palette(1, 1, pal_sand);
-    set_bkg_palette(2, 1, pal_grass);
+    // // Imposta palette (associa tile 0=water, 1=sand, 2=grass)
+    // set_bkg_palette(0, 1, pal_water);
+    // set_bkg_palette(1, 1, pal_sand);
+    // set_bkg_palette(2, 1, pal_grass);
 
     // Disegna la mappa
     render_full_map();
@@ -540,13 +539,24 @@ void main(void) {
 
     DISPLAY_OFF;
 
+    VBK_REG = 0;
+
     font_init();
     font_set(font_load(font_ibm));
-    set_bkg_palette(0, 1, PALETTE0);
-    set_sprite_palette(0, 1, PALETTE0);
 
-    VBK_REG = 0;
-    set_bkg_data(0, tileset_TILE_COUNT, tileset_tiles);
+    set_bkg_data(FONT_OFFSET, tileset_TILE_COUNT, tileset_tiles);
+    set_sprite_data(0, Alex_idle_16x16_TILE_COUNT, Alex_idle_16x16_tiles);
+    set_sprite_data(Alex_idle_16x16_TILE_COUNT, Alex_run_16x16_TILE_COUNT, Alex_run_16x16_tiles);
+
+    // TODO: fix palettes
+    // if (_cpu == CGB_TYPE) {
+    //     set_bkg_palette(70, tileset_PALETTE_COUNT, tileset_palettes);
+    //     set_sprite_palette(0, Alex_idle_16x16_PALETTE_COUNT, Alex_idle_16x16_palettes);
+    //     set_sprite_palette(Alex_idle_16x16_PALETTE_COUNT, Alex_run_16x16_PALETTE_COUNT, Alex_run_16x16_palettes);
+    // }
+
+    // set_bkg_palette(0, 1, PALETTE0);
+    // set_sprite_palette(0, 1, PALETTE0);
 
     SPRITES_8x16;
     SHOW_SPRITES;

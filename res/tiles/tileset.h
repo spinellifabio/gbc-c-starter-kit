@@ -9,23 +9,23 @@
 #define tileset_TILE_ORIGIN 0
 #define tileset_TILE_W 8
 #define tileset_TILE_H 8
-#define tileset_WIDTH 992
-#define tileset_HEIGHT 864
-#define tileset_TILE_COUNT 1174
-#define tileset_PALETTE_COUNT 8
+#define tileset_WIDTH 96
+#define tileset_HEIGHT 192
+#define tileset_TILE_COUNT 40
+#define tileset_PALETTE_COUNT 2
 #define tileset_COLORS_PER_PALETTE 4
-#define tileset_TOTAL_COLORS 32
+#define tileset_TOTAL_COLORS 8
 #define tileset_MAP_ATTRIBUTES tileset_map_attributes
-#define tileset_MAP_ATTRIBUTES_WIDTH 124
-#define tileset_MAP_ATTRIBUTES_HEIGHT 108
-#define tileset_MAP_ATTRIBUTES_PACKED_WIDTH 124
-#define tileset_MAP_ATTRIBUTES_PACKED_HEIGHT 108
-extern const unsigned char tileset_map[13392];
-extern const unsigned char tileset_map_attributes[13392];
+#define tileset_MAP_ATTRIBUTES_WIDTH 12
+#define tileset_MAP_ATTRIBUTES_HEIGHT 24
+#define tileset_MAP_ATTRIBUTES_PACKED_WIDTH 12
+#define tileset_MAP_ATTRIBUTES_PACKED_HEIGHT 24
+extern const unsigned char tileset_map[288];
+extern const unsigned char tileset_map_attributes[288];
 
 BANKREF_EXTERN(tileset)
 
-extern const palette_color_t tileset_palettes[32];
-extern const uint8_t tileset_tiles[18784];
+extern const palette_color_t tileset_palettes[8];
+extern const uint8_t tileset_tiles[640];
 
 #endif
