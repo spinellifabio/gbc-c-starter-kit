@@ -3,16 +3,25 @@
         {
             "name": "Win32",
             "includePath": [
+                "C:/gbdk/include/**",
                 "${default}",
-                "${workspaceFolder}/include",
-                "${workspaceFolder}/res"
+                "${workspaceFolder}/include/**",
+                "${workspaceFolder}/res/**",
+                "${workspaceFolder}/src/**"
+            ],
+            "defines": [
+                "__PORT_sm83",
+                "__TARGET_gb"
             ],
             "windowsSdkVersion": "10.0.26100.0",
-            "compilerPath": "cl.exe",
+            "compilerPath": "",
             "cStandard": "c17",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "windows-msvc-x64",
-            "configurationProvider": "ms-vscode.cmake-tools"
+            "intelliSenseMode": "${default}",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "compilerArgs": [],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4

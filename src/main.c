@@ -56,7 +56,9 @@
 #define TILE_SAND    1
 #define TILE_GRASS   2
 
-#define FONT_OFFSET 100
+#define FONT_OFFSET 128
+
+static uint8_t map_buffer[sizeof(tileset_map)];
 
 static void game_over_screen(uint8_t reason);
 
@@ -544,19 +546,41 @@ void main(void) {
     font_init();
     font_set(font_load(font_ibm));
 
-    set_bkg_data(FONT_OFFSET, tileset_TILE_COUNT, tileset_tiles);
+    // --- OFFSET MAPPA TILE ---
+    for (uint16_t i = 0; i < sizeof(tileset_map); i++) {
+        map_buffer[i] = tileset_map[i] + 128; // carichiamo i nostri tile dopo il font
+    }
+
+    // --- CARICAMENTO TILE ---
+    set_bkg_data(128, tileset_TILE_COUNT, tileset_tiles);
+
+    // --- PALETTE E ATTRIBUTI ---
+    if (_cpu == CGB_TYPE) {
+        // Siamo su Game Boy Color
+        // Carichiamo le palette (tileset_PALETTE_COUNT = 2)
+        set_bkg_palette(0, tileset_PALETTE_COUNT, tileset_palettes);
+
+        // Carichiamo mappa e attributi
+        set_bkg_tiles(0, 0, tileset_MAP_ATTRIBUTES_WIDTH, tileset_MAP_ATTRIBUTES_HEIGHT, map_buffer);
+        set_bkg_attributes(0, 0, tileset_MAP_ATTRIBUTES_WIDTH, tileset_MAP_ATTRIBUTES_HEIGHT, tileset_map_attributes);
+    } else {
+        // Siamo su DMG (nessun colore)
+        // Carichiamo solo la mappa, senza attributi
+        set_bkg_tiles(0, 0, tileset_MAP_ATTRIBUTES_WIDTH, tileset_MAP_ATTRIBUTES_HEIGHT, map_buffer);
+    }
+
+    // --- CARICAMENTO TILE SPRITE ---
     set_sprite_data(0, Alex_idle_16x16_TILE_COUNT, Alex_idle_16x16_tiles);
     set_sprite_data(Alex_idle_16x16_TILE_COUNT, Alex_run_16x16_TILE_COUNT, Alex_run_16x16_tiles);
 
-    // TODO: fix palettes
-    // if (_cpu == CGB_TYPE) {
-    //     set_bkg_palette(70, tileset_PALETTE_COUNT, tileset_palettes);
-    //     set_sprite_palette(0, Alex_idle_16x16_PALETTE_COUNT, Alex_idle_16x16_palettes);
-    //     set_sprite_palette(Alex_idle_16x16_PALETTE_COUNT, Alex_run_16x16_PALETTE_COUNT, Alex_run_16x16_palettes);
-    // }
-
-    // set_bkg_palette(0, 1, PALETTE0);
-    // set_sprite_palette(0, 1, PALETTE0);
+    // --- PALETTE SPRITE ---
+    if (_cpu == CGB_TYPE) {
+        // Siamo su CGB: carichiamo le palette per gli sprite
+        // Idle usa 1 palette
+        set_sprite_palette(0, Alex_idle_16x16_PALETTE_COUNT, Alex_idle_16x16_palettes);
+        // Run usa 2 palette (le carico subito dopo)
+        set_sprite_palette(Alex_idle_16x16_PALETTE_COUNT, Alex_run_16x16_PALETTE_COUNT, Alex_run_16x16_palettes);
+    }
 
     SPRITES_8x16;
     SHOW_SPRITES;
