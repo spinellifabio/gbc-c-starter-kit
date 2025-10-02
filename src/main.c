@@ -29,9 +29,13 @@
 #include "Alex_run_16x16.h"
 #include "tileset.h"
 
+/* -------------------- Constants ------------------- */
+
+// Screen center in pixels
 #define SCREEN_CENTER_X 80
 #define SCREEN_CENTER_Y 72
 
+// Player sprite offset (metasprite origin → feet)
 #define PLAYER_OFFSET_X -8
 #define PLAYER_OFFSET_Y +16
 
@@ -43,63 +47,200 @@
 #define DIR_LEFT  2
 #define DIR_FRONT 3
 
-// Speed
-#define MOVE_SPEED 2 // px/frame
+// Player speed in pixels/frame
+#define MOVE_SPEED 2
 
-// Map dimensions in tiles
-#define MAP_WIDTH  32
-#define MAP_HEIGHT 32
-#define TILE_SIZE  16
+// Map size (logical tiles, 16x16 px each)
+#define MAP_WIDTH   32
+#define MAP_HEIGHT  32
+#define TILE_SIZE   16       // logical tile size in pixels
+#define TILE_SHIFT  4        // log2(16)
 
-// Tile types
-#define TILE_WATER   0
-#define TILE_SAND    1
-#define TILE_GRASS   2
+// Screen size in hardware tiles (8x8 px each)
+#define SCREEN_TILE_W 20
+#define SCREEN_TILE_H 18
+
+// Tile types (logic)
+#define M_WATER 0
+#define M_SAND  1
+#define M_GRASS 2
 
 #define FONT_OFFSET 128
 
+/* -------------------- Global Vars ----------------- */
+
+// World camera in pixels
+static uint16_t cam_x = 0;
+static uint16_t cam_y = 0;
+
+static uint8_t old_keys = 0;
 static uint8_t map_buffer[sizeof(tileset_map)];
 
 static void game_over_screen(uint8_t reason);
 
-// Simple collision map: 0 = walkable, 1 = solid
-static uint8_t map[MAP_WIDTH * MAP_HEIGHT];
-
-// Palette GBC (4 colori ciascuna, 15-bit RGB 0RRRRRGGGGGBBBBB)
-
-/* -------------------- Palette -------------------- */
-// static const palette_color_t PALETTE0[4] = { RGB_WHITE, RGB_LIGHTGRAY, RGB_DARKGRAY, RGB_BLACK };
-// static const palette_color_t pal_water[] = { RGB(0,0,31), RGB(0,0,16), RGB(0,0,8), RGB(0,0,0) };    // blu
-// static const palette_color_t pal_sand[] = { RGB(31,31,0), RGB(20,20,0), RGB(12,12,0), RGB(0,0,0) }; // giallo
-// static const palette_color_t pal_grass[] = { RGB(0,31,0),  RGB(0,20,0),  RGB(0,12,0),  RGB(0,0,0) }; // verde
-
-/* -------------------- Game Mode ----------------- */
-typedef enum {
-    MODE_RELEASE,
-    MODE_DEBUG
-} GameMode;
-
-/* -------------------- Global Settings ------------ */
+/* -------------------- Menu / Settings (unchanged) ----------------- */
+typedef enum { MODE_RELEASE, MODE_DEBUG } GameMode;
 typedef struct {
     uint8_t sound_on;
     uint8_t difficulty;
     uint8_t lives;
     GameMode mode;
     Language language;
-
     const char* game_name;
     const char* version;
 } GameSettings;
 
 static GameSettings settings = {
-    1,                 /* sound_on */
-    1,                 /* difficulty: 0=easy,1=normal,2=hard */
-    3,                 /* lives */
-    MODE_DEBUG,
-    LANG_EN,
-    "GBC Prototype",
-    "v0.1.0"
+    1, 1, 3, MODE_DEBUG, LANG_EN,
+    "GBC Prototype", "v0.2.0"
 };
+
+/* -------------------- Input Helpers ----------------- */
+static uint8_t get_pressed(void) {
+    uint8_t keys = joypad();
+    uint8_t pressed = keys & (uint8_t)(~old_keys);
+    old_keys = keys;
+    return pressed;
+}
+static void flush_input(void) { while (joypad()) wait_vbl_done(); old_keys = 0; }
+
+/* -------------------- Test Map -------------------- */
+// Example island (water border, sand edge, grass center)
+static const uint8_t island_map[MAP_HEIGHT][MAP_WIDTH] = {
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+};
+
+/* -------------------- Map Rendering ------------------- */
+
+static uint8_t logic_to_tile(uint8_t logic_tile) {
+    switch (logic_tile) {
+    case M_WATER: return M_WATER + FONT_OFFSET;
+    case M_SAND:  return M_SAND + FONT_OFFSET;
+    case M_GRASS: return M_GRASS + FONT_OFFSET;
+    default:      return M_WATER + FONT_OFFSET;
+    }
+}
+
+static void blit_logic_tile(uint8_t lx, uint8_t ly, uint8_t vram_x, uint8_t vram_y) {
+    uint8_t t = logic_to_tile(island_map[ly][lx]);
+    uint8_t buf[4] = { t,t,t,t };
+    set_bkg_tiles(vram_x, vram_y, 2, 2, buf);
+}
+
+// Render whole map once at startup
+static void render_full_map(void) {
+    for (uint8_t y = 0; y < MAP_HEIGHT; y++)
+        for (uint8_t x = 0; x < MAP_WIDTH; x++)
+            blit_logic_tile(x, y, x * 2, y * 2);
+}
+
+// Camera update with clamping
+static void update_camera(uint16_t world_x, uint16_t world_y) {
+    int16_t new_x = (int16_t)world_x - SCREEN_CENTER_X;
+    int16_t new_y = (int16_t)world_y - SCREEN_CENTER_Y;
+    if (new_x < 0) new_x = 0;
+    if (new_y < 0) new_y = 0;
+    uint16_t max_x = MAP_WIDTH * TILE_SIZE - SCREENWIDTH;
+    uint16_t max_y = MAP_HEIGHT * TILE_SIZE - SCREENHEIGHT;
+    if (new_x > (int16_t)max_x) new_x = (int16_t)max_x;
+    if (new_y > (int16_t)max_y) new_y = (int16_t)max_y;
+    cam_x = new_x; cam_y = new_y;
+    SCX_REG = (uint8_t)cam_x;
+    SCY_REG = (uint8_t)cam_y;
+}
+
+/* -------------------- Collision ------------------- */
+static uint8_t can_walk(uint16_t x, uint16_t y) {
+    uint16_t px = x >> TILE_SHIFT;
+    uint16_t py = y >> TILE_SHIFT;
+    if ((px >= MAP_WIDTH) || (py >= MAP_HEIGHT)) return 0;
+    return (island_map[py][px] != M_WATER);
+}
+
+/* -------------------- Gameplay ------------------- */
+static void gameplay_screen(void) {
+    uint16_t world_x = SCREEN_CENTER_X;
+    uint16_t world_y = SCREEN_CENTER_Y;
+    uint8_t dir = DIR_FRONT, run_frame = 0, anim_tick = 0;
+
+    render_full_map();
+
+    while (1) {
+        uint8_t keys = joypad();
+        uint8_t moving = 0;
+        int16_t nx = world_x, ny = world_y;
+
+        if (keys == J_DOWN) { dir = DIR_FRONT; ny += MOVE_SPEED; moving = 1; } else if (keys == J_UP) { dir = DIR_BACK; ny -= MOVE_SPEED; moving = 1; } else if (keys == J_LEFT) { dir = DIR_LEFT; nx -= MOVE_SPEED; moving = 1; } else if (keys == J_RIGHT) { dir = DIR_RIGHT; nx += MOVE_SPEED; moving = 1; }
+
+        if (moving && can_walk(nx, ny + PLAYER_OFFSET_Y)) { world_x = nx;world_y = ny; } else moving = 0;
+
+        if (moving) {
+            uint8_t delay = (MOVE_SPEED == 1) ? 8 : (MOVE_SPEED == 2) ? 6 : 4;
+            if (++anim_tick >= delay) { anim_tick = 0;run_frame = (run_frame + 1) % RUN_FRAMES_PER_DIR; }
+            uint8_t idx = dir * RUN_FRAMES_PER_DIR + run_frame;
+            move_metasprite_ex(Alex_run_16x16_metasprites[idx],
+                Alex_idle_16x16_TILE_COUNT, 0, 0,
+                SCREEN_CENTER_X + PLAYER_OFFSET_X,
+                SCREEN_CENTER_Y + PLAYER_OFFSET_Y);
+        } else {
+            move_metasprite_ex(Alex_idle_16x16_metasprites[dir],
+                0, 0, 0,
+                SCREEN_CENTER_X + PLAYER_OFFSET_X,
+                SCREEN_CENTER_Y + PLAYER_OFFSET_Y);
+            run_frame = anim_tick = 0;
+        }
+
+        update_camera(world_x, world_y);
+        wait_vbl_done();
+    }
+}
+
+
+static void game_over_screen(uint8_t reason) {
+    cls();
+    gotoxy(2, 8);
+    LangStringId msg_id = STR_GAMEOVER_TITLE;
+    if (reason == 1u)      msg_id = STR_GAMEOVER_REASON_HOLE;
+    else if (reason == 2u) msg_id = STR_GAMEOVER_REASON_ENEMY;
+    printf("%s", lang_str(msg_id));
+
+    uint16_t frame_counter = 0;
+    uint8_t  skippable = 0;
+    while (1) {
+        wait_vbl_done();
+        frame_counter++;
+        if (frame_counter >= 210u) skippable = 1;
+        if (skippable && joypad()) break;
+    }
+
+    flush_input();
+    cls();
+}
+
+/* -------------------- ----------------------------------------------- ----------------- */
+
+
+// Simple collision map: 0 = walkable, 1 = solid
+static uint8_t map[MAP_WIDTH * MAP_HEIGHT];
+
+
 
 /* -------------------- Menu System ----------------
  * Cambiamo la callback: ritorna 1 se serve ridisegnare TUTTA la schermata.
@@ -144,20 +285,6 @@ static MenuItem option_items[] = {
 };
 #define OPTION_COUNT (sizeof(option_items) / sizeof(MenuItem))
 
-/* -------------------- Input State ---------------- */
-static uint8_t old_keys = 0;
-
-static uint8_t get_pressed(void) {
-    uint8_t keys = joypad();
-    uint8_t pressed = keys & (uint8_t)(~old_keys);
-    old_keys = keys;
-    return pressed;
-}
-
-static void flush_input(void) {
-    while (joypad()) wait_vbl_done();
-    old_keys = 0;
-}
 
 /* -------------------- Helpers UI -----------------
  * Per stringhe “blink” di lunghezze diverse EN/IT, puliamo sempre 16 char.
@@ -367,174 +494,6 @@ static void title_screen(void) {
     cls();
 }
 
-/* -------------------- Gameplay --------------------- */
-// --- Init mappa: come da tua versione ---
-static void init_map(void) {
-    uint8_t x, y;
-    uint8_t cx = MAP_WIDTH / 2;
-    uint8_t cy = MAP_HEIGHT / 2;
-    uint8_t rx = MAP_WIDTH / 2 - 2;   // semi-asse x
-    uint8_t ry = MAP_HEIGHT / 2 - 4;  // semi-asse y
-
-    for (y = 0; y < MAP_HEIGHT; y++) {
-        for (x = 0; x < MAP_WIDTH; x++) {
-            int dx = (x - cx);
-            int dy = (y - cy);
-
-            // Ellisse: dentro = isola
-            if ((dx * dx) * (ry * ry) + (dy * dy) * (rx * rx) <= (rx * rx) * (ry * ry)) {
-                // Bordo sabbia, interno erba
-                if ((dx * dx) * (ry * ry) + (dy * dy) * (rx * rx) >
-                    (rx - 2) * (rx - 2) * (ry - 2) * (ry - 2)) {
-                    map[y * MAP_WIDTH + x] = TILE_SAND + FONT_OFFSET;
-                } else {
-                    map[y * MAP_WIDTH + x] = TILE_GRASS + FONT_OFFSET;
-                }
-            } else {
-                map[y * MAP_WIDTH + x] = TILE_WATER + FONT_OFFSET;
-            }
-        }
-    }
-}
-
-// --- Disegna tutta la mappa su VRAM ---
-static void render_full_map(void) {
-    uint8_t y;
-    for (y = 0; y < MAP_HEIGHT; y++) {
-        set_bkg_tiles(0, y, MAP_WIDTH, 1, &map[y * MAP_WIDTH]);
-    }
-}
-
-// Check if position (in pixels) is inside walkable area
-static uint8_t can_walk(uint16_t x, uint16_t y) {
-    // Player feet: align to bottom center
-    uint16_t px = x / TILE_SIZE;
-    uint16_t py = y / TILE_SIZE;
-
-    if (px >= MAP_WIDTH || py >= MAP_HEIGHT)
-        return 0; // out of map
-
-    uint8_t tile = map[py * MAP_WIDTH + px];
-    return (tile != 0); // 0 = not walkable
-}
-
-static void gameplay_screen(void) {
-    uint16_t world_x = SCREEN_CENTER_X;
-    uint16_t world_y = SCREEN_CENTER_Y;
-    uint8_t dir = DIR_FRONT;
-    uint8_t run_frame = 0;
-    uint8_t anim_tick = 0;
-
-    uint8_t oam_idx = 0;
-
-    init_map();
-
-    // // Imposta palette (associa tile 0=water, 1=sand, 2=grass)
-    // set_bkg_palette(0, 1, pal_water);
-    // set_bkg_palette(1, 1, pal_sand);
-    // set_bkg_palette(2, 1, pal_grass);
-
-    // Disegna la mappa
-    render_full_map();
-
-    while (1) {
-        uint8_t keys = joypad();
-        uint8_t is_moving = 0;
-        int16_t next_x = world_x;
-        int16_t next_y = world_y;
-
-        if (keys & J_UP)   keys &= ~(J_LEFT | J_RIGHT);
-        if (keys & J_DOWN) keys &= ~(J_LEFT | J_RIGHT);
-
-        if (keys == J_DOWN) {
-            dir = DIR_FRONT;
-            next_y += MOVE_SPEED;
-            is_moving = 1;
-        } else if (keys == J_UP) {
-            dir = DIR_BACK;
-            next_y -= MOVE_SPEED;
-            is_moving = 1;
-        } else if (keys == J_LEFT) {
-            dir = DIR_LEFT;
-            next_x -= MOVE_SPEED;
-            is_moving = 1;
-        } else if (keys == J_RIGHT) {
-            dir = DIR_RIGHT;
-            next_x += MOVE_SPEED;
-            is_moving = 1;
-        }
-
-        // Collision check: only update if walkable
-        if (is_moving && can_walk(next_x, next_y + PLAYER_OFFSET_Y)) {
-            world_x = next_x;
-            world_y = next_y;
-        } else {
-            is_moving = 0;
-        }
-
-        if (is_moving) {
-            uint8_t anim_delay = (MOVE_SPEED == 1) ? 8 : (MOVE_SPEED == 2) ? 6 : 4;
-
-            anim_tick++;
-            if (anim_tick >= anim_delay) {
-                anim_tick = 0;
-                run_frame++;
-                if (run_frame >= RUN_FRAMES_PER_DIR) run_frame = 0;
-            }
-
-            uint8_t sprite_index = dir * RUN_FRAMES_PER_DIR + run_frame;
-
-            oam_idx = move_metasprite_ex(
-                Alex_run_16x16_metasprites[sprite_index],
-                Alex_idle_16x16_TILE_COUNT,
-                0, 0,
-                SCREEN_CENTER_X + PLAYER_OFFSET_X,
-                SCREEN_CENTER_Y + PLAYER_OFFSET_Y
-            );
-        } else {
-            oam_idx = move_metasprite_ex(
-                Alex_idle_16x16_metasprites[dir],
-                0, 0, 0,
-                SCREEN_CENTER_X + PLAYER_OFFSET_X,
-                SCREEN_CENTER_Y + PLAYER_OFFSET_Y
-            );
-
-            run_frame = 0;
-            anim_tick = 0;
-        }
-
-        // Camera scroll
-        SCX_REG = (uint8_t)(world_x - SCREEN_CENTER_X);
-        SCY_REG = (uint8_t)(world_y - SCREEN_CENTER_Y);
-
-        wait_vbl_done();
-
-        if (keys & J_START) { game_over_screen(1); break; }
-        if (keys & J_SELECT) { game_over_screen(2); break; }
-    }
-}
-
-static void game_over_screen(uint8_t reason) {
-    cls();
-    gotoxy(2, 8);
-    LangStringId msg_id = STR_GAMEOVER_TITLE;
-    if (reason == 1u)      msg_id = STR_GAMEOVER_REASON_HOLE;
-    else if (reason == 2u) msg_id = STR_GAMEOVER_REASON_ENEMY;
-    printf("%s", lang_str(msg_id));
-
-    uint16_t frame_counter = 0;
-    uint8_t  skippable = 0;
-    while (1) {
-        wait_vbl_done();
-        frame_counter++;
-        if (frame_counter >= 210u) skippable = 1;
-        if (skippable && joypad()) break;
-    }
-
-    flush_input();
-    cls();
-}
-
 /* -------------------- Main ----------------------- */
 void main(void) {
     cgb_compatibility();
@@ -548,11 +507,11 @@ void main(void) {
 
     // --- OFFSET MAPPA TILE ---
     for (uint16_t i = 0; i < sizeof(tileset_map); i++) {
-        map_buffer[i] = tileset_map[i] + 128; // carichiamo i nostri tile dopo il font
+        map_buffer[i] = tileset_map[i] + FONT_OFFSET; // carichiamo i nostri tile dopo il font
     }
 
     // --- CARICAMENTO TILE ---
-    set_bkg_data(128, tileset_TILE_COUNT, tileset_tiles);
+    set_bkg_data(FONT_OFFSET, tileset_TILE_COUNT, tileset_tiles);
 
     // --- PALETTE E ATTRIBUTI ---
     if (_cpu == CGB_TYPE) {
