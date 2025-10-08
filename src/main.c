@@ -139,16 +139,43 @@ static uint8_t logic_to_tile(uint8_t logic_tile) {
 }
 
 static void blit_logic_tile(uint8_t lx, uint8_t ly, uint8_t vram_x, uint8_t vram_y) {
-    uint8_t t = logic_to_tile(island_map[ly][lx]);
-    uint8_t buf[4] = { t,t,t,t };
+    uint8_t logic = island_map[ly][lx];
+    uint8_t buf[4];
+
+    switch (logic) {
+    case M_WATER:
+        // Acqua: 2 tile (alterniamo TL/TR, ma visivamente uguali)
+        buf[0] = FONT_OFFSET + 0;
+        buf[1] = FONT_OFFSET + 1;
+        buf[2] = FONT_OFFSET + 0;
+        buf[3] = FONT_OFFSET + 1;
+        break;
+
+    case M_SAND:
+        // Sabbia uniforme
+        buf[0] = buf[1] = buf[2] = buf[3] = FONT_OFFSET + 2;
+        break;
+
+    case M_GRASS:
+        // Erba uniforme
+        buf[0] = buf[1] = buf[2] = buf[3] = FONT_OFFSET + 3;
+        break;
+
+    default:
+        buf[0] = buf[1] = buf[2] = buf[3] = FONT_OFFSET + 0;
+        break;
+    }
+
     set_bkg_tiles(vram_x, vram_y, 2, 2, buf);
 }
 
-// Render whole map once at startup
 static void render_full_map(void) {
-    for (uint8_t y = 0; y < MAP_HEIGHT; y++)
-        for (uint8_t x = 0; x < MAP_WIDTH; x++)
-            blit_logic_tile(x, y, x * 2, y * 2);
+    for (uint8_t y = 0; y < MAP_HEIGHT; y++) {
+        for (uint8_t x = 0; x < MAP_WIDTH; x++) {
+            // Ogni tile logico 16×16 copre 2×2 tile hardware
+            blit_logic_tile(x, y, (uint8_t)(x * 2u), (uint8_t)(y * 2u));
+        }
+    }
 }
 
 // Camera update with clamping
