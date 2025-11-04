@@ -205,6 +205,7 @@ gameboy-color, gbc, gbdk-2020, cmake, ninja, c-programming, starter-kit, templat
 - [RPG-Style Movement](https://laroldsretrogameyard.com/tutorials/gb/rpg-style-movement-in-gbdk/) – Tutorial for RPG-style movement in Game Boy development
 - [Game Boy Graphics](https://irfanbstr.medium.com/gbdk-2020-understanding-the-gameboys-graphics-847ef2d2db08) - Understanding the Game Boy's Graphics in Game Boy development
 - [Learn about retro game development!](<https://laroldsretrogameyard.com/category/tutorials/gb/>) – A collection of tutorials for Game Boy development
+- [Drawing Advanced Dialogue Boxes](https://laroldsretrogameyard.com/tutorials/gb/drawing-advanced-dialogue-boxes/) - Tutorial for drawing advanced dialogue boxes in Game Boy development
 
 ## Credits
 
