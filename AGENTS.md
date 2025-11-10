@@ -67,4 +67,9 @@ Use the [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0
   - `docs: correct spelling of CHANGELOG`
   - `fix(parser): prevent racing of requests`
 
+Additional rules:
+
+1. When you have unrelated change types in the same work session, split them into separate, type-focused commits so each commit stays scoped to a single intent (e.g., docs vs. fix).
+2. Before running any `git commit` command, explicitly confirm with the requestor (or document the confirmation in the task) so everyone agrees on the resulting commits.
+
 Following these rules ensures automated tooling can identify release notes, calculate versions, and understand the impact of each change.
