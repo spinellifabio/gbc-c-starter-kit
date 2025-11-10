@@ -108,17 +108,6 @@ static void clear_dialogue_text(void) {
     }
 }
 
-static void shift_text_rows_upward(void) {
-    uint8_t buffer[INNER_DIALOGUE_BOX_WIDTH];
-    for (uint8_t y = 0u; y < (uint8_t)(INNER_DIALOGUE_BOX_HEIGHT - 1u); y++) {
-        get_win_tiles(1u, (uint8_t)(2u + y), INNER_DIALOGUE_BOX_WIDTH, 1u, buffer);
-        set_win_tiles(1u, (uint8_t)(1u + y), INNER_DIALOGUE_BOX_WIDTH, 1u, buffer);
-    }
-    for (uint8_t x = 1u; x <= INNER_DIALOGUE_BOX_WIDTH; x++) {
-        set_win_char(x, (uint8_t)(INNER_DIALOGUE_BOX_HEIGHT), ' ');
-    }
-}
-
 static void slide_dialogue_box_on_screen(void) {
     window_y_position = DIALOGUE_WIN_OFFSCREEN_Y;
     move_win(DIALOGUE_WIN_X, (uint8_t)window_y_position);
@@ -139,49 +128,74 @@ static void slide_dialogue_box_off_screen(void) {
     HIDE_WIN;
 }
 
-static void draw_advanced_dialogue(const char *text) {
+static void show_continue_arrow(void) {
+    set_win_char((uint8_t)(DIALOG_BOX_WIDTH - 2u), (uint8_t)(DIALOG_BOX_HEIGHT - 2u), '>');
+}
+
+static void hide_continue_arrow(void) {
+    set_win_char((uint8_t)(DIALOG_BOX_WIDTH - 2u), (uint8_t)(DIALOG_BOX_HEIGHT - 2u), ' ');
+}
+
+static void prompt_continue(void) {
+    show_continue_arrow();
+    wait_for_advance();
+    hide_continue_arrow();
+    clear_dialogue_text();
+}
+
+void dialogue_show_text(const char *text) {
     uint16_t index = 0u;
     uint8_t row = 0u;
     uint8_t column = 0u;
+    uint8_t has_pending = 0u;
 
     draw_dialogue_box();
     clear_dialogue_text();
+    hide_continue_arrow();
     slide_dialogue_box_on_screen();
 
     while (text[index] != '\0') {
         char c = text[index];
-        set_win_char((uint8_t)(1u + column), (uint8_t)(1u + row), c);
         index++;
-        column++;
 
-        if ((c == '.') || (c == '?') || (c == '!')) {
-            wait_for_advance();
-            clear_dialogue_text();
-            row = 0u;
-            column = 0u;
-            while (text[index] == ' ') {
-                index++;
-            }
-            continue;
-        }
-
-        if (should_break_line(text, index, column)) {
+        if (c == '\n') {
             column = 0u;
             row++;
-            if (row >= INNER_DIALOGUE_BOX_HEIGHT) {
-                shift_text_rows_upward();
-                row = (uint8_t)(INNER_DIALOGUE_BOX_HEIGHT - 1u);
-            }
-            while (text[index] == ' ') {
-                index++;
-            }
         } else {
-            uint8_t delay = (joypad() & J_A) ? 1u : 3u;
-            vsync_frames(delay);
+            set_win_char((uint8_t)(1u + column), (uint8_t)(1u + row), c);
+            column++;
+            has_pending = 1u;
+
+            if (!should_break_line(text, index, column)) {
+                uint8_t delay = (joypad() & J_A) ? 1u : 3u;
+                vsync_frames(delay);
+                continue;
+            }
+
+            column = 0u;
+            row++;
+        }
+
+        while (text[index] == ' ') {
+            index++;
+        }
+
+        if (row >= INNER_DIALOGUE_BOX_HEIGHT) {
+            prompt_continue();
+            row = 0u;
+            column = 0u;
+            has_pending = 0u;
         }
     }
 
-    wait_for_advance();
+    if (has_pending) {
+        prompt_continue();
+    } else {
+        show_continue_arrow();
+        wait_for_advance();
+        hide_continue_arrow();
+    }
+
     slide_dialogue_box_off_screen();
     clear_dialogue_text();
 }
@@ -216,5 +230,5 @@ void play_dialogue_sequence(void) {
         }
     }
 
-    draw_advanced_dialogue(dialogue_text);
+    dialogue_show_text(dialogue_text);
 }
