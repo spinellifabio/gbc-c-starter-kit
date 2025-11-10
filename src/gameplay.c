@@ -203,6 +203,7 @@ static void draw_full_view(uint8_t tile_x, uint8_t tile_y) {
 }
 
 static void draw_logic_column(uint8_t current_tile_x, uint8_t current_tile_y, uint8_t logic_x, uint8_t dest_col) {
+    (void)current_tile_x;
     for (uint8_t row = 0u; row < VIEW_LOGIC_H; row++) {
         uint8_t logic_y = (uint8_t)(current_tile_y + row);
         uint8_t dest_row = (uint8_t)(((current_tile_y + row) & (VIEW_LOGIC_H - 1u)) << 1);
@@ -211,6 +212,7 @@ static void draw_logic_column(uint8_t current_tile_x, uint8_t current_tile_y, ui
 }
 
 static void draw_logic_row(uint8_t current_tile_x, uint8_t current_tile_y, uint8_t logic_y, uint8_t dest_row) {
+    (void)current_tile_y;
     for (uint8_t col = 0u; col < VIEW_LOGIC_W; col++) {
         uint8_t logic_x = (uint8_t)(current_tile_x + col);
         uint8_t dest_col = (uint8_t)(((current_tile_x + col) & (VIEW_LOGIC_W - 1u)) << 1);
