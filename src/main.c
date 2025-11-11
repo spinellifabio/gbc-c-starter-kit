@@ -16,6 +16,7 @@
 #include "intro.h"
 #include "splash.h"
 #include "title_screen.h"
+#include "credits.h"
 
 void main(void) {
     game_system_init();
@@ -26,5 +27,6 @@ void main(void) {
     while (1) {
         title_screen();
         gameplay_screen();
+        credits_scene();
     }
 }
