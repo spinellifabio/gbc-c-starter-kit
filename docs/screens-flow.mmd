@@ -10,13 +10,13 @@ flowchart TD
   TITLE["Title Screen"]:::Impl
   OPTIONS["Options Menu (multilingual, live switch)"]:::Impl
   GAMEPLAY["Gameplay Screen (test loop)"]:::Impl
-  GAMEOVER["Game Over Screen (delay, skippable)"]:::Impl
+  CREDITS["Credits Screen (scroll, skippable)"]:::Impl
 
   %% PLANNED SCREENS / ENHANCEMENTS (from roadmap)
   SLOT["Save Slots (3) / Continue"]:::Planned
   ADV_INTRO["Animated Intro / Cutscene"]:::Planned
   ADV_TITLE["Advanced Title (logo, polish)"]:::Planned
-  CREDITS["Credits Screen"]:::Planned
+  GAMEOVER["Game Over Screen"]:::Planned
 
   %% FLOW (implemented path is solid; planned enhancements dashed)
   SPL --> INTRO
@@ -36,15 +36,13 @@ flowchart TD
   SLOT -. "Erase Slot" .-> SLOT
 
   %% Gameplay outcomes
-  GAMEPLAY -- "START → Reason #1" --> GAMEOVER
-  GAMEPLAY -- "SELECT → Reason #2" --> GAMEOVER
-  GAMEOVER -- "After delay + any key" --> TITLE
+  GAMEPLAY -- "Completion" --> CREDITS
+  CREDITS -- "Auto/skip → Title" --> TITLE
 
   %% Planned branches
   INTRO -. "Upgrade path" .-> ADV_INTRO
   TITLE -. "Polish pass" .-> ADV_TITLE
-  GAMEPLAY -. "Completion" .-> CREDITS
-  CREDITS -. "Back to title" .-> TITLE
+  GAMEPLAY -. "Failure states" .-> GAMEOVER
 
   %% Legend
   subgraph LEGEND["Legend"]

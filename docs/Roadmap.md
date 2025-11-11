@@ -26,10 +26,10 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
 
 ## 4. Intro Video / Cutscene
 
-- [ ] Animated intro screen (sprite/background)
-- [ ] Text dialogue synced with frames → speed up with `A` button
-- [ ] Ability to skip the entire video with one button
-- [ ] Final link to the title screen
+- [x] Animated intro screen (sprite/background)
+- [x] Text dialogue synced with frames → speed up with `A` button
+- [x] Ability to skip the entire video with one button
+- [x] Final link to the title screen
 
 ## 5. Advanced Title Screen
 
@@ -70,8 +70,8 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
 
 ## 8. Game Completion / Credits
 
-- [ ] Scrolling or static credits screen
-- [ ] Ability to return to title or full reset
+- [x] Scrolling or static credits screen
+- [x] Ability to return to title or full reset
 - [ ] Global language respected also in credits
 
 ## 9. Audio (BGM + SFX)

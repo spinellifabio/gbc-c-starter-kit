@@ -44,7 +44,7 @@ Make sure the following tools are installed:
 - Support for **Ninja** as a fast and portable build system
 - Compatible with **Visual Studio Code** on Windows (with CMake Tools extension)
 - Integrated with **bgbw64 emulator** for testing the compiled ROMs directly from the project
-- Minimal working game example included
+- Minimal working game example included (splash → intro → title → gameplay → credits)
 - Clean folder layout for source code, headers, and assets
 - Easy to extend for larger projects
 
@@ -78,6 +78,8 @@ After compilation, the `.gbc` ROM file will be generated inside the `rom/` direc
 ```bash
 start bgbw64.exe rom/your-game.gbc
 ```
+
+By default the prototype runs through splash, intro cutscene, title, gameplay test loop, then shows the credits scene (skippable with START/SELECT) before returning to the title screen.
 
 ### Visual Studio Code (recommended)
 
