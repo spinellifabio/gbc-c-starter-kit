@@ -44,9 +44,36 @@ Make sure the following tools are installed:
 - Support for **Ninja** as a fast and portable build system
 - Compatible with **Visual Studio Code** on Windows (with CMake Tools extension)
 - Integrated with **bgbw64 emulator** for testing the compiled ROMs directly from the project
-- Minimal working game example included (splash → intro → title → gameplay → credits)
+- State-based game loop with smooth screen transitions
 - Clean folder layout for source code, headers, and assets
 - Easy to extend for larger projects
+
+### Graphics & Display
+
+- **Advanced Sprite Management**
+  - Efficient OAM handling with automatic tile reuse
+  - Support for multi-tile sprites (up to 2x2)
+  - Dynamic sprite allocation and deallocation
+  - CGB palette support with DMG fallback
+
+- **Background System**
+  - Multiple background layer support (game, UI, etc.)
+  - Smooth scrolling capabilities
+  - CGB attribute map support
+  - Dynamic palette management
+  - Efficient VRAM usage
+
+### Technical Features
+
+- **DMG/CGB Compatibility**
+  - Auto-detection of hardware
+  - Graceful degradation on DMG
+  - Full CGB features when available
+
+- **Memory Management**
+  - Efficient VRAM usage
+  - Optimized sprite and background updates
+  - Safe memory access patterns
 
 ## Getting Started
 
@@ -147,20 +174,37 @@ gbc-c-starter-kit/
 │   │── launch.json             # Launch configuration
 │   │── settings.json           # User settings
 │   └── tasks.json              # CMake tasks
-│── assets/                     # Graphics, tiles, maps
-│   └── sprites                 # Sprite graphics
 │── build/                      # Output directory (generated after compilation)
 │── cmake/                      # CMake scripts
 │   └── gbdk-toolchain.cmake    # Toolchain configuration
 │── docs/                       # Project documentation
 │── include/                    # Header files
-│   └── sprites.h               # Sprite graphics
+│   │── sprite.h                # Sprite management system
+│   │── game_settings.h         # Game settings and configuration
+│   │── game_system.h           # Core game system functions
+│   └── input.h                 # Input handling
 │── res/                        # Resource files
-│   └── sprites/                # Sprite graphics
+│   ├── sprites/                # Sprite graphics
+│   │   ├── Alex_idle_16x16.c   # Character sprite data
+│   │   └── Alex_run_16x16.c    # Character run animation
+│   └── tiles/                  # Tile graphics
+│       └── tileset.c           # Game tileset data
 │── rom/                        # Compiled ROMs
 │── src/                        # C source code
-│   └── main.c                  # Minimal working example
+│   │── credits.c               # Credits screen implementation
+│   │── dialogue.c              # Dialogue system
+│   │── game_settings.c         # Game settings implementation
+│   │── game_system.c           # Core game system
+│   │── gameplay.c              # Main game logic
+│   │── input.c                 # Input handling
+│   │── intro.c                 # Intro sequence
+│   │── lang.c                  # Language support
+│   │── main.c                  # Entry point
+│   │── options_screen.c        # Options menu
+│   │── sprite.c                # Sprite management
+│   └── title_screen.c          # Title screen
 │── .gitignore                  # Ignored files
+│── AGENTS.md                   # AI agent configuration
 │── CMakeLists.txt              # Main build configuration
 │── CMakePresets.json           # CMake presets
 └── README.md                   # Project documentation
