@@ -19,6 +19,137 @@ You are a senior C developer specialized in GameBoy Color development using gbdk
 ## Reference Materials
 - Explore the sample project under `../examples/` for implementation patterns and reusable snippets.
 
+### Example Projects
+- **apa_image**: Demonstrates displaying high-color images (more than 256 tiles) using APA (All-Points-Addressable) graphics mode. Key features:
+  - Uses `png2asset` with specific flags for APA mode
+  - Shows how to handle CGB palettes and display initialization
+  - Example of full-screen image rendering
+
+- **colorbar**: Shows advanced color palette handling on GBC:
+  - Multiple background palettes
+  - Palette manipulation and management
+  - Color cycling techniques
+
+- **comm**: Example of Game Boy Link Cable communication:
+  - Basic send/receive functionality
+  - Handshake protocols
+  - Data transfer patterns
+
+- **crash**: Demonstrates error handling and debugging techniques:
+  - Memory access patterns
+  - Hardware register usage
+  - Crash recovery strategies
+
+- **dscan**: Implements display scanning techniques:
+  - Mid-frame palette changes
+  - Background and window layer manipulation
+  - Tile and map data management
+
+- **filltest**: Performance testing tool:
+  - Screen filling algorithms
+  - Frame rate measurement
+  - Performance optimization techniques
+
+- **galaxy**: Advanced graphics demo:
+  - Parallax scrolling
+  - Sprite manipulation
+  - Complex background effects
+
+- **gb-dtmf**: DTMF tone generator and visualizer:
+  - Generates DTMF tones for telephony
+  - Interactive keypad interface
+  - Visual feedback for keypresses
+
+- **gbprinter**: Game Boy Printer emulation:
+  - Communication with GB Printer
+  - Image data handling
+  - Printer status management
+
+- **gbtype**: System detection and identification
+  - Detects Game Boy hardware type (DMG, MGB, CGB, GBA)
+  - Identifies Super Game Boy models (SGB1/SGB2)
+  - Demonstrates system-specific initialization
+
+- **hblank_copy**: Demonstrates H-Blank copying techniques:
+  - VRAM manipulation during H-Blank
+  - Double buffering with VRAM banks
+  - Smooth animation techniques
+
+- **hicolor**: High-color graphics demonstration
+  - Advanced color manipulation
+  - Palette effects and transitions
+  - Memory-efficient rendering techniques
+
+- **irq**: Interrupt handling example
+  - VBLANK and TIMER interrupts
+  - Critical section management
+  - Interrupt-driven timing
+
+- **isr_vector**: Low-level interrupt handling
+  - Direct ISR vector manipulation
+  - Custom interrupt service routines
+  - Hardware-level control
+
+- **lcd_isr_wobble**: LCD effects using interrupts
+  - Scanline-based effects
+  - Real-time screen manipulation
+  - Smooth visual distortions
+
+- **linkerfile**: Custom memory layout example
+  - ROM banking configuration
+  - Memory segment management
+  - Advanced linking techniques
+
+- **paint**: Drawing application
+  - Tile-based drawing tools
+  - Multiple brush types and colors
+  - Real-time rendering
+
+- **ram_function**: Shows how to execute code from RAM:
+  - RAM function copying and execution
+  - Performance-critical code optimization
+  - Memory management techniques
+
+- **rand**: Random number generation
+  - Pseudo-random number algorithms
+  - Seeding techniques
+  - Distribution visualization
+
+- **rpn**: Reverse Polish Notation calculator
+  - Stack-based arithmetic
+  - Input parsing
+  - Interactive console interface
+
+- **sgb_border**: Super Game Boy border display:
+  - Custom border graphics
+  - SGB communication protocols
+  - Multiplayer features
+
+- **sgb_pong**: Multiplayer Pong game
+  - SGB packet communication
+  - Two-player gameplay
+  - Score tracking
+
+- **sgb_sfx**: Super Game Boy sound effects
+  - SGB sound channel control
+  - Multiple effect types
+  - Real-time parameter adjustment
+
+- **sound**: Audio programming examples:
+  - Channel control and mixing
+  - Sound effects implementation
+  - Music playback
+
+- **template_minimal**: Minimal project template
+  - Basic project structure
+  - Essential setup code
+  - Build configuration
+
+- **wav_sample**: Audio sample playback
+  - Waveform generation
+  - Sample rate control
+  - Audio buffer management
+
 ## Code Quality Rules
 - Deliver C code that compiles with the gbdk-2020 toolchain.
 - Keep code minimal and tuned for CPU/RAM efficiency; avoid heap allocations or heavy libraries.
