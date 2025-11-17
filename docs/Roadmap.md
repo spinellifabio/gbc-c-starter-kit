@@ -12,33 +12,39 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
 - [x] Consolidated global settings: sound, difficulty, lives, mode, language, game_name, version
 - [x] Input flush check to prevent stuck keys
 
-## 2. Game Over
+## 2. Game Over (Completed)
 
 - [x] Game over screen with delay before it becomes skippable (~3–4s)
 - [x] Ability to set different messages/game over variants for future scenarios
 
-## 3. Sprites and Visual Content
+## 3. Game State Management (Completed)
+
+- [x] Centralized game state structure (lives, score, level)
+- [x] State initialization and reset functionality
+- [x] Integration with game over and menu systems
+
+## 4. Sprites and Visual Content
 
 - [ ] Sprite management (OAM, tile reuse)
 - [ ] Background layer management separate from UI
 - [ ] Dynamic palette and DMG/CGB compatibility
 - [ ] Visual effects: blink, fade, scroll, basic animations
 
-## 4. Intro Video / Cutscene
+## 5. Intro Video / Cutscene
 
 - [x] Animated intro screen (sprite/background)
 - [x] Text dialogue synced with frames → speed up with `A` button
 - [x] Ability to skip the entire video with one button
 - [x] Final link to the title screen
 
-## 5. Advanced Title Screen
+## 6. Advanced Title Screen
 
 - [ ] Display game_name + version + optional logo
 - [ ] START → **Slot Selection / Continue** (see Section 6)
 - [ ] SELECT → options menu
 - [ ] Multilanguage options working also in UI messages
 
-## 6. Save System (3 Slots) and Game Resume
+## 7. Save System (3 Slots) and Game Resume
 
 - [ ] **SRAM Map**: define `SaveSlot` with header, version, checksum, language, difficulty, lives, progress flags, seed, etc.
   - [ ] Header: magic `"GBCP"`, version `u8`, slot_id `u8`
@@ -58,7 +64,7 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
 - [ ] **Multilingual UI/UX**: localized labels for slot menu
 - [ ] **Performance**: SRAM writes outside vblank; input blocked during I/O
 
-## 7. Gameplay Test / Mini RPG
+## 8. Gameplay Test / Mini RPG
 
 - [ ] Gameplay screen with controllable character (tile-based movement)
 - [ ] Interaction with map elements (NPC, objects)

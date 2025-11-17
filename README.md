@@ -45,6 +45,10 @@ Make sure the following tools are installed:
 - Compatible with **Visual Studio Code** on Windows (with CMake Tools extension)
 - Integrated with **bgbw64 emulator** for testing the compiled ROMs directly from the project
 - State-based game loop with smooth screen transitions
+- **Game State Management**
+  - Centralized game state tracking (lives, score, level)
+  - Easy state initialization and reset
+  - Extensible structure for future game mechanics
 - Clean folder layout for source code, headers, and assets
 - Easy to extend for larger projects
 

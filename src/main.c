@@ -16,16 +16,19 @@
 #include "intro.h"
 #include "splash.h"
 #include "title_screen.h"
+#include "game_state.h"
 #include "credits.h"
 
 void main(void) {
     game_system_init();
+    game_state_init();
 
     splash_sequence();
     intro_cut_scene();
 
     while (1) {
         title_screen();
+        game_state_reset();
         gameplay_screen();
         credits_scene();
     }
