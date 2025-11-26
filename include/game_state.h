@@ -8,6 +8,8 @@ typedef struct {
     uint8_t lives;
     uint16_t score;
     uint8_t level;
+    uint8_t has_treasure;  // Flag for treasure collection
+    uint8_t encountered_hazard;  // Flag for hazard encounter
 } GameState;
 
 // Global game state

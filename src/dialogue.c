@@ -143,6 +143,64 @@ static void prompt_continue(void) {
     clear_dialogue_text();
 }
 
+uint8_t dialogue_show_yes_no(const char *question) {
+    uint8_t selected = 0; // 0 = Yes, 1 = No
+    uint8_t blink_timer = 0;
+
+    // Show the question
+    dialogue_show_text(question);
+
+    // Prepare the yes/no prompt
+    draw_dialogue_box();
+    clear_dialogue_text();
+
+    // Position the yes/no prompt at the bottom of the dialogue box
+    set_win_char(5, 3, 'Y');
+    set_win_char(6, 3, 'E');
+    set_win_char(7, 3, 'S');
+    set_win_char(10, 3, 'N');
+    set_win_char(11, 3, 'O');
+
+    // Initial cursor position
+    set_win_char(4, 3, '>');
+
+    slide_dialogue_box_on_screen();
+
+    // Input loop for yes/no selection
+    uint8_t done = 0;
+    while (!done) {
+        vsync_frames(1);
+        blink_timer++;
+
+        // Blink the cursor
+        if ((blink_timer & 0x10) == 0) {
+            set_win_char(4, 3, ' ');
+            set_win_char(9, 3, ' ');
+        } else {
+            set_win_char(4 + (selected * 5), 3, '>');
+            set_win_char(9 - (selected * 5), 3, ' ');
+        }
+
+        // Handle input
+        uint8_t joy = joypad();
+        if (joy & J_LEFT) {
+            selected = 0;
+            waitpadup();
+        } else if (joy & J_RIGHT) {
+            selected = 1;
+            waitpadup();
+        } else if ((joy & J_A) || (joy & J_START)) {
+            done = 1;
+            waitpadup();
+        }
+    }
+
+    slide_dialogue_box_off_screen();
+    clear_dialogue_text();
+
+    return selected ? DIALOGUE_RESULT_NO : DIALOGUE_RESULT_YES;
+}
+
 void dialogue_show_text(const char *text) {
     uint16_t index = 0u;
     uint8_t row = 0u;

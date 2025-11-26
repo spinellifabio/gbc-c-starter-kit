@@ -3,12 +3,17 @@
 #include <gb/metasprites.h>
 
 #include <stdint.h>
+#include <string.h>
 
 #include "Alex_idle_16x16.h"
 #include "Alex_run_16x16.h"
 #include "gameplay.h"
 #include "tileset.h"
 #include "world_defs.h"
+#include "game_objects.h"
+#include "game_state.h"
+#include "dialogue.h"
+#include "game_over.h"
 
 #define SCREEN_CENTER_X 80u
 #define SCREEN_CENTER_Y 72u
@@ -267,69 +272,178 @@ static void render_viewport(void) {
     }
 }
 
-void gameplay_screen(void) {
-    uint16_t world_x = SCREEN_CENTER_X;
-    uint16_t world_y = SCREEN_CENTER_Y;
-    uint8_t dir = DIR_FRONT;
-    uint8_t run_frame = 0u;
-    uint8_t anim_tick = 0u;
+// Function to wait for a number of frames
+static void vsync_frames(uint8_t frames) {
+    for (uint8_t i = 0; i < frames; i++) {
+        vsync();
+    }
+}
 
+// Player state
+typedef struct {
+    uint16_t x;
+    uint16_t y;
+    uint8_t dir;
+    uint8_t frame;
+    uint8_t moving;
+} Player;
+
+static Player player;
+static uint8_t game_active = 1;
+static GameObject* last_obj_interacted = 0;
+static const uint8_t run_frame_lut[RUN_FRAMES_PER_DIR * 2] = {0,0,1,1,2,2,3,3,4,4,5,5};
+
+void reset_gameplay(void) {
+    // Reset player position
+    player.x = 80;
+    player.y = 80;
+    player.dir = DIR_FRONT;
+    player.frame = 0;
+    player.moving = 0;
+
+    // Reset camera
+    cam_x = 0;
+    cam_y = 0;
+    reset_viewport_cache();
+
+    // Reset game objects
+    init_game_objects();
+
+    // Reset game state flags
+    game_state.has_treasure = 0;
+    game_state.encountered_hazard = 0;
+    last_obj_interacted = 0;
+
+    // Reset game active flag
+    game_active = 1;
+}
+
+void handle_player_movement(void) {
+    uint8_t joy = joypad();
+    uint8_t moved = 0;
+
+    // Handle movement
+    if (joy & J_LEFT) {
+        player.dir = DIR_LEFT;
+        if (can_walk((uint16_t)(player.x - MOVE_SPEED), player.y + PLAYER_OFFSET_Y)) {
+            player.x -= MOVE_SPEED;
+            moved = 1;
+        }
+    } else if (joy & J_RIGHT) {
+        player.dir = DIR_RIGHT;
+        if (can_walk((uint16_t)(player.x + MOVE_SPEED), player.y + PLAYER_OFFSET_Y)) {
+            player.x += MOVE_SPEED;
+            moved = 1;
+        }
+    } else if (joy & J_UP) {
+        player.dir = DIR_BACK;
+        if (can_walk(player.x, (uint16_t)(player.y - MOVE_SPEED + PLAYER_OFFSET_Y))) {
+            player.y -= MOVE_SPEED;
+            moved = 1;
+        }
+    } else if (joy & J_DOWN) {
+        player.dir = DIR_FRONT;
+        if (can_walk(player.x, (uint16_t)(player.y + MOVE_SPEED + PLAYER_OFFSET_Y))) {
+            player.y += MOVE_SPEED;
+            moved = 1;
+        }
+    }
+
+    // Update animation
+    if (moved) {
+        player.frame = (player.frame + 1) % (RUN_FRAMES_PER_DIR * 2);
+    } else {
+        player.frame = 0;
+    }
+    player.moving = moved;
+
+    // Check for object collisions
+    GameObject* obj = check_object_collision(player.x - 4, player.y - 8, 8, 16);
+    if (obj) {
+        if (obj != last_obj_interacted) {
+            handle_object_interaction(obj);
+            last_obj_interacted = obj;
+        }
+    } else {
+        last_obj_interacted = 0;
+    }
+
+    // Check win condition (return to start with treasure)
+    if (game_state.has_treasure && player.x < 32 && player.y < 32) {
+        dialogue_show_text("You won!\nCongratulations!");
+        game_active = 0;
+    }
+}
+
+void draw_player(void) {
+    uint8_t tile;
+
+    if (player.moving) {
+        // Use running animation frames; frame_lut avoids costly div/mod on Z80
+        uint8_t frame_idx = run_frame_lut[player.frame]; /* 0..5 */
+        tile = (uint8_t)((player.dir * RUN_FRAMES_PER_DIR + frame_idx) << 2);
+    } else {
+        // Standing still
+        tile = (uint8_t)((player.dir * RUN_FRAMES_PER_DIR) << 2);
+    }
+
+    // Draw player sprite (4 tiles for 16x16)
+    set_sprite_tile(8, tile);
+    set_sprite_tile(9, tile + 1);
+    set_sprite_tile(10, tile + 2);
+    set_sprite_tile(11, tile + 3);
+
+    // Position sprites (adjust for camera)
+    int16_t screen_x = (int16_t)player.x - (int16_t)cam_x;
+    int16_t screen_y = (int16_t)player.y - (int16_t)cam_y - 8;
+
+    move_sprite(8, screen_x, screen_y);
+    move_sprite(9, screen_x + 8, screen_y);
+    move_sprite(10, screen_x, screen_y + 8);
+    move_sprite(11, screen_x + 8, screen_y + 8);
+}
+
+
+
+void gameplay_screen(void) {
+    // Initialize game state
+    reset_gameplay();
+
+    // Initialize graphics
     ensure_tile_quads();
     reset_viewport_cache();
-    update_camera(world_x, world_y);
 
-    while (1) {
-        uint8_t keys = joypad();
-        uint8_t moving = 0u;
-        int16_t nx = (int16_t)world_x;
-        int16_t ny = (int16_t)world_y;
+    // Show instructions
+    dialogue_show_text("Find the treasure!\nBut beware of hazards!");
 
-        if (keys == J_DOWN) {
-            dir = DIR_FRONT;
-            ny += MOVE_SPEED;
-            moving = 1u;
-        } else if (keys == J_UP) {
-            dir = DIR_BACK;
-            ny -= MOVE_SPEED;
-            moving = 1u;
-        } else if (keys == J_LEFT) {
-            dir = DIR_LEFT;
-            nx -= MOVE_SPEED;
-            moving = 1u;
-        } else if (keys == J_RIGHT) {
-            dir = DIR_RIGHT;
-            nx += MOVE_SPEED;
-            moving = 1u;
-        }
+    // Main game loop
+    while (game_active) {
+        // Handle input and update game state
+        handle_player_movement();
 
-        if (moving && can_walk((uint16_t)nx, (uint16_t)(ny + PLAYER_OFFSET_Y))) {
-            world_x = (uint16_t)nx;
-            world_y = (uint16_t)ny;
-        } else {
-            moving = 0u;
-        }
+        // Update camera to follow player
+        update_camera(player.x, player.y);
 
-        if (moving) {
-            uint8_t delay = (MOVE_SPEED == 1) ? 8u : (MOVE_SPEED == 2) ? 6u : 4u;
-            if (++anim_tick >= delay) {
-                anim_tick = 0u;
-                run_frame = (uint8_t)((run_frame + 1u) % RUN_FRAMES_PER_DIR);
-            }
-            uint8_t idx = (uint8_t)(dir * RUN_FRAMES_PER_DIR + run_frame);
-            move_metasprite_ex(Alex_run_16x16_metasprites[idx],
-                               Alex_idle_16x16_TILE_COUNT, 0u, 0u,
-                               SCREEN_CENTER_X + PLAYER_OFFSET_X,
-                               SCREEN_CENTER_Y + PLAYER_OFFSET_Y);
-        } else {
-            move_metasprite_ex(Alex_idle_16x16_metasprites[dir],
-                               0u, 0u, 0u,
-                               SCREEN_CENTER_X + PLAYER_OFFSET_X,
-                               SCREEN_CENTER_Y + PLAYER_OFFSET_Y);
-            run_frame = 0u;
-            anim_tick = 0u;
-        }
+        // Update game objects
+        update_game_objects();
 
-        update_camera(world_x, world_y);
+        // Render the viewport
+        render_viewport();
+
+        // Draw game objects
+        draw_game_objects(cam_x, cam_y);
+
+        // Draw player
+        draw_player();
+
+        // Wait for VBLANK to ensure smooth animation
         wait_vbl_done();
     }
+
+    // Game over or win, wait for input before returning
+    waitpadup();
+    while (!(joypad() & (J_A | J_START))) {
+        vsync_frames(1);
+    }
+    waitpadup();
 }
