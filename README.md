@@ -112,6 +112,11 @@ start bgbw64.exe rom/your-game.gbc
 
 By default the prototype runs through splash, intro cutscene, title, gameplay test loop, then shows the credits scene (skippable with START/SELECT) before returning to the title screen.
 
+### Prototype controls
+
+- Title: `START` to play, `SELECT` for options.
+- Dialogue Yes/No: `LEFT/RIGHT` moves the cursor, `A` confirms current choice, `B` snaps to **No** and confirms.
+
 ### Visual Studio Code (recommended)
 
 If you are using **Visual Studio Code** with the *CMake Tools* extension:
