@@ -9,6 +9,7 @@
 #include "input.h"
 #include "lang.h"
 #include "options_screen.h"
+#include "utils.h"
 
 typedef uint8_t (*MenuChangeFn)(int dir);
 
@@ -105,6 +106,7 @@ static void draw_option_line(uint8_t i, uint8_t cursor) {
 
 static void draw_options(uint8_t cursor) {
     cls();
+    clear_attr_map();
     gotoxy(6u, 1u);
     printf("%s", lang_str(STR_OPTIONS_TITLE));
     gotoxy(2u, 3u);
@@ -151,4 +153,5 @@ void options_screen(void) {
     }
     flush_input();
     cls();
+    clear_attr_map();
 }

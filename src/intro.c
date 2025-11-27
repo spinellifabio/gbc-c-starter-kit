@@ -13,6 +13,7 @@
 #include "input.h"
 #include "intro.h"
 #include "lang.h"
+#include "utils.h"
 
 #define RUN_FRAMES_PER_DIR 6u
 #define DIR_RIGHT 0u
@@ -51,6 +52,7 @@ void intro_cut_scene(void) {
     flush_input();
     clear_intro_background();
     cls();
+    clear_attr_map();
     HIDE_WIN;
 
     uint16_t lead_x = LEAD_START_X;
@@ -120,13 +122,8 @@ void intro_cut_scene(void) {
         move_metasprite_ex(Alex_idle_16x16_metasprites[DIR_FRONT],
                            0u, 0u, 4u,
                            0u, 160u);
-        cls();
         const char *hurry_text = lang_str(STR_INTRO_HURRY);
-        gotoxy((uint8_t)((20u - strlen(hurry_text)) / 2u), 9u);
-        printf("%s", hurry_text);
-        for (uint16_t f = 0u; f < 120u; f++) {
-            wait_vbl_done();
-        }
+        dialogue_show_text(hurry_text);
     }
 
     move_metasprite_ex(Alex_idle_16x16_metasprites[DIR_FRONT],
@@ -138,4 +135,5 @@ void intro_cut_scene(void) {
 
     flush_input();
     cls();
+    clear_attr_map();
 }

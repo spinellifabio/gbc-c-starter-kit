@@ -10,6 +10,7 @@
 #include "lang.h"
 #include "options_screen.h"
 #include "title_screen.h"
+#include "utils.h"
 
 static void draw_blink_line(uint8_t x, uint8_t y, LangStringId id, uint8_t visible) {
     gotoxy(x, y);
@@ -24,6 +25,7 @@ void title_screen(void) {
     uint8_t frame_counter = 0u;
     uint8_t visible = 1u;
     cls();
+    clear_attr_map();
 
     set_bkg_tiles(5u, 6u, (uint8_t)strlen(g_settings.game_name), 1u, (uint8_t *)g_settings.game_name);
     set_bkg_tiles(7u, 7u, (uint8_t)strlen(g_settings.version), 1u, (uint8_t *)g_settings.version);
@@ -46,4 +48,5 @@ void title_screen(void) {
     }
     flush_input();
     cls();
+    clear_attr_map();
 }

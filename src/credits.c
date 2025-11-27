@@ -7,6 +7,7 @@
 
 #include "credits.h"
 #include "input.h"
+#include "utils.h"
 
 #define SCREEN_WIDTH_TILES 20u
 #define SCREEN_HEIGHT_TILES 18u
@@ -74,6 +75,7 @@ void credits_scene(void) {
     SCX_REG = 0u;
     SCY_REG = 0u;
     cls();
+    clear_attr_map();
     render_rows(top_row);
 
     while (!done) {
@@ -98,4 +100,5 @@ void credits_scene(void) {
 
     flush_input();
     cls();
+    clear_attr_map();
 }

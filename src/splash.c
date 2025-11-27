@@ -7,8 +7,11 @@
 
 #include "lang.h"
 #include "splash.h"
+#include "utils.h"
 
 static void show_splash(LangStringId id_text, uint16_t duration_frames) {
+    cls();
+    clear_attr_map();
     const char *text = lang_str(id_text);
     gotoxy((uint8_t)((20u - strlen(text)) / 2u), 9u);
     printf("%s", text);
@@ -16,6 +19,7 @@ static void show_splash(LangStringId id_text, uint16_t duration_frames) {
         wait_vbl_done();
     }
     cls();
+    clear_attr_map();
 }
 
 void splash_sequence(void) {
