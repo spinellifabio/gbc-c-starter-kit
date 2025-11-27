@@ -189,7 +189,17 @@ uint8_t dialogue_show_yes_no(const char *question) {
         } else if (joy & J_RIGHT) {
             selected = 1;
             waitpadup();
-        } else if ((joy & J_A) || (joy & J_START)) {
+        } else if (joy & J_A) {
+            done = 1;
+            waitpadup();
+        } else if (joy & J_B) {
+            selected = 1; /* Treat B as choosing No */
+            set_win_char(9, 3, '>');
+            set_win_char(4, 3, ' ');
+            vsync_frames(1); /* show the arrow snap before closing */
+            done = 1;
+            waitpadup();
+        } else if (joy & J_START) {
             done = 1;
             waitpadup();
         }
