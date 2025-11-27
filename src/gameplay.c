@@ -290,8 +290,14 @@ typedef struct {
 
 static Player player;
 static uint8_t game_active = 1;
+static GameplayResult game_result = GAME_RESULT_WIN;
 static GameObject* last_obj_interacted = 0;
 static const uint8_t run_frame_lut[RUN_FRAMES_PER_DIR * 2] = {0,0,1,1,2,2,3,3,4,4,5,5};
+
+void gameplay_signal_game_over(void) {
+    game_result = GAME_RESULT_GAME_OVER;
+    game_active = 0;
+}
 
 void reset_gameplay(void) {
     // Reset player position
@@ -316,6 +322,7 @@ void reset_gameplay(void) {
 
     // Reset game active flag
     game_active = 1;
+    game_result = GAME_RESULT_WIN;
 }
 
 void handle_player_movement(void) {
@@ -371,6 +378,7 @@ void handle_player_movement(void) {
     // Check win condition (return to start with treasure)
     if (game_state.has_treasure && player.x < 32 && player.y < 32) {
         dialogue_show_text("You won!\nCongratulations!");
+        game_result = GAME_RESULT_WIN;
         game_active = 0;
     }
 }
@@ -405,7 +413,7 @@ void draw_player(void) {
 
 
 
-void gameplay_screen(void) {
+GameplayResult gameplay_screen(void) {
     // Initialize game state
     reset_gameplay();
 
@@ -440,10 +448,14 @@ void gameplay_screen(void) {
         wait_vbl_done();
     }
 
-    // Game over or win, wait for input before returning
-    waitpadup();
-    while (!(joypad() & (J_A | J_START))) {
-        vsync_frames(1);
+    // Only wait for input after a win; game over screen handles its own input
+    if (game_result == GAME_RESULT_WIN) {
+        waitpadup();
+        while (!(joypad() & (J_A | J_START))) {
+            vsync_frames(1);
+        }
+        waitpadup();
     }
-    waitpadup();
+
+    return game_result;
 }

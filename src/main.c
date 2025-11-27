@@ -18,6 +18,7 @@
 #include "title_screen.h"
 #include "game_state.h"
 #include "credits.h"
+#include "game_over.h"
 
 void main(void) {
     game_system_init();
@@ -29,7 +30,10 @@ void main(void) {
     while (1) {
         title_screen();
         game_state_reset();
-        gameplay_screen();
+        GameplayResult result = gameplay_screen();
+        if (result == GAME_RESULT_GAME_OVER) {
+            show_game_over_screen(GAME_OVER_DEFAULT, game_state.score);
+        }
         credits_scene();
     }
 }

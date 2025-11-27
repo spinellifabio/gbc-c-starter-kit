@@ -1,6 +1,7 @@
 #include "game_objects.h"
 #include "game_state.h"
 #include "dialogue.h"
+#include "gameplay.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -118,13 +119,9 @@ uint8_t game_lose_life(void) {
     if (game_state.lives > 0) {
         game_state.lives--;
         if (game_state.lives == 0) {
-            // Game over
-            dialogue_show_text("Game Over!\nPress START");
-            // Reset game after a delay
-            waitpad(J_START);
-            waitpadup();
+            gameplay_signal_game_over();
         } else {
-            // Show remaining lives
+            // Show remaining lives (rare, but kept if lives increase later)
             char lives_text[32];
             sprintf(lives_text, "Ouch! %u lives left.", (uint8_t)game_state.lives);
             dialogue_show_text(lives_text);
@@ -155,8 +152,7 @@ void handle_object_interaction(GameObject* obj) {
                 if (choice == DIALOGUE_RESULT_YES) {
                     game_state.encountered_hazard = 1;
                     if (game_lose_life() == 0) {
-                        dialogue_show_text("Game Over!");
-                        // TODO: Handle game over
+                        // Game over: gameplay loop will exit and screen will show
                     } else {
                         dialogue_show_text("Ouch! Lost a life!");
                     }
