@@ -30,6 +30,11 @@
 
 #define MOVE_SPEED 2
 
+#define HOME_MIN_X 64u   /* Spawn zone bounding box; landing back here ends game */
+#define HOME_MAX_X 96u
+#define HOME_MIN_Y 64u
+#define HOME_MAX_Y 96u
+
 #define M_WATER 0u
 #define M_SAND  1u
 #define M_GRASS 2u
@@ -272,13 +277,6 @@ static void render_viewport(void) {
     }
 }
 
-// Function to wait for a number of frames
-static void vsync_frames(uint8_t frames) {
-    for (uint8_t i = 0; i < frames; i++) {
-        vsync();
-    }
-}
-
 // Player state
 typedef struct {
     uint16_t x;
@@ -375,9 +373,10 @@ void handle_player_movement(void) {
         last_obj_interacted = 0;
     }
 
-    // Check win condition (return to start with treasure)
-    if (game_state.has_treasure && player.x < 32 && player.y < 32) {
-        dialogue_show_text("You won!\nCongratulations!");
+    // Check win condition (return to home zone with treasure)
+    if (game_state.has_treasure &&
+        (player.x >= HOME_MIN_X) && (player.x <= HOME_MAX_X) &&
+        (player.y >= HOME_MIN_Y) && (player.y <= HOME_MAX_Y)) {
         game_result = GAME_RESULT_WIN;
         game_active = 0;
     }
@@ -446,15 +445,6 @@ GameplayResult gameplay_screen(void) {
 
         // Wait for VBLANK to ensure smooth animation
         wait_vbl_done();
-    }
-
-    // Only wait for input after a win; game over screen handles its own input
-    if (game_result == GAME_RESULT_WIN) {
-        waitpadup();
-        while (!(joypad() & (J_A | J_START))) {
-            vsync_frames(1);
-        }
-        waitpadup();
     }
 
     return game_result;

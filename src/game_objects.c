@@ -141,7 +141,7 @@ void handle_object_interaction(GameObject* obj) {
                 if (choice == DIALOGUE_RESULT_YES) {
                     game_state.has_treasure = 1;
                     obj->active = 0;  // Remove treasure
-                    dialogue_show_text("You got the treasure!\nReturn to start to win!");
+                    dialogue_show_text("You got the treasure!");
                 }
             }
             break;

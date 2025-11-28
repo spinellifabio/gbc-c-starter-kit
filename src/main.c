@@ -19,6 +19,7 @@
 #include "game_state.h"
 #include "credits.h"
 #include "game_over.h"
+#include "win_screen.h"
 
 void main(void) {
     game_system_init();
@@ -33,6 +34,8 @@ void main(void) {
         GameplayResult result = gameplay_screen();
         if (result == GAME_RESULT_GAME_OVER) {
             show_game_over_screen(GAME_OVER_DEFAULT, game_state.score);
+        } else {
+            show_win_screen(game_state.score);
         }
         credits_scene();
     }
