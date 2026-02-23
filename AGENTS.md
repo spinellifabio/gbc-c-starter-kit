@@ -254,4 +254,5 @@ Use the [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0
 
 **Rules:**
 1. Split unrelated change types into separate commits.
-2. Confirm commit message with the requestor before running `git commit`.
+2. I will NOT suggest git commits unless you explicitly ask.
+3. If you do ask, I'll only suggest the commit message for your approval before you run `git commit` manually.
