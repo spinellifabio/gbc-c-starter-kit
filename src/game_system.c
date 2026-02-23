@@ -6,6 +6,7 @@
 
 #include "Alex_idle_16x16.h"
 #include "Alex_run_16x16.h"
+#include "dialogue.h"
 #include "game_settings.h"
 #include "game_system.h"
 #include "lang.h"
@@ -22,7 +23,9 @@ void game_system_init(void) {
     VBK_REG = 0u;
 
     font_init();
-    font_set(font_load(font_ibm));
+    font_t ibm_font = font_load(font_ibm);
+    dialogue_set_window_base_tile(((pmfont_handle)ibm_font)->first_tile);
+    font_set(ibm_font);
 
     for (uint16_t i = 0u; i < sizeof(tileset_map); i++) {
         map_buffer[i] = (uint8_t)(tileset_map[i] + FONT_OFFSET);

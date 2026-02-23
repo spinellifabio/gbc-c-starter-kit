@@ -19,6 +19,11 @@
 #define DIALOGUE_TEXT_BUFFER (LANG_DLG_PAGE_COUNT * LANG_DLG_MAX_LINES_PER_PAGE * (INNER_DIALOGUE_BOX_WIDTH + 4u))
 
 static int16_t window_y_position = DIALOGUE_WIN_OFFSCREEN_Y;
+static uint8_t window_tile_base = 0u;
+
+void dialogue_set_window_base_tile(uint8_t base_tile) {
+    window_tile_base = base_tile;
+}
 
 static uint8_t char_to_tile(char c) {
     if ((c >= 'a') && (c <= 'z')) {
@@ -32,7 +37,7 @@ static uint8_t char_to_tile(char c) {
 
 static void set_win_char(uint8_t x, uint8_t y, char c) {
     uint8_t tile = char_to_tile(c);
-    set_win_tiles(x, y, 1u, 1u, &tile);
+    set_win_based_tiles(x, y, 1u, 1u, &tile, window_tile_base);
 }
 
 static void vsync_frames(uint8_t count) {
