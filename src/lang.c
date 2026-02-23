@@ -38,7 +38,12 @@ static const char* const STRINGS_EN[STR__COUNT] = {
 
     /* STR_GAMEOVER_TITLE       */ "GAME OVER",
     /* STR_GAMEOVER_REASON_HOLE */ "FELL INTO A HOLE",
-    /* STR_GAMEOVER_REASON_ENEMY*/ "DEFEATED BY ENEMY"
+    /* STR_GAMEOVER_REASON_ENEMY*/ "DEFEATED BY ENEMY",
+
+    /* STR_WIN_TITLE            */ "YOU WIN!",
+    /* STR_WIN_TREASURE         */ "TREASURE SECURED",
+    /* STR_SCORE_LABEL          */ "SCORE",
+    /* STR_PRESS_START          */ "PRESS START"
 };
 
 static const char* const STRINGS_IT[STR__COUNT] = {
@@ -73,7 +78,12 @@ static const char* const STRINGS_IT[STR__COUNT] = {
 
     /* STR_GAMEOVER_TITLE       */ "GAME OVER",
     /* STR_GAMEOVER_REASON_HOLE */ "CADUTO IN UNA BUCA",
-    /* STR_GAMEOVER_REASON_ENEMY*/ "SCONFITTO DAL NEMICO"
+    /* STR_GAMEOVER_REASON_ENEMY*/ "SCONFITTO DAL NEMICO",
+
+    /* STR_WIN_TITLE            */ "HAI VINTO!",
+    /* STR_WIN_TREASURE         */ "TESORO RECUPERATO",
+    /* STR_SCORE_LABEL          */ "PUNTEGGIO",
+    /* STR_PRESS_START          */ "PREMI START"
 };
 
 static const char* const* const STRINGS_ALL[LANG_COUNT] = {

@@ -20,6 +20,7 @@ set(SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/dialogue.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/input.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/lang.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/utils.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/intro.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/splash.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/title_screen.c"

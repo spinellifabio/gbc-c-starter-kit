@@ -51,6 +51,12 @@ typedef enum {
     STR_GAMEOVER_REASON_HOLE,   /* "FELL INTO A HOLE" / "CADUTO IN UNA BUCA" */
     STR_GAMEOVER_REASON_ENEMY,  /* "DEFEATED BY ENEMY" / "SCONFITTO DAL NEMICO" */
 
+    /* Win Screen */
+    STR_WIN_TITLE,              /* "YOU WIN!" / "HAI VINTO!" */
+    STR_WIN_TREASURE,           /* "TREASURE SECURED" / "TESORO RECUPERATO" */
+    STR_SCORE_LABEL,            /* "SCORE" / "PUNTEGGIO" */
+    STR_PRESS_START,            /* "PRESS START" / "PREMI START" */
+
     STR__COUNT                  /* sempre ultimo */
 } LangStringId;
 

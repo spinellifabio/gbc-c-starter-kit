@@ -5,6 +5,13 @@
 #include <gbdk/console.h>
 #include <stdio.h>
 #include <string.h>
+/* Fixed: ensure fixed-width integer types are available for prototypes */
+#include <stdint.h>
+
+// Scene transition utilities
+void scene_init_clean(void);
+void fade_to_black(uint8_t frames);
+void fade_from_black(uint8_t frames);
 
 /**
  * @brief Waits for any button press and clears the input buffer

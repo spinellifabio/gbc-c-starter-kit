@@ -3,6 +3,7 @@
 #include "game_over.h"
 #include "game_settings.h"
 #include "utils.h"
+#include "lang.h"
 
 // Game over messages (will be moved to language system later)
 static const char game_over_messages[][14] = {  // Longest string is 13 chars + null
@@ -13,39 +14,43 @@ static const char game_over_messages[][14] = {  // Longest string is 13 chars + 
 };
 
 void show_game_over_screen(GameOverReason reason, uint16_t score) {
-    // Clear screen and hide sprites
-    clear_screen();
-    HIDE_SPRITES;
+    /* Fade to black for clean transition */
+    fade_to_black(12u);
 
-    // Display game over message
+    /* Initialize clean scene (disable LCD, hide sprites, clear VRAM, reset palettes) */
+    scene_init_clean();
+
+    /* Display game over title centered vertically at row 8 */
     const char *message = game_over_messages[reason];
-    print_centered(message, 6);
+    print_centered(message, 8u);
 
-    // Display score if not zero
-    if (score > 0) {
-        char score_str[6]; // Up to 5 digits + null terminator
-        int_to_str(score, score_str, 5);
+    /* Display score if not zero */
+    if (score > 0u) {
+        char score_str[6];  /* Up to 5 digits + null terminator */
+        int_to_str(score, score_str, 5u);
 
-        // Display "SCORE: " text
-        const char score_text[] = "SCORE:";
-        print_centered(score_text, 8);
+        /* Display score label at row 10 */
+        print_centered(lang_str(STR_SCORE_LABEL), 10u);
 
-        // Display score value
-        gotoxy(13, 8);
-        for (uint8_t i = 0; i < 5; i++) {
+        /* Display score value next to label */
+        gotoxy(13u, 10u);
+        for (uint8_t i = 0u; i < 5u; i++) {
             printf("%c", score_str[i]);
         }
     }
 
-    // Wait a moment before allowing input (60 frames = ~1 second)
-    uint8_t wait_frames = 180; // 3 seconds at 60 FPS
+    /* Fade in from black */
+    fade_from_black(12u);
+
+    /* Wait a moment before allowing input (180 frames = ~3 seconds at 60 FPS) */
+    uint8_t wait_frames = 180u;
     while (wait_frames--) {
         wait_vbl_done();
     }
 
-    // Show continue prompt
-    print_centered("PRESS START", 12);
+    /* Show continue prompt at row 16 (near bottom) */
+    print_centered(lang_str(STR_PRESS_START), 16u);
 
-    // Wait for any key
+    /* Wait for any key */
     wait_any_key();
 }

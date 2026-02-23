@@ -289,6 +289,7 @@ typedef struct {
 static Player player;
 static uint8_t game_active = 1;
 static GameplayResult game_result = GAME_RESULT_WIN;
+static WinReason game_result_reason = WIN_TREASURE_SECURED;
 static GameObject* last_obj_interacted = 0;
 static const uint8_t run_frame_lut[RUN_FRAMES_PER_DIR * 2] = {0,0,1,1,2,2,3,3,4,4,5,5};
 
@@ -446,4 +447,12 @@ GameplayResult gameplay_screen(void) {
     }
 
     return game_result;
+}
+
+/**
+ * @brief Retrieves the reason for the win condition
+ * @return WinReason enum value indicating why the player won
+ */
+WinReason gameplay_get_win_reason(void) {
+    return game_result_reason;
 }
