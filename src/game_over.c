@@ -14,9 +14,6 @@ static const char game_over_messages[][14] = {  // Longest string is 13 chars + 
 };
 
 void show_game_over_screen(GameOverReason reason, uint16_t score) {
-    /* Fade to black for clean transition */
-    fade_to_black(12u);
-
     /* Initialize clean scene (disable LCD, hide sprites, clear VRAM, reset palettes) */
     scene_init_clean();
 

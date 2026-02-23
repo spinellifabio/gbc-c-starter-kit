@@ -8,9 +8,6 @@
 void show_win_screen(uint16_t score, WinReason reason) {
     (void)reason;  /* Currently only one win reason, but extensible for future */
 
-    /* Fade to black for clean transition */
-    fade_to_black(12u);
-
     /* Initialize clean scene (disable LCD, hide sprites, clear VRAM, reset palettes) */
     scene_init_clean();
 
