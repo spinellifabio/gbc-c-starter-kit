@@ -24,13 +24,9 @@ const uint8_t hazard_tiles[] = {
 #define MAX_OBJECTS 10
 
 static GameObject objects[MAX_OBJECTS];
-static uint8_t objects_initialized = 0;
 
-// Initialize game objects
+// Initialize game objects — always resets so each game run starts fresh
 void init_game_objects(void) {
-    if (objects_initialized) return;
-
-    // Clear all objects
     memset(objects, 0, sizeof(objects));
 
     // Add treasure chest
@@ -39,7 +35,7 @@ void init_game_objects(void) {
     objects[0].width = 16;
     objects[0].height = 16;
     objects[0].sprite_tile = TREASURE_TILE;
-    objects[0].palette = 1;  // Red palette
+    objects[0].palette = 1;  /* Red palette */
     objects[0].type = OBJECT_TREASURE;
     objects[0].active = 1;
 
@@ -49,15 +45,11 @@ void init_game_objects(void) {
     objects[1].width = 8;
     objects[1].height = 16;
     objects[1].sprite_tile = HAZARD_TILE;
-    objects[1].palette = 2;  // Yellow palette
+    objects[1].palette = 2;  /* Yellow palette */
     objects[1].type = OBJECT_HAZARD;
     objects[1].active = 1;
 
-    // Load sprite data into VRAM
-    set_sprite_data(TREASURE_TILE, 4, treasure_tiles);
-    set_sprite_data(HAZARD_TILE, 4, hazard_tiles);
-
-    objects_initialized = 1;
+    /* Sprite tile data is loaded once at game_system_init; no need to reload here */
 }
 
 // Update game objects

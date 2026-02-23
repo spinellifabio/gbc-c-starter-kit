@@ -23,12 +23,16 @@ typedef struct {
     uint8_t active;
 } GameObject;
 
-// Treasure chest sprite (8x8)
-#define TREASURE_TILE 64
+/* Sprite VRAM layout:
+ *   0..19  : Alex idle  (Alex_idle_16x16_TILE_COUNT = 20)
+ *  20..99  : Alex run   (Alex_run_16x16_TILE_COUNT  = 80)
+ * 100..103 : Treasure chest (4 tiles)
+ * 104..107 : Hazard         (4 tiles)
+ */
+#define TREASURE_TILE 100u
 extern const uint8_t treasure_tiles[];
 
-// Hazard sprite (8x8)
-#define HAZARD_TILE 68
+#define HAZARD_TILE   104u
 extern const uint8_t hazard_tiles[];
 
 // Initialize game objects

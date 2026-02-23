@@ -1,27 +1,25 @@
+#include "background.h"
+
 #include <gb/gb.h>
 #include <gb/cgb.h>
-#include "background.h"
 #include <string.h>
 
-// Maximum number of background layers
+/* NOTE: background.c is currently unused by the game. It is excluded from
+ * the CMake build (see CMakeLists.txt) to avoid wasting ~48 bytes WRAM.
+ * Keep this file as a reference implementation for future use. */
+
 #define MAX_BACKGROUNDS 3
 
-// Forward declarations
-static bool is_cgb(void);
-
-// Check if current hardware is CGB (using GBDK's built-in macro)
-static bool is_cgb(void) {
+static uint8_t is_cgb(void) {
     #ifdef CGB
-    return _cpu == CGB_TYPE;
+    return (_cpu == CGB_TYPE) ? 1u : 0u;
     #else
-    return false;
+    return 0u;
     #endif
 }
 
-
-// Background layers array
 static background_t backgrounds[MAX_BACKGROUNDS];
-static bool system_initialized = false;
+static uint8_t system_initialized = 0u;
 
 // Initialize background system
 void bg_init(void) {
@@ -53,7 +51,7 @@ void bg_init(void) {
     SHOW_SPRITES;
     DISPLAY_ON;
 
-    system_initialized = true;
+    system_initialized = 1u;
 }
 
 // Load a background from ROM
@@ -76,7 +74,7 @@ void bg_load(background_t* bg, uint8_t layer,
     target->scroll_y = 0;
     target->scroll_mode = BG_SCROLL_NONE;
     target->palette = 0;
-    target->visible = true;
+    target->visible = 1u;
 
     // Set VRAM bank and load tiles
     if (is_cgb()) {
@@ -137,7 +135,7 @@ void bg_set_scroll(background_t* bg, int8_t dx, int8_t dy) {
 }
 
 // Set background visibility
-void bg_set_visible(background_t* bg, bool visible) {
+void bg_set_visible(background_t* bg, uint8_t visible) {
     if (!bg) return;
     bg->visible = visible;
 
@@ -214,8 +212,8 @@ uint8_t bg_get_tile(background_t* bg, uint8_t x, uint8_t y) {
 }
 
 // Check if coordinates are within background bounds
-bool bg_in_bounds(const background_t* bg, uint8_t x, uint8_t y) {
-    return bg && x < bg->width && y < bg->height;
+uint8_t bg_in_bounds(const background_t* bg, uint8_t x, uint8_t y) {
+    return (bg && x < bg->width && y < bg->height) ? 1u : 0u;
 }
 
 

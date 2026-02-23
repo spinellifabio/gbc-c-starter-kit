@@ -7,11 +7,30 @@ file(MAKE_DIRECTORY "${ROM_DIR}")
 set(ROM_NAME "${PROJECT_NAME}.gbc")
 set(ROM_PATH "${ROM_DIR}/${ROM_NAME}")
 
-# === Source files (.c in src/ and .c in res/sprites) ===
-file(GLOB SRC_FILES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
+# === Source files ===
+# Explicit list preferred over glob: avoids compiling dead-code modules
+# (sprite.c and background.c are unused — excluded to save ~400 bytes WRAM + ROM)
+set(SRC_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/game_system.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/game_settings.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/game_state.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/gameplay.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/game_objects.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/dialogue.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/input.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/lang.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/intro.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/splash.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/title_screen.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/options_screen.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/credits.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/game_over.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/win_screen.c"
+    # sprite.c   — excluded: dead code, 352 bytes WRAM wasted
+    # background.c — excluded: dead code, ~48 bytes WRAM wasted
+)
 file(GLOB RES_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/res/**/*.c")
-# file(GLOB SPRITE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/res/sprites/*.c")
-# file(GLOB TILESET_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/res/tiles/*.c")
 
 # === Locate tools (from GBDK_ROOT) ===
 set(LCC_DEFAULT "${GBDK_ROOT}/bin/lcc.exe")
@@ -58,9 +77,8 @@ list(APPEND LCC_FLAGS -Wm-yo8)   # 8 ROM banks = 128 KB
 # list(APPEND LCC_FLAGS -Wm-yo32)  # 32 ROM banks = 512 KB
 # list(APPEND LCC_FLAGS -Wm-yo64)  # 64 ROM banks = 1 MB
 # list(APPEND LCC_FLAGS -Wm-yo128) # 128 ROM banks = 2 MB
-list(APPEND LCC_FLAGS -Wm-yc5)   # Usa MBC5 nel header
-list(APPEND LCC_FLAGS -Wm-yc5)    # header: cart type = MBC5
-list(APPEND LCC_FLAGS -Wl-yt5)    # linker: forza cart type = 0x19 (MBC5, no RAM, no batt)
+list(APPEND LCC_FLAGS -Wm-yc5)   # header: cart type = MBC5
+list(APPEND LCC_FLAGS -Wl-yt5)   # linker: force cart type = 0x19 (MBC5, no RAM, no batt)
 
 # === Build ROM ===
 add_custom_command(

@@ -3,7 +3,7 @@
 
 #include <gb/gb.h>
 #include <stdint.h>
-#include <stdbool.h>
+/* No stdbool.h: GBDK/Z80 target uses uint8_t as boolean (0/1) */
 
 // Background layer IDs
 #define BG_LAYER_BG0 0
@@ -31,7 +31,7 @@ typedef struct {
     uint8_t scroll_y;       // Y scroll offset
     bg_scroll_mode_t scroll_mode;  // Scroll mode
     uint8_t palette;        // Background palette (DMG) / palette bank (CGB)
-    bool visible;           // Visibility flag
+    uint8_t visible;        /* 0=hidden, 1=visible */
 } background_t;
 
 // Initialize background system
@@ -49,7 +49,7 @@ void bg_set_pos(background_t* bg, uint8_t x, uint8_t y);
 void bg_set_scroll(background_t* bg, int8_t dx, int8_t dy);
 
 // Set background visibility
-void bg_set_visible(background_t* bg, bool visible);
+void bg_set_visible(background_t* bg, uint8_t visible);
 
 // Set background scroll mode
 void bg_set_scroll_mode(background_t* bg, bg_scroll_mode_t mode);
@@ -73,7 +73,7 @@ void bg_set_tile(background_t* bg, uint8_t x, uint8_t y, uint8_t tile);
 uint8_t bg_get_tile(background_t* bg, uint8_t x, uint8_t y);
 
 // Check if coordinates are within background bounds
-bool bg_in_bounds(const background_t* bg, uint8_t x, uint8_t y);
+uint8_t bg_in_bounds(const background_t* bg, uint8_t x, uint8_t y);
 
 // Set CGB background palette colors
 void bg_set_cgb_palette(uint8_t palette, uint16_t* colors);

@@ -16,17 +16,13 @@ static inline void wait_any_key(void) {
 
 #ifdef CGB
 /**
- * @brief Clears the background attribute map (CGB palettes/tiles) to prevent bleed between scenes
+ * @brief Clears the background attribute map (CGB palettes/tiles) to prevent bleed between scenes.
+ * Uses a single fill_bkg_rect call per row instead of 20 individual set_bkg_tiles calls.
  */
 static inline void clear_attr_map(void) {
-    uint8_t attr_clear = 0u;
     uint8_t old_vbk = VBK_REG;
     VBK_REG = 1u;
-    for (uint8_t y = 0u; y < 18u; y++) {
-        for (uint8_t x = 0u; x < 20u; x++) {
-            set_bkg_tiles(x, y, 1u, 1u, &attr_clear);
-        }
-    }
+    fill_bkg_rect(0u, 0u, 20u, 18u, 0u);
     VBK_REG = old_vbk;
 }
 #else
@@ -34,16 +30,11 @@ static inline void clear_attr_map(void) { /* DMG: nothing to do */ }
 #endif
 
 /**
- * @brief Clears the screen by filling it with space characters
+ * @brief Clears the screen by filling it with space characters.
+ * Uses fill_bkg_rect (single DMA-friendly call) instead of 360 individual tile writes.
  */
 static inline void clear_screen(void) {
-    uint8_t space = ' ';
-    /* Clear tile IDs */
-    for (uint8_t y = 0; y < 18; y++) {
-        for (uint8_t x = 0; x < 20; x++) {
-            set_bkg_tiles(x, y, 1, 1, &space);
-        }
-    }
+    fill_bkg_rect(0u, 0u, 20u, 18u, (uint8_t)' ');
     clear_attr_map();
 }
 

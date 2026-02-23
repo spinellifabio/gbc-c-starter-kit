@@ -7,13 +7,12 @@
 #include "Alex_idle_16x16.h"
 #include "Alex_run_16x16.h"
 #include "dialogue.h"
+#include "game_objects.h"
 #include "game_settings.h"
 #include "game_system.h"
 #include "lang.h"
 #include "tileset.h"
 #include "world_defs.h"
-
-static uint8_t map_buffer[sizeof(tileset_map)];
 
 void game_system_init(void) {
     cgb_compatibility();
@@ -27,6 +26,8 @@ void game_system_init(void) {
     dialogue_set_window_base_tile(((pmfont_handle)ibm_font)->first_tile);
     font_set(ibm_font);
 
+    /* map_buffer on the stack — only needed during init, saves 12 bytes WRAM */
+    uint8_t map_buffer[sizeof(tileset_map)];
     for (uint16_t i = 0u; i < sizeof(tileset_map); i++) {
         map_buffer[i] = (uint8_t)(tileset_map[i] + FONT_OFFSET);
     }
@@ -41,8 +42,11 @@ void game_system_init(void) {
         set_bkg_tiles(0u, 0u, tileset_MAP_ATTRIBUTES_WIDTH, tileset_MAP_ATTRIBUTES_HEIGHT, map_buffer);
     }
 
+    /* Sprite VRAM: idle(0-19), run(20-99), treasure(100-103), hazard(104-107) */
     set_sprite_data(0u, Alex_idle_16x16_TILE_COUNT, Alex_idle_16x16_tiles);
     set_sprite_data(Alex_idle_16x16_TILE_COUNT, Alex_run_16x16_TILE_COUNT, Alex_run_16x16_tiles);
+    set_sprite_data(TREASURE_TILE, 4u, treasure_tiles);
+    set_sprite_data(HAZARD_TILE, 4u, hazard_tiles);
 
     if (_cpu == CGB_TYPE) {
         set_sprite_palette(0u, Alex_idle_16x16_PALETTE_COUNT, Alex_idle_16x16_palettes);

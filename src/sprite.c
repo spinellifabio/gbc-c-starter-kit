@@ -5,24 +5,18 @@
 static Sprite sprites[MAX_SPRITES];
 static uint8_t next_sprite_id = 0;
 
+/* NOTE: sprite.c is currently unused by the game. It is excluded from the
+ * CMake build (see CMakeLists.txt) to avoid wasting 352 bytes WRAM.
+ * Keep this file as a reference implementation for future use. */
+
 // Initialize the sprite system
 void sprite_init(void) {
-    // Clear sprite array
+    /* Single memset zeros all fields; then only set non-zero defaults */
     memset(sprites, 0, sizeof(sprites));
-    
-    // Initialize all sprites as inactive
-    for (uint8_t i = 0; i < MAX_SPRITES; i++) {
+    for (uint8_t i = 0u; i < MAX_SPRITES; i++) {
         sprites[i].id = i;
-        sprites[i].flags = 0;
-        sprites[i].x = 0;
-        sprites[i].y = 0;
-        sprites[i].tile_id = 0;
-        sprites[i].width = 1;
-        sprites[i].height = 1;
-        sprites[i].palette = 0;
-        sprites[i].priority = 0;
-        sprites[i].flip_x = 0;
-        sprites[i].flip_y = 0;
+        sprites[i].width = 1u;
+        sprites[i].height = 1u;
     }
     
     // Clear OAM (hide all sprites by setting Y=0)

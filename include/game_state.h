@@ -25,18 +25,11 @@ void game_state_init(void);
  */
 void game_state_reset(void);
 
-/**
- * @brief Add points to the score
- *
- * @param points Number of points to add
- */
+/* NOTE: game_add_score() is declared here but not yet implemented.
+ * Implement in game_state.c when scoring logic is needed. */
 void game_add_score(uint16_t points);
 
-/**
- * @brief Lose a life
- *
- * @return uint8_t Remaining lives (0 if game over)
- */
-uint8_t game_lose_life(void);
+/* NOTE: game_lose_life() is implemented in game_objects.c (it triggers
+ * object-layer dialogue). Declaration lives in game_objects.h. */
 
 #endif // GAME_STATE_H

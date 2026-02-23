@@ -394,20 +394,21 @@ void draw_player(void) {
         tile = (uint8_t)((player.dir * RUN_FRAMES_PER_DIR) << 2);
     }
 
-    // Draw player sprite (4 tiles for 16x16)
-    set_sprite_tile(8, tile);
-    set_sprite_tile(9, tile + 1);
-    set_sprite_tile(10, tile + 2);
-    set_sprite_tile(11, tile + 3);
+    /* OAM layout: indices 0-19 reserved for game objects (10 objects × 2 sprites),
+     * player occupies indices 20-23 to avoid collision. */
+    set_sprite_tile(20, tile);
+    set_sprite_tile(21, tile + 1);
+    set_sprite_tile(22, tile + 2);
+    set_sprite_tile(23, tile + 3);
 
     // Position sprites (adjust for camera)
     int16_t screen_x = (int16_t)player.x - (int16_t)cam_x;
     int16_t screen_y = (int16_t)player.y - (int16_t)cam_y - 8;
 
-    move_sprite(8, screen_x, screen_y);
-    move_sprite(9, screen_x + 8, screen_y);
-    move_sprite(10, screen_x, screen_y + 8);
-    move_sprite(11, screen_x + 8, screen_y + 8);
+    move_sprite(20, screen_x, screen_y);
+    move_sprite(21, screen_x + 8, screen_y);
+    move_sprite(22, screen_x, screen_y + 8);
+    move_sprite(23, screen_x + 8, screen_y + 8);
 }
 
 
@@ -428,14 +429,11 @@ GameplayResult gameplay_screen(void) {
         // Handle input and update game state
         handle_player_movement();
 
-        // Update camera to follow player
+        // Update camera to follow player (also renders the viewport internally)
         update_camera(player.x, player.y);
 
         // Update game objects
         update_game_objects();
-
-        // Render the viewport
-        render_viewport();
 
         // Draw game objects
         draw_game_objects(cam_x, cam_y);
