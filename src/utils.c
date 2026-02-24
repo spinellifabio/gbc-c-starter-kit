@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * @brief Initializes a clean scene by disabling LCD, hiding sprites, clearing VRAM,
+ * @brief Initializes a clean scene by disabling LCD, clearing OAM, clearing VRAM,
  * resetting display layers, and restoring default palettes.
  * 
  * Call this at the start of any scene transition to prevent glitching.
@@ -13,8 +13,12 @@ void scene_init_clean(void) {
     /* Disable LCD to prevent VRAM corruption during setup */
     DISPLAY_OFF;
     
-    /* Hide all sprites by clearing OAM */
-    HIDE_SPRITES;
+    /* Clear OAM (sprite memory) by writing 0xFF to all 160 bytes */
+    /* This completely removes all old sprites from the display */
+    uint8_t *oam = (uint8_t *)0xFE00u;
+    for (uint8_t i = 0u; i < 160u; i++) {
+        oam[i] = 0xFFu;
+    }
     
     /* Clear background VRAM */
     clear_screen();
