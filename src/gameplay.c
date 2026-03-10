@@ -30,6 +30,9 @@
 
 #define MOVE_SPEED 2
 
+#define CAM_MAX_X ((uint16_t)(MAP_WIDTH  * TILE_SIZE - SCREENWIDTH))
+#define CAM_MAX_Y ((uint16_t)(MAP_HEIGHT * TILE_SIZE - SCREENHEIGHT))
+
 #define HOME_MIN_X 64u   /* Spawn zone bounding box; landing back here ends game */
 #define HOME_MAX_X 96u
 #define HOME_MIN_Y 64u
@@ -114,13 +117,11 @@ static void update_camera(uint16_t world_x, uint16_t world_y) {
     if (new_y < 0) {
         new_y = 0;
     }
-    uint16_t max_x = MAP_WIDTH * TILE_SIZE - SCREENWIDTH;
-    uint16_t max_y = MAP_HEIGHT * TILE_SIZE - SCREENHEIGHT;
-    if (new_x > (int16_t)max_x) {
-        new_x = (int16_t)max_x;
+    if (new_x > (int16_t)CAM_MAX_X) {
+        new_x = (int16_t)CAM_MAX_X;
     }
-    if (new_y > (int16_t)max_y) {
-        new_y = (int16_t)max_y;
+    if (new_y > (int16_t)CAM_MAX_Y) {
+        new_y = (int16_t)CAM_MAX_Y;
     }
     cam_x = (uint16_t)new_x;
     cam_y = (uint16_t)new_y;
@@ -212,8 +213,7 @@ static void draw_full_view(uint8_t tile_x, uint8_t tile_y) {
     }
 }
 
-static void draw_logic_column(uint8_t current_tile_x, uint8_t current_tile_y, uint8_t logic_x, uint8_t dest_col) {
-    (void)current_tile_x;
+static void draw_logic_column(uint8_t current_tile_y, uint8_t logic_x, uint8_t dest_col) {
     for (uint8_t row = 0u; row < VIEW_LOGIC_H; row++) {
         uint8_t logic_y = (uint8_t)(current_tile_y + row);
         uint8_t dest_row = (uint8_t)(((current_tile_y + row) & (VIEW_LOGIC_H - 1u)) << 1);
@@ -221,8 +221,7 @@ static void draw_logic_column(uint8_t current_tile_x, uint8_t current_tile_y, ui
     }
 }
 
-static void draw_logic_row(uint8_t current_tile_x, uint8_t current_tile_y, uint8_t logic_y, uint8_t dest_row) {
-    (void)current_tile_y;
+static void draw_logic_row(uint8_t current_tile_x, uint8_t logic_y, uint8_t dest_row) {
     for (uint8_t col = 0u; col < VIEW_LOGIC_W; col++) {
         uint8_t logic_x = (uint8_t)(current_tile_x + col);
         uint8_t dest_col = (uint8_t)(((current_tile_x + col) & (VIEW_LOGIC_W - 1u)) << 1);
@@ -249,7 +248,7 @@ static void render_viewport(void) {
     while (delta_x > 0) {
         uint8_t logic_x = (uint8_t)(last_view_tile_x + VIEW_LOGIC_W);
         uint8_t dest_col = (uint8_t)(((last_view_tile_x + VIEW_LOGIC_W) & (VIEW_LOGIC_W - 1u)) << 1);
-        draw_logic_column(tile_x, tile_y, logic_x, dest_col);
+        draw_logic_column(tile_y, logic_x, dest_col);
         last_view_tile_x++;
         delta_x--;
     }
@@ -258,13 +257,13 @@ static void render_viewport(void) {
         delta_x++;
         uint8_t logic_x = last_view_tile_x;
         uint8_t dest_col = (uint8_t)((last_view_tile_x & (VIEW_LOGIC_W - 1u)) << 1);
-        draw_logic_column(tile_x, tile_y, logic_x, dest_col);
+        draw_logic_column(tile_y, logic_x, dest_col);
     }
 
     while (delta_y > 0) {
         uint8_t logic_y = (uint8_t)(last_view_tile_y + VIEW_LOGIC_H);
         uint8_t dest_row = (uint8_t)(((last_view_tile_y + VIEW_LOGIC_H) & (VIEW_LOGIC_H - 1u)) << 1);
-        draw_logic_row(tile_x, tile_y, logic_y, dest_row);
+        draw_logic_row(tile_x, logic_y, dest_row);
         last_view_tile_y++;
         delta_y--;
     }
@@ -273,7 +272,7 @@ static void render_viewport(void) {
         delta_y++;
         uint8_t logic_y = last_view_tile_y;
         uint8_t dest_row = (uint8_t)((last_view_tile_y & (VIEW_LOGIC_H - 1u)) << 1);
-        draw_logic_row(tile_x, tile_y, logic_y, dest_row);
+        draw_logic_row(tile_x, logic_y, dest_row);
     }
 }
 

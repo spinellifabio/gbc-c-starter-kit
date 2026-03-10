@@ -1,6 +1,7 @@
 #include "utils.h"
 
 #include <gb/gb.h>
+#include <gb/metasprites.h>
 #include <stdint.h>
 
 /**
@@ -10,33 +11,36 @@
  * Call this at the start of any scene transition to prevent glitching.
  */
 void scene_init_clean(void) {
-    /* Disable LCD to prevent VRAM corruption during setup */
     DISPLAY_OFF;
-    
-    /* Clear OAM (sprite memory) by writing 0xFF to all 160 bytes */
-    /* This completely removes all old sprites from the display */
-    uint8_t *oam = (uint8_t *)0xFE00u;
-    for (uint8_t i = 0u; i < 160u; i++) {
-        oam[i] = 0xFFu;
-    }
-    
-    /* Clear background VRAM */
+
+    /* Reset background scroll — gameplay sets camera offsets that persist otherwise */
+    SCX_REG = 0u;
+    SCY_REG = 0u;
+
+    /* Move window off-screen and hide it — dialogue may have left it visible */
+    WX_REG = 7u;
+    WY_REG = 144u;
+    HIDE_WIN;
+
+    /* Clear background tiles and attribute map */
     clear_screen();
-    
-    /* Show background and sprites */
+
     SHOW_BKG;
-    SHOW_SPRITES;
-    
-    /* Restore default palettes (DMG/CGB compatible) */
-    BGP_REG = 0xE4u;  /* Default DMG palette */
+
+    /* Restore default DMG palettes */
+    BGP_REG  = 0xE4u;
     OBP0_REG = 0xE4u;
     OBP1_REG = 0xE4u;
-    
-    /* Re-enable LCD */
+
     DISPLAY_ON;
-    
-    /* Wait for VBlank to ensure all changes are applied */
-    wait_vbl_done();
+
+    /* Clear the GBDK shadow OAM buffer. Direct writes to hardware OAM (0xFE00) are
+     * overwritten by the VBlank DMA transfer, so hide_sprites_range() — which updates
+     * the shadow buffer — is the correct way to prevent old sprites from persisting. */
+    hide_sprites_range(0u, 40u);
+    SHOW_SPRITES;
+
+    wait_vbl_done();  /* Trigger DMA so cleared shadow OAM reaches hardware */
 }
 
 /**
@@ -47,41 +51,25 @@ void scene_init_clean(void) {
  * This function gradually reduces palette brightness by looping through
  * palette entries and reducing their values. Works on both DMG and CGB.
  */
+/* DMG palette fade steps: each entry encodes 4 color→shade mappings (2 bits each).
+ * 0xE4 = [3,2,1,0] normal  →  0xFF = [3,3,3,3] fully black. */
+static const uint8_t dmg_fade_steps[4] = { 0xE4u, 0xE9u, 0xFAu, 0xFFu };
+
 void fade_to_black(uint8_t frames) {
-    uint8_t frame;
-    uint8_t step;
-    
     if (frames == 0u) return;
-    
-    /* For each frame, reduce palette brightness */
-    for (frame = 0u; frame < frames; frame++) {
-        /* Calculate fade step (0 to frames-1) */
-        step = (frame * 4u) / frames;  /* 0-4 step range */
-        
-        /* Apply fade to background palette */
-        uint8_t faded_bgp = BGP_REG;
-        if (step > 0u) {
-            /* Gradually darken: shift palette values down */
-            faded_bgp = (faded_bgp >> (step * 2u)) & 0xC0u;
-        }
-        BGP_REG = faded_bgp;
-        
-        /* Apply fade to sprite palettes */
-        uint8_t faded_obp = OBP0_REG;
-        if (step > 0u) {
-            faded_obp = (faded_obp >> (step * 2u)) & 0xC0u;
-        }
-        OBP0_REG = faded_obp;
-        OBP1_REG = faded_obp;
-        
-        /* Wait for VBlank to apply palette change */
+
+    for (uint8_t frame = 0u; frame < frames; frame++) {
+        uint8_t pal = dmg_fade_steps[(frame * 4u) / frames];
+        BGP_REG = pal;
+        OBP0_REG = pal;
+        OBP1_REG = pal;
         wait_vbl_done();
     }
-    
+
     /* Ensure fully black at the end */
-    BGP_REG = 0u;
-    OBP0_REG = 0u;
-    OBP1_REG = 0u;
+    BGP_REG = 0xFFu;
+    OBP0_REG = 0xFFu;
+    OBP1_REG = 0xFFu;
     wait_vbl_done();
 }
 
@@ -94,36 +82,16 @@ void fade_to_black(uint8_t frames) {
  * Works on both DMG and CGB.
  */
 void fade_from_black(uint8_t frames) {
-    uint8_t frame;
-    uint8_t step;
-    
     if (frames == 0u) return;
-    
-    /* For each frame, increase palette brightness */
-    for (frame = 0u; frame < frames; frame++) {
-        /* Calculate fade step (0 to frames-1) */
-        step = (frame * 4u) / frames;  /* 0-4 step range */
-        
-        /* Restore background palette */
-        uint8_t restored_bgp = 0xE4u;  /* Default palette */
-        if (step < 4u) {
-            /* Gradually brighten: shift palette values up */
-            restored_bgp = (0xE4u >> (4u - step) * 2u) & 0xFFu;
-        }
-        BGP_REG = restored_bgp;
-        
-        /* Restore sprite palettes */
-        uint8_t restored_obp = 0xE4u;
-        if (step < 4u) {
-            restored_obp = (0xE4u >> (4u - step) * 2u) & 0xFFu;
-        }
-        OBP0_REG = restored_obp;
-        OBP1_REG = restored_obp;
-        
-        /* Wait for VBlank to apply palette change */
+
+    for (uint8_t frame = 0u; frame < frames; frame++) {
+        uint8_t pal = dmg_fade_steps[3u - (frame * 4u) / frames];
+        BGP_REG = pal;
+        OBP0_REG = pal;
+        OBP1_REG = pal;
         wait_vbl_done();
     }
-    
+
     /* Ensure fully restored at the end */
     BGP_REG = 0xE4u;
     OBP0_REG = 0xE4u;

@@ -3,7 +3,6 @@
 #include "dialogue.h"
 #include "gameplay.h"
 #include <string.h>
-#include <stdio.h>
 
 // Treasure chest sprite (8x8)
 const uint8_t treasure_tiles[] = {
@@ -112,11 +111,6 @@ uint8_t game_lose_life(void) {
         game_state.lives--;
         if (game_state.lives == 0) {
             gameplay_signal_game_over();
-        } else {
-            // Show remaining lives (rare, but kept if lives increase later)
-            char lives_text[32];
-            sprintf(lives_text, "Ouch! %u lives left.", (uint8_t)game_state.lives);
-            dialogue_show_text(lives_text);
         }
     }
     return game_state.lives;
