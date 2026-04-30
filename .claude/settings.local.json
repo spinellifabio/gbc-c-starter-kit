@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "mcp__vexp__run_pipeline"
+      "mcp__vexp__run_pipeline",
+      "Bash(python3 -m scripts \"C:\\\\Users\\\\fabio.spinelli\\\\source\\\\repos\\\\personal-data\\\\gbdk-partials\\\\gbc-c-starter-kit\\\\AGENTS.md\")"
     ]
   }
 }

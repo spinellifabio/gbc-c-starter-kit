@@ -1,184 +1,19 @@
-# CLAUDE.md
+# Agent Config
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Agent role, response format, priorities, and example project references: see `AGENTS.md`.
+Project facts (build, architecture, code style): see `CLAUDE.md`.
 
-## vexp — Context-Aware AI Coding <!-- vexp v1.0.0 -->
+## Code Search
 
-### MANDATORY: use vexp pipeline — do NOT grep, glob, or Read files
-For every task — bug fixes, features, refactors, debugging:
-**call `run_pipeline` FIRST**. It executes context search + impact analysis +
-memory recall in a single call, returning compressed results.
+Use `ccc` for all codebase exploration. No grep/glob/Read without a ccc search first.
 
-Do NOT use grep, glob, Bash, Read, or cat to search/explore the codebase.
-vexp returns pre-indexed, graph-ranked context that is more relevant and
-uses fewer tokens than manual file reading.
-
-### Primary Tool
-- `run_pipeline` — **USE THIS FOR EVERYTHING**. Single call that runs
-  capsule + impact + memory server-side. Returns compressed results.
-  Auto-detects intent (debug/modify/refactor/explore) from your task.
-  Includes full file content for pivots (no need to Read files).
-  Examples:
-  - `run_pipeline({ "task": "fix JWT validation bug" })` — auto-detect
-  - `run_pipeline({ "task": "refactor db layer", "preset": "refactor" })` — explicit
-  - `run_pipeline({ "task": "add auth", "observation": "using JWT" })` — save insight in same call
-
-### Other MCP tools (use only when run_pipeline is insufficient)
-- `get_context_capsule` — lightweight alternative for simple questions only
-- `get_impact_graph` — standalone deep impact analysis of a specific symbol
-- `search_logic_flow` — trace execution paths between two specific symbols
-- `get_skeleton` — token-efficient file structure for a specific file
-- `index_status` — indexing status and health check
-- `get_session_context` — recall observations from current/previous sessions
-- `search_memory` — cross-session search for past decisions
-- `save_observation` — persist insights (prefer using run_pipeline's observation param instead)
-
-### Workflow
-1. `run_pipeline("your task")` — ALWAYS FIRST. Returns pivots + impact + memories in 1 call
-2. Make targeted changes based on the context returned
-3. `run_pipeline` again ONLY if you need more context during implementation
-4. Do NOT chain multiple vexp calls — one `run_pipeline` replaces capsule + impact + memory + observation
-
-### Smart Features (automatic — no action needed)
-- **Intent Detection**: auto-detects from your task keywords. "fix bug" → Debug, "refactor" → blast-radius, "add" → Modify
-- **Hybrid Search**: keyword + semantic + graph centrality ranking
-- **Session Memory**: auto-captures observations; memories auto-surfaced in results
-- **LSP Bridge**: VS Code captures type-resolved call edges
-- **Change Coupling**: co-changed files included as related context
-
-### Advanced Parameters
-- `preset: "debug"` — forces debug mode (capsule+tests+impact+memory)
-- `preset: "refactor"` — deep impact analysis (depth 5)
-- `max_tokens: 12000` — increase total budget for complex tasks
-- `include_tests: true` — include test files in results
-- `include_file_content: false` — omit full file content (lighter response)
-
-### Multi-Repo Workspaces
-`run_pipeline` auto-queries all indexed repos. Use `repos: ["alias"]` to scope.
-Use `index_status` to discover available repo aliases.
-
----
-
-## Build System
-
-CMake + Ninja with the GBDK-2020 `lcc` cross-compiler. Requires `GBDK_ROOT` env var or CMake variable pointing to your gbdk-2020 install.
-
-### Configure
 ```bash
-cmake --preset ninja-gbdk
-# or manually:
-cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/gbdk-toolchain.cmake
+ccc search "<semantic query>" 2>&1 || true
 ```
 
-### Build ROM
-```bash
-cmake --build --preset build-rom
-# or:
-ninja -C build
-```
+Refine with symbols found. Read files only after narrowing target.
 
-### Run in emulator
-```bash
-cmake --build build --target run
-# or:
-cmake --build --preset run
-```
+## Commits
 
-ROM output: `rom/gbc-c-starter-kit.gbc`
-
-**No automated tests.** Testing is done by running the ROM in BGB or SameBoy and verifying behavior manually.
-
-### VS Code tasks (Ctrl+Shift+B)
-- **CMake: build rom** — configure + build
-- **Run in BGB** — build then launch in bgbw64
-- **Run in BGB with VRAM** — same but opens BGB VRAM viewer
-
----
-
-## Architecture
-
-### Screen Flow (`src/main.c`)
-Top-level loop: splash → intro cutscene → title → [options] → gameplay → game over / win screen → credits → title
-
-### Key Modules
-| File | Purpose |
-|------|---------|
-| `src/game_system.c` | Hardware init: display off/on, VRAM setup, font/palette/sprite loading |
-| `src/game_settings.c` | Global `g_settings` (sound, difficulty, language) — persists across screens |
-| `src/game_state.c` | Per-run state: lives, score, flags — reset between runs |
-| `src/gameplay.c` | Main game loop, player movement, collision, camera |
-| `src/dialogue.c` | Sliding window dialogue box with typewriter effect |
-| `src/input.c` | Edge-triggered input via `get_pressed()` + `flush_input()` |
-| `src/utils.c` | `fade_to_black()`, `clear_screen()`, `print_centered()`, `int_to_str()` |
-| `include/world_defs.h` | Map/tile constants: `MAP_WIDTH`, `TILE_SIZE`, `FONT_OFFSET` |
-
-### Resources (`res/`)
-Assets are generated by `png2asset` (from GBDK-2020) into `.c`/`.h` pairs:
-- `res/sprites/` — sprite sheets (Alex idle/run, treasure, hazard)
-- `res/tiles/` — tileset used for backgrounds
-
-`sprite.c` and `background.c` exist but are **excluded from the build** (dead code — saves ~400 bytes WRAM).
-
-### VRAM Layout (sprites)
-Tiles 0–19: Alex idle, 20–99: Alex run, 100–103: treasure, 104–107: hazard. Defined by `TREASURE_TILE` / `HAZARD_TILE` constants.
-
-### CGB vs DMG
-Hardware detected at runtime via `_cpu == CGB_TYPE`. CGB path sets palettes; DMG path skips them gracefully.
-
----
-
-## Code Style
-
-- **C99**, no heap allocation, no `<stdbool.h>`. Use `uint8_t` as boolean.
-- Prefer `uint8_t`/`uint16_t` over `int`; explicit narrowing casts: `(uint8_t)(x + y)`.
-- Unsigned literals for hardware registers: `0u`, `0xFFu`.
-- 4-space indentation, opening brace on same line.
-- `static` all module-private symbols. Mark ROM data `const`.
-
-### Naming
-| Kind | Convention | Example |
-|------|-----------|---------|
-| Functions | `snake_case` | `sprite_alloc`, `game_system_init` |
-| Types/structs/enums | `PascalCase` | `GameSettings`, `WinReason` |
-| Enum values / macros | `UPPER_SNAKE_CASE` | `MODE_DEBUG`, `MAX_SPRITES` |
-| Globals | `g_` prefix | `g_settings` |
-| Header guards | `FILENAME_H` | `#ifndef SPRITE_H` |
-
-### Game Loop Pattern
-```c
-while (1) {
-    handle_input();
-    update_state();
-    render();
-    wait_vbl_done();  /* sync to 60 Hz VBlank */
-}
-```
-
-### Performance Rules
-- `uint8_t` loop counters (saves Z80 cycles vs `int`).
-- Lookup tables in ROM instead of runtime division/modulo.
-- All VRAM writes must occur outside LCD Mode 3 (use `wait_vbl_done()` or H-Blank ISR).
-- OAM index bounds: < 40; palette index: 0–7.
-
-### Include Order (in `.c` files)
-1. Own `.h` header
-2. GBDK system headers (`<gb/gb.h>`, `<gb/cgb.h>`, `<stdint.h>`)
-3. Other project headers
-4. Resource headers (`tileset.h`, sprite headers) last
-
-Use `#ifndef` header guards, not `#pragma once`.
-
----
-
-## Commit Guidelines (Conventional Commits 1.0.0)
-
-Format: `<type>[optional scope]: <description>`
-
-Types: `fix`, `feat`, `perf`, `refactor`, `docs`, `style`, `test`, `build`, `chore`
-
-Examples:
-- `feat(dialogue): add yes/no prompt with blinking cursor`
-- `fix(sprite): clamp OAM index to prevent overflow`
-- `perf(gameplay): replace modulo with LUT for animation frames`
-
-Only suggest commit messages when explicitly asked.
+Conventional Commits. Confirm with user before committing.
+`fix` · `feat` · `perf` · `refactor` · `docs` · `chore`

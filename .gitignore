@@ -31,3 +31,5 @@
 # === OS cruft ===
 .DS_Store
 Thumbs.db
+# CocoIndex Code (ccc)
+/.cocoindex_code/
