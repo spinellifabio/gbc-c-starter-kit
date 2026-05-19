@@ -228,6 +228,20 @@ The following diagram shows the screen flow for the GBC prototype. Nodes styled 
 
 ![Screens Flow](docs/screens-flow.png)
 
+## Examples
+
+The `examples/` folder contains a curated set of reference projects from gbdk-2020, each buildable independently via Makefile:
+
+| Folder | Demonstrates |
+|--------|-------------|
+| `template_minimal/` | Minimal game loop — scaffold for a new project |
+| `colorbar/` | CGB palettes, dual-bank VRAM tile/attribute split |
+| `hblank_copy/` | HBlank ISR, fast VRAM animation with dual banking |
+| `sound/` | All 4 audio channels, direct register control |
+| `space/` | Sprites, scrolling, input — complete mini-game |
+
+See [`examples/README.md`](examples/README.md) for build instructions.
+
 ## Goal
 
 The goal of this starter kit is to provide a **solid foundation for Game Boy Color homebrew development**.

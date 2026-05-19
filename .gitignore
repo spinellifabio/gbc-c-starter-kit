@@ -31,5 +31,8 @@
 # === OS cruft ===
 .DS_Store
 Thumbs.db
+# === Examples build artifacts ===
+examples/**/obj/
+
 # CocoIndex Code (ccc)
 /.cocoindex_code/
