@@ -14,6 +14,11 @@
 #include "tileset.h"
 #include "world_defs.h"
 
+static void LCD_ISR(void) {
+    /* Stub: add per-scanline work here (palette swaps, VRAM copy, wobble, etc.)
+     * See examples/hblank_copy for a full usage example. */
+}
+
 void game_system_init(void) {
     cgb_compatibility();
 
@@ -52,6 +57,13 @@ void game_system_init(void) {
         set_sprite_palette(0u, Alex_idle_16x16_PALETTE_COUNT, Alex_idle_16x16_palettes);
         set_sprite_palette(Alex_idle_16x16_PALETTE_COUNT, Alex_run_16x16_PALETTE_COUNT, Alex_run_16x16_palettes);
     }
+
+    CRITICAL {
+        LYC_REG  = 0u;
+        STAT_REG |= STATF_LYC;
+        add_LCD(LCD_ISR);
+    }
+    set_interrupts(IE_REG | LCD_IFLAG);
 
     SPRITES_8x16;
     SHOW_SPRITES;

@@ -127,7 +127,6 @@ static void update_camera(uint16_t world_x, uint16_t world_y) {
     cam_y = (uint16_t)new_y;
     SCX_REG = (uint8_t)cam_x;
     SCY_REG = (uint8_t)cam_y;
-    render_viewport();
 }
 
 static uint8_t point_walkable(int16_t sample_x, int16_t sample_y) {
@@ -423,14 +422,16 @@ GameplayResult gameplay_screen(void) {
 
     // Show instructions
     dialogue_show_text("Find the treasure!\nBut beware of hazards!");
+    wait_vbl_done(); /* ensure VRAM writes settle before loop starts */
 
     // Main game loop
     while (game_active) {
         // Handle input and update game state
         handle_player_movement();
 
-        // Update camera to follow player (also renders the viewport internally)
+        // Update camera to follow player
         update_camera(player.x, player.y);
+        render_viewport();
 
         // Update game objects
         update_game_objects();
