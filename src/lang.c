@@ -43,7 +43,9 @@ static const char* const STRINGS_EN[STR__COUNT] = {
     /* STR_WIN_TITLE            */ "YOU WIN!",
     /* STR_WIN_TREASURE         */ "TREASURE SECURED",
     /* STR_SCORE_LABEL          */ "SCORE",
-    /* STR_PRESS_START          */ "PRESS START"
+    /* STR_PRESS_START          */ "PRESS START",
+
+    /* STR_NPC_GREETING         */ "Hello traveler!"
 };
 
 static const char* const STRINGS_IT[STR__COUNT] = {
@@ -83,7 +85,9 @@ static const char* const STRINGS_IT[STR__COUNT] = {
     /* STR_WIN_TITLE            */ "HAI VINTO!",
     /* STR_WIN_TREASURE         */ "TESORO RECUPERATO",
     /* STR_SCORE_LABEL          */ "PUNTEGGIO",
-    /* STR_PRESS_START          */ "PREMI START"
+    /* STR_PRESS_START          */ "PREMI START",
+
+    /* STR_NPC_GREETING         */ "Ciao viaggiatore!"
 };
 
 static const char* const* const STRINGS_ALL[LANG_COUNT] = {

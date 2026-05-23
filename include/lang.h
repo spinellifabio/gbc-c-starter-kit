@@ -57,6 +57,9 @@ typedef enum {
     STR_SCORE_LABEL,            /* "SCORE" / "PUNTEGGIO" */
     STR_PRESS_START,            /* "PRESS START" / "PREMI START" */
 
+    /* NPC */
+    STR_NPC_GREETING,           /* "Hello traveler!" / "Ciao viaggiatore!" */
+
     STR__COUNT                  /* sempre ultimo */
 } LangStringId;
 

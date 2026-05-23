@@ -14,6 +14,7 @@
 #include "game_state.h"
 #include "dialogue.h"
 #include "game_over.h"
+#include "npc.h"
 
 #define SCREEN_CENTER_X 80u
 #define SCREEN_CENTER_Y 72u
@@ -289,6 +290,7 @@ static uint8_t game_active = 1;
 static GameplayResult game_result = GAME_RESULT_WIN;
 static WinReason game_result_reason = WIN_TREASURE_SECURED;
 static GameObject* last_obj_interacted = 0;
+static uint8_t prev_joy_a = 0u;  /* tracks A rising edge for NPC interaction */
 static const uint8_t run_frame_lut[RUN_FRAMES_PER_DIR * 2] = {0,0,1,1,2,2,3,3,4,4,5,5};
 
 void gameplay_signal_game_over(void) {
@@ -311,11 +313,13 @@ void reset_gameplay(void) {
 
     // Reset game objects
     init_game_objects();
+    npc_init_all();
 
     // Reset game state flags
     game_state.has_treasure = 0;
     game_state.encountered_hazard = 0;
     last_obj_interacted = 0;
+    prev_joy_a = 0u;
 
     // Reset game active flag
     game_active = 1;
@@ -329,25 +333,29 @@ void handle_player_movement(void) {
     // Handle movement
     if (joy & J_LEFT) {
         player.dir = DIR_LEFT;
-        if (can_walk((uint16_t)(player.x - MOVE_SPEED), player.y + PLAYER_OFFSET_Y)) {
+        if (can_walk((uint16_t)(player.x - MOVE_SPEED), player.y + PLAYER_OFFSET_Y) &&
+            !npc_solid_at((uint8_t)(player.x - MOVE_SPEED - 4u), (uint8_t)(player.y - 8u), 8u, 16u)) {
             player.x -= MOVE_SPEED;
             moved = 1;
         }
     } else if (joy & J_RIGHT) {
         player.dir = DIR_RIGHT;
-        if (can_walk((uint16_t)(player.x + MOVE_SPEED), player.y + PLAYER_OFFSET_Y)) {
+        if (can_walk((uint16_t)(player.x + MOVE_SPEED), player.y + PLAYER_OFFSET_Y) &&
+            !npc_solid_at((uint8_t)(player.x + MOVE_SPEED - 4u), (uint8_t)(player.y - 8u), 8u, 16u)) {
             player.x += MOVE_SPEED;
             moved = 1;
         }
     } else if (joy & J_UP) {
         player.dir = DIR_BACK;
-        if (can_walk(player.x, (uint16_t)(player.y - MOVE_SPEED + PLAYER_OFFSET_Y))) {
+        if (can_walk(player.x, (uint16_t)(player.y - MOVE_SPEED + PLAYER_OFFSET_Y)) &&
+            !npc_solid_at((uint8_t)(player.x - 4u), (uint8_t)(player.y - MOVE_SPEED - 8u), 8u, 16u)) {
             player.y -= MOVE_SPEED;
             moved = 1;
         }
     } else if (joy & J_DOWN) {
         player.dir = DIR_FRONT;
-        if (can_walk(player.x, (uint16_t)(player.y + MOVE_SPEED + PLAYER_OFFSET_Y))) {
+        if (can_walk(player.x, (uint16_t)(player.y + MOVE_SPEED + PLAYER_OFFSET_Y)) &&
+            !npc_solid_at((uint8_t)(player.x - 4u), (uint8_t)(player.y + MOVE_SPEED - 8u), 8u, 16u)) {
             player.y += MOVE_SPEED;
             moved = 1;
         }
@@ -370,6 +378,24 @@ void handle_player_movement(void) {
         }
     } else {
         last_obj_interacted = 0;
+    }
+
+    // Check NPC interaction: A rising edge while in range (first hit, lowest index)
+    {
+        uint8_t cur_joy_a = (joy & J_A) ? 1u : 0u;
+        if (cur_joy_a && !prev_joy_a) {
+            uint8_t ni;
+            for (ni = 0u; ni < MAX_NPCS; ni++) {
+                /* Reach box: player AABB expanded 4px on all sides so
+                 * interaction fires while player is adjacent (blocked by solid). */
+                if (npc_check_collision(ni, (uint8_t)(player.x - 8u),
+                                            (uint8_t)(player.y - 12u), 16u, 24u)) {
+                    npc_interact(ni);
+                    break;
+                }
+            }
+        }
+        prev_joy_a = cur_joy_a;
     }
 
     // Check win condition (return to home zone with treasure)
@@ -435,9 +461,11 @@ GameplayResult gameplay_screen(void) {
 
         // Update game objects
         update_game_objects();
+        npc_update_all();
 
         // Draw game objects
         draw_game_objects(cam_x, cam_y);
+        npc_draw_all(cam_x, cam_y);
 
         // Draw player
         draw_player();

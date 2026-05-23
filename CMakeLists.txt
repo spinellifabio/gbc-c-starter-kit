@@ -17,6 +17,7 @@ set(SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/game_state.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/gameplay.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/game_objects.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/npc.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/dialogue.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/input.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/lang.c"
