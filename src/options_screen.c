@@ -120,6 +120,9 @@ static void draw_options(uint8_t cursor) {
 
 void options_screen(void) {
     uint8_t cursor = 0u;
+    WY_REG = 144u;
+    HIDE_WIN;
+    set_solid_bkg(BKG_COLOR_OPTIONS);
     draw_options(cursor);
     while (1) {
         wait_vbl_done();

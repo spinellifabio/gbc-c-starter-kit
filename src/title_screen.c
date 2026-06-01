@@ -24,6 +24,9 @@ static void draw_blink_line(uint8_t x, uint8_t y, LangStringId id, uint8_t visib
 void title_screen(void) {
     uint8_t frame_counter = 0u;
     uint8_t visible = 1u;
+    WY_REG = 144u;
+    HIDE_WIN;
+    set_solid_bkg(BKG_COLOR_TITLE);
     cls();
     clear_attr_map();
 

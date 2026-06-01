@@ -10,6 +10,9 @@
 #include "utils.h"
 
 static void show_splash(LangStringId id_text, uint16_t duration_frames) {
+    WY_REG = 144u;
+    HIDE_WIN;
+    set_solid_bkg(BKG_COLOR_SPLASH);
     cls();
     clear_attr_map();
     const char *text = lang_str(id_text);

@@ -45,7 +45,9 @@ static const char* const STRINGS_EN[STR__COUNT] = {
     /* STR_SCORE_LABEL          */ "SCORE",
     /* STR_PRESS_START          */ "PRESS START",
 
-    /* STR_NPC_GREETING         */ "Hello traveler!"
+    /* STR_NPC_GREETING         */ "Hello traveler!",
+
+    /* STR_NPC_CAT_MEOW         */ "Meow!"
 };
 
 static const char* const STRINGS_IT[STR__COUNT] = {
@@ -87,7 +89,9 @@ static const char* const STRINGS_IT[STR__COUNT] = {
     /* STR_SCORE_LABEL          */ "PUNTEGGIO",
     /* STR_PRESS_START          */ "PREMI START",
 
-    /* STR_NPC_GREETING         */ "Ciao viaggiatore!"
+    /* STR_NPC_GREETING         */ "Ciao viaggiatore!",
+
+    /* STR_NPC_CAT_MEOW         */ "Miao!"
 };
 
 static const char* const* const STRINGS_ALL[LANG_COUNT] = {

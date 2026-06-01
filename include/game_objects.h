@@ -24,16 +24,23 @@ typedef struct {
 } GameObject;
 
 /* Sprite VRAM layout:
- *   0..19  : Alex idle  (Alex_idle_16x16_TILE_COUNT = 20)
- *  20..99  : Alex run   (Alex_run_16x16_TILE_COUNT  = 80)
- * 100..103 : Treasure chest (4 tiles)
- * 104..107 : Hazard         (4 tiles)
+ *   0.. 19 : player_idle       (20 tiles)
+ *  20.. 99 : player_run        (80 tiles)
+ * 100..103 : obj_treasure       (4 tiles)
+ * 104..107 : obj_hazard         (4 tiles)
+ * 108..127 : cat_idle          (20 tiles, placeholder)
+ * 128..147 : cutscene_player   (20 tiles, placeholder)
+ * 148..167 : cutscene_npc      (20 tiles, placeholder)
  */
-#define TREASURE_TILE 100u
+#define TREASURE_TILE        100u
 extern const uint8_t treasure_tiles[];
 
-#define HAZARD_TILE   104u
+#define HAZARD_TILE          104u
 extern const uint8_t hazard_tiles[];
+
+#define CAT_IDLE_TILE        108u
+#define CUTSCENE_PLAYER_TILE 128u
+#define CUTSCENE_NPC_TILE    148u
 
 // Initialize game objects
 void init_game_objects(void);

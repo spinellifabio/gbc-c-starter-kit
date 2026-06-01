@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "dialogue.h"
 #include "lang.h"
+#include "game_objects.h"
 
 static Npc npcs[MAX_NPCS];
 
@@ -29,7 +30,11 @@ void npc_init_all(void) {
         npcs[i].active = 0u;
     }
     /* World NPC definitions */
-    npc_init(0u, 120u, 60u, 0u, 2u, (uint8_t)STR_NPC_GREETING);
+    npc_init(0u, 120u,  60u, 0u,           2u, (uint8_t)STR_NPC_GREETING);
+
+    /* Slot 1: cat NPC */
+    npc_init(1u,  50u, 120u, CAT_IDLE_TILE, 3u, (uint8_t)STR_NPC_CAT_MEOW);
+    npcs[1].npc_type = NPC_TYPE_CAT;
 }
 
 /* 2-frame idle toggle every 30 frames (~0.5 s at 60 Hz) */
@@ -42,6 +47,31 @@ void npc_update(uint8_t idx) {
             (npcs[idx].sprite_tile == npcs[idx].sprite_tile_base)
             ? npcs[idx].sprite_tile_base + 4u
             : npcs[idx].sprite_tile_base;
+    }
+
+    /* Cat AI: rest 90f then sprint 1px/frame for 20f, cycling direction */
+    if (npcs[idx].npc_type == NPC_TYPE_CAT) {
+        npcs[idx].ai_timer++;
+        if (npcs[idx].ai_state == NPC_STATE_REST) {
+            if (npcs[idx].ai_timer >= 90u) {
+                npcs[idx].ai_timer = 0u;
+                npcs[idx].ai_state = NPC_STATE_SPRINT;
+                npcs[idx].ai_dir   = (npcs[idx].ai_dir + 1u) & 3u;
+            }
+        } else {
+            uint8_t nx = npcs[idx].x;
+            uint8_t ny = npcs[idx].y;
+            if      (npcs[idx].ai_dir == 0u && nx < 240u) nx++;
+            else if (npcs[idx].ai_dir == 1u && nx >   8u) nx--;
+            else if (npcs[idx].ai_dir == 2u && ny >   8u) ny--;
+            else if (npcs[idx].ai_dir == 3u && ny < 200u) ny++;
+            npcs[idx].x = nx;
+            npcs[idx].y = ny;
+            if (npcs[idx].ai_timer >= 20u) {
+                npcs[idx].ai_timer = 0u;
+                npcs[idx].ai_state = NPC_STATE_REST;
+            }
+        }
     }
 }
 

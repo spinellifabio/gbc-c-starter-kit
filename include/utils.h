@@ -7,9 +7,22 @@
 #include <string.h>
 /* Fixed: ensure fixed-width integer types are available for prototypes */
 #include <stdint.h>
+#include <gb/cgb.h>
 
 // Scene transition utilities
 void scene_init_clean(void);
+
+/* Sets CGB background palette 0 to a solid color (no-op on DMG).
+ * Call before cls()/clear_screen() in scenes without custom BG art. */
+void set_solid_bkg(palette_color_t color);
+
+/* Per-scene solid background colors */
+#define BKG_COLOR_SPLASH    RGB8(  0,  0, 80)   /* dark blue   — cinematic */
+#define BKG_COLOR_TITLE     RGB8( 24,  0, 64)   /* dark purple — title */
+#define BKG_COLOR_OPTIONS   RGB8(  0, 48, 16)   /* dark green  — menu */
+#define BKG_COLOR_GAMEOVER  RGB8( 64,  0,  0)   /* dark red    — danger */
+#define BKG_COLOR_WIN       RGB8( 48, 40,  0)   /* dark gold   — victory */
+#define BKG_COLOR_CREDITS   RGB8(  0, 32, 48)   /* dark teal   — end roll */
 void fade_to_black(uint8_t frames);
 void fade_from_black(uint8_t frames);
 

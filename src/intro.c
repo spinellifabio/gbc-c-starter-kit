@@ -6,8 +6,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "Alex_idle_16x16.h"
-#include "Alex_run_16x16.h"
+#include "player_idle.h"
+#include "player_run.h"
 #include "dialogue.h"
 #include "input.h"
 #include "intro.h"
@@ -89,18 +89,18 @@ void intro_cut_scene(void) {
                 run_frame = (uint8_t)((run_frame + 1u) % RUN_FRAMES_PER_DIR);
             }
             uint8_t run_idx = (uint8_t)(DIR_RIGHT * RUN_FRAMES_PER_DIR + run_frame);
-            move_metasprite_ex(Alex_run_16x16_metasprites[run_idx],
-                               Alex_idle_16x16_TILE_COUNT, 0u, 0u,
+            move_metasprite_ex(player_run_metasprites[run_idx],
+                               player_idle_TILE_COUNT, 0u, 0u,
                                lead_x, LEAD_Y);
-            move_metasprite_ex(Alex_run_16x16_metasprites[run_idx],
-                               Alex_idle_16x16_TILE_COUNT, 0u, 4u,
+            move_metasprite_ex(player_run_metasprites[run_idx],
+                               player_idle_TILE_COUNT, 0u, 4u,
                                buddy_x, BUDDY_Y);
             idle_hold = 0u;
         } else {
-            move_metasprite_ex(Alex_idle_16x16_metasprites[DIR_FRONT],
+            move_metasprite_ex(player_idle_metasprites[DIR_FRONT],
                                0u, 0u, 0u,
                                lead_x, LEAD_Y);
-            move_metasprite_ex(Alex_idle_16x16_metasprites[DIR_FRONT],
+            move_metasprite_ex(player_idle_metasprites[DIR_FRONT],
                                0u, 0u, 4u,
                                buddy_x, BUDDY_Y);
             if (idle_hold >= CUTSCENE_IDLE_HOLD_FRAMES) {
@@ -115,20 +115,20 @@ void intro_cut_scene(void) {
     if (!hurry) {
         play_dialogue_sequence();
     } else {
-        move_metasprite_ex(Alex_idle_16x16_metasprites[DIR_FRONT],
+        move_metasprite_ex(player_idle_metasprites[DIR_FRONT],
                            0u, 0u, 0u,
                            0u, 160u);
-        move_metasprite_ex(Alex_idle_16x16_metasprites[DIR_FRONT],
+        move_metasprite_ex(player_idle_metasprites[DIR_FRONT],
                            0u, 0u, 4u,
                            0u, 160u);
         const char *hurry_text = lang_str(STR_INTRO_HURRY);
         dialogue_show_text(hurry_text);
     }
 
-    move_metasprite_ex(Alex_idle_16x16_metasprites[DIR_FRONT],
+    move_metasprite_ex(player_idle_metasprites[DIR_FRONT],
                        0u, 0u, 0u,
                        0u, 160u);
-    move_metasprite_ex(Alex_idle_16x16_metasprites[DIR_FRONT],
+    move_metasprite_ex(player_idle_metasprites[DIR_FRONT],
                        0u, 0u, 4u,
                        0u, 160u);
 

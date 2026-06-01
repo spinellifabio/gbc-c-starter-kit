@@ -71,9 +71,11 @@ void credits_scene(void) {
 
     flush_input();
 
+    WY_REG = 144u;
     HIDE_WIN;
     SCX_REG = 0u;
     SCY_REG = 0u;
+    set_solid_bkg(BKG_COLOR_CREDITS);
     cls();
     clear_attr_map();
     render_rows(top_row);

@@ -10,6 +10,7 @@ void show_win_screen(uint16_t score, WinReason reason) {
 
     /* Initialize clean scene (disable LCD, hide sprites, clear VRAM, reset palettes) */
     scene_init_clean();
+    set_solid_bkg(BKG_COLOR_WIN);
 
     /* Display win title centered vertically at row 8 */
     print_centered(lang_str(STR_WIN_TITLE), 8u);

@@ -5,8 +5,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "Alex_idle_16x16.h"
-#include "Alex_run_16x16.h"
 #include "gameplay.h"
 #include "tileset.h"
 #include "world_defs.h"

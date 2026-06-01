@@ -1,0 +1,11 @@
+exclude_patterns:
+- '**/.*'
+- '**/.cocoindex_code'
+- '**/build/assets'
+include_patterns:
+- '**/*.c'
+- '**/*.h'
+- '**/*.json'
+- '**/*.md'
+- '**/*.txt'
+- '**/*.yaml'

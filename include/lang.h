@@ -59,6 +59,7 @@ typedef enum {
 
     /* NPC */
     STR_NPC_GREETING,           /* "Hello traveler!" / "Ciao viaggiatore!" */
+    STR_NPC_CAT_MEOW,           /* "Meow!" / "Miao!" */
 
     STR__COUNT                  /* sempre ultimo */
 } LangStringId;

@@ -4,8 +4,9 @@
 
 #include <stdint.h>
 
-#include "Alex_idle_16x16.h"
-#include "Alex_run_16x16.h"
+#include "player_idle.h"
+#include "player_run.h"
+#include "cat_idle.h"
 #include "dialogue.h"
 #include "game_objects.h"
 #include "game_settings.h"
@@ -47,15 +48,27 @@ void game_system_init(void) {
         set_bkg_tiles(0u, 0u, tileset_MAP_ATTRIBUTES_WIDTH, tileset_MAP_ATTRIBUTES_HEIGHT, map_buffer);
     }
 
-    /* Sprite VRAM: idle(0-19), run(20-99), treasure(100-103), hazard(104-107) */
-    set_sprite_data(0u, Alex_idle_16x16_TILE_COUNT, Alex_idle_16x16_tiles);
-    set_sprite_data(Alex_idle_16x16_TILE_COUNT, Alex_run_16x16_TILE_COUNT, Alex_run_16x16_tiles);
-    set_sprite_data(TREASURE_TILE, 4u, treasure_tiles);
-    set_sprite_data(HAZARD_TILE, 4u, hazard_tiles);
+    /* Sprite VRAM layout:
+     *   0- 19: player_idle       (20 tiles)
+     *  20- 99: player_run        (80 tiles)
+     * 100-103: obj_treasure       (4 tiles)
+     * 104-107: obj_hazard         (4 tiles)
+     * 108-127: cat_idle          (20 tiles, placeholder)
+     * 128-147: cutscene_player   (20 tiles, placeholder)
+     * 148-167: cutscene_npc      (20 tiles, placeholder)
+     */
+    set_sprite_data(0u,                     player_idle_TILE_COUNT,    player_idle_tiles);
+    set_sprite_data(player_idle_TILE_COUNT, player_run_TILE_COUNT,     player_run_tiles);
+    set_sprite_data(TREASURE_TILE,          4u,                        treasure_tiles);
+    set_sprite_data(HAZARD_TILE,            4u,                        hazard_tiles);
+    set_sprite_data(CAT_IDLE_TILE,          cat_idle_TILE_COUNT,       cat_idle_tiles);
+    /* Cutscene slots share player_idle tile data until final art is added */
+    set_sprite_data(CUTSCENE_PLAYER_TILE, player_idle_TILE_COUNT, player_idle_tiles);
+    set_sprite_data(CUTSCENE_NPC_TILE,    player_idle_TILE_COUNT, player_idle_tiles);
 
     if (_cpu == CGB_TYPE) {
-        set_sprite_palette(0u, Alex_idle_16x16_PALETTE_COUNT, Alex_idle_16x16_palettes);
-        set_sprite_palette(Alex_idle_16x16_PALETTE_COUNT, Alex_run_16x16_PALETTE_COUNT, Alex_run_16x16_palettes);
+        set_sprite_palette(0u, player_idle_PALETTE_COUNT, player_idle_palettes);
+        set_sprite_palette(player_idle_PALETTE_COUNT, player_run_PALETTE_COUNT, player_run_palettes);
     }
 
     CRITICAL {

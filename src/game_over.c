@@ -16,6 +16,7 @@ static const char game_over_messages[][14] = {  // Longest string is 13 chars + 
 void show_game_over_screen(GameOverReason reason, uint16_t score) {
     /* Initialize clean scene (disable LCD, hide sprites, clear VRAM, reset palettes) */
     scene_init_clean();
+    set_solid_bkg(BKG_COLOR_GAMEOVER);
 
     /* Display game over title centered vertically at row 8 */
     const char *message = game_over_messages[reason];

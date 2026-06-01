@@ -8,6 +8,14 @@
 #define NPC_OAM_BASE  24u
 #define MAX_NPCS       4u
 
+/* NPC behavior types */
+#define NPC_TYPE_STATIC  0u
+#define NPC_TYPE_CAT     1u
+
+/* Cat AI states */
+#define NPC_STATE_REST    0u
+#define NPC_STATE_SPRINT  1u
+
 typedef struct {
     uint8_t x;
     uint8_t y;
@@ -17,6 +25,10 @@ typedef struct {
     uint8_t sprite_tile_base;   /* frame A tile (animation origin) */
     uint8_t palette;            /* CGB palette index (0-based) */
     uint8_t dialogue_id;        /* cast to LangStringId on use */
+    uint8_t npc_type;           /* NPC_TYPE_STATIC / NPC_TYPE_CAT */
+    uint8_t ai_state;           /* NPC_STATE_REST / NPC_STATE_SPRINT */
+    uint8_t ai_timer;           /* frames in current AI state */
+    uint8_t ai_dir;             /* 0=right 1=left 2=up 3=down (cycles) */
 } Npc;
 
 /* Initialize one NPC slot. Returns 1 on success, 0 if index out of range. */

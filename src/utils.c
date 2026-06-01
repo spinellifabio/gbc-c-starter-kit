@@ -1,6 +1,7 @@
 #include "utils.h"
 
 #include <gb/gb.h>
+#include <gb/cgb.h>
 #include <gb/metasprites.h>
 #include <stdint.h>
 
@@ -10,6 +11,18 @@
  * 
  * Call this at the start of any scene transition to prevent glitching.
  */
+void set_solid_bkg(palette_color_t color) {
+    if (_cpu == CGB_TYPE) {
+        palette_color_t pal[4] = {
+            color,               /* color 0: background fill */
+            RGB8(140,140,140),   /* color 1: medium gray */
+            RGB8(200,200,200),   /* color 2: light gray */
+            RGB8(255,255,255),   /* color 3: white — GBDK font ink pixels use index 3 */
+        };
+        set_bkg_palette(0u, 1u, pal);
+    }
+}
+
 void scene_init_clean(void) {
     DISPLAY_OFF;
 

@@ -35,4 +35,5 @@ Thumbs.db
 examples/**/obj/
 
 # CocoIndex Code (ccc)
-/.cocoindex_code/
+/.cocoindex_code/*
+!/.cocoindex_code/settings.yml

@@ -66,12 +66,12 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
 
 ## 8. Gameplay Test / Mini RPG
 
-- [ ] Gameplay screen with controllable character (tile-based movement)
-- [ ] Interaction with map elements (NPC, objects)
-- [ ] At least two events:
-  - [ ] leads to `game_over_screen`
-  - [ ] leads to completion (credits)
-- [ ] Update of global state (e.g., lives, score, language)
+- [x] Gameplay screen with controllable character (tile-based movement)
+- [x] Interaction with map elements (NPC, objects)
+- [x] At least two events:
+  - [x] leads to `game_over_screen` (hazard depletes lives)
+  - [x] leads to completion (credits) (treasure secured → win)
+- [x] Update of global state (e.g., lives, score, language)
 - [ ] **Save integration**: optional checkpoint/autosave, restore state from slot
 
 ## 8. Game Completion / Credits
@@ -191,3 +191,51 @@ These objectives are **additional**, useful as extra value for future games.
   - [ ] More complex sprite animations (NPC walking cycles, battles)
   - [ ] Additional languages for narrative texts or dialogues
   - [ ] Persistent score tracking via temporary save on RAM/EEPROM
+
+## 13. Art Assets — Sprites & Backgrounds
+
+Tracks which visual assets still need custom artwork to replace placeholders.
+
+### Sprite Assets
+
+| Asset file | Used by | Status | Notes |
+|------------|---------|--------|-------|
+| `res/sprites/player_idle.h` | Player standing (4 dirs) | Placeholder | Replace with final character art |
+| `res/sprites/player_run.h` | Player walking (4 dirs × 6 frames) | Placeholder | Replace with final character art |
+| `res/sprites/cat_idle.h` | Cat NPC (idle + sprint AI) | Placeholder (copy of player_idle) | Replace with 16×16 cat sprite (2+ frames) |
+| `res/sprites/cutscene_player.h` | Player in cutscenes | Placeholder (copy of player_idle) | Replace with cutscene-specific player art |
+| `res/sprites/cutscene_npc.h` | NPC in cutscenes | Placeholder (copy of player_idle) | Replace with cutscene-specific NPC art |
+
+> All sprites: 16×16 px, 8×16 OAM mode, up to 4 CGB palettes. Use `png2asset` to regenerate `.h`/`.c` from source PNG.
+
+**VRAM budget (current):**
+```
+  0- 19 : player_idle       (20 tiles)
+ 20- 99 : player_run        (80 tiles)
+100-103 : obj_treasure       (4 tiles)
+104-107 : obj_hazard         (4 tiles)
+108-127 : cat_idle          (20 tiles, placeholder)
+128-147 : cutscene_player   (20 tiles, placeholder)
+148-167 : cutscene_npc      (20 tiles, placeholder)
+```
+168 of 256 VRAM sprite tiles used. 88 tiles free for future sprites.
+
+### Background / Tileset Assets
+
+| Asset | Used by | Status | Notes |
+|-------|---------|--------|-------|
+| `res/tiles/tileset.*` | Gameplay world map (water/sand/grass) | Placeholder | Replace with final tileset |
+| *(missing)* | Splash screen | Placeholder (solid black) | Replace with dedicated art when ready |
+| *(missing)* | Title screen logo/background | Placeholder (solid black) | Logo/tilemap art needed; high priority |
+| *(missing)* | Options screen background | Placeholder (solid black) | Optional decorative art |
+| *(missing)* | Game Over screen | Placeholder (solid black) | Optional decorative art |
+| *(missing)* | Win / Credits screen | Placeholder (solid black) | Optional decorative art |
+
+### Asset Priority Order
+
+1. **`cat_idle`** — unlock real cat NPC visuals
+2. **`cutscene_player` / `cutscene_npc`** — differentiate cutscene characters from gameplay sprites
+3. **Title screen logo** — first thing player sees; high visual impact
+4. **`player_idle` / `player_run`** — character defines visual identity
+5. **`tileset`** — world look defines game feel
+6. Splash, Game Over, Credits — polish pass

@@ -6,7 +6,8 @@
       "PowerShell(Get-ChildItem -Recurse -File | Where-Object { $_.FullName -notmatch 'node_modules|\\\\.git|dist|build|\\\\.cocoindex_code|target|vendor|coverage|\\\\.next|\\\\.nuxt|\\\\.cache|\\\\.turbo' } | Select-Object -ExpandProperty Extension | Where-Object { $_ -ne '' } | Sort-Object -Unique)",
       "PowerShell(ccc index *)",
       "PowerShell(cmake *)",
-      "Bash(exit 0)"
+      "Bash(exit 0)",
+      "Bash(cmake --build --preset build-rom)"
     ]
   }
 }
