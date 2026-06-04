@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "audio.h"
+#include "bgm.h"
 #include "game_settings.h"
 #include "input.h"
 #include "lang.h"
@@ -27,6 +29,7 @@ void title_screen(void) {
     WY_REG = 144u;
     HIDE_WIN;
     set_solid_bkg(BKG_COLOR_TITLE);
+    bgm_play_title_theme();
     cls();
     clear_attr_map();
 
@@ -42,13 +45,16 @@ void title_screen(void) {
         }
         uint8_t pressed = get_pressed();
         if (pressed & J_START) {
+            sfx_play(SFX_UI_SELECT);
             break;
         }
         if (pressed & J_SELECT) {
+            sfx_play(SFX_UI_SELECT);
             options_screen();
         }
         wait_vbl_done();
     }
+    bgm_stop();
     flush_input();
     cls();
     clear_attr_map();

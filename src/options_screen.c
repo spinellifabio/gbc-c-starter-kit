@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "audio.h"
+#include "bgm.h"
 #include "game_settings.h"
 #include "input.h"
 #include "lang.h"
@@ -21,6 +23,7 @@ typedef struct {
 static uint8_t toggle_sound(int dir) {
     (void)dir;
     g_settings.sound_on ^= 1u;
+    audio_set_enabled(g_settings.sound_on);
     return 0u;
 }
 
@@ -120,6 +123,7 @@ static void draw_options(uint8_t cursor) {
 
 void options_screen(void) {
     uint8_t cursor = 0u;
+    bgm_pause();
     WY_REG = 144u;
     HIDE_WIN;
     set_solid_bkg(BKG_COLOR_OPTIONS);
@@ -128,24 +132,28 @@ void options_screen(void) {
         wait_vbl_done();
         uint8_t pressed = get_pressed();
         if (pressed & J_B) {
+            sfx_play(SFX_UI_BACK);
             break;
         }
 
         if ((pressed & J_UP) && (cursor > 0u)) {
             uint8_t old_cursor = cursor;
             cursor--;
+            sfx_play(SFX_UI_MOVE);
             draw_option_line(old_cursor, cursor);
             draw_option_line(cursor, cursor);
         }
         if ((pressed & J_DOWN) && (cursor < (OPTION_COUNT - 1u))) {
             uint8_t old_cursor = cursor;
             cursor++;
+            sfx_play(SFX_UI_MOVE);
             draw_option_line(old_cursor, cursor);
             draw_option_line(cursor, cursor);
         }
 
         if (pressed & (J_LEFT | J_RIGHT)) {
             int dir = (pressed & J_LEFT) ? -1 : +1;
+            sfx_play(SFX_UI_SELECT);
             uint8_t full_redraw = option_items[cursor].change(dir);
             if (full_redraw) {
                 draw_options(cursor);
@@ -154,6 +162,7 @@ void options_screen(void) {
             }
         }
     }
+    bgm_resume();
     flush_input();
     cls();
     clear_attr_map();

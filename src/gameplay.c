@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "audio.h"
 #include "gameplay.h"
 #include "tileset.h"
 #include "world_defs.h"
@@ -284,6 +285,7 @@ typedef struct {
 } Player;
 
 static Player player;
+static uint8_t step_timer  = 0u;
 static uint8_t game_active = 1;
 static GameplayResult game_result = GAME_RESULT_WIN;
 static WinReason game_result_reason = WIN_TREASURE_SECURED;
@@ -362,8 +364,13 @@ void handle_player_movement(void) {
     // Update animation
     if (moved) {
         player.frame = (player.frame + 1) % (RUN_FRAMES_PER_DIR * 2);
+        if (++step_timer >= 8u) {
+            step_timer = 0u;
+            sfx_play(SFX_STEP);
+        }
     } else {
         player.frame = 0;
+        step_timer = 0u;
     }
     player.moving = moved;
 

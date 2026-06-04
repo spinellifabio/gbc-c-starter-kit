@@ -84,56 +84,56 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
 
 ### 9.1 Audio Architecture
 
-- [ ] **BGM Driver**: choose and integrate (e.g., hUGEDriver/GBT Player) or lightweight custom driver
-- [ ] **Tick timing**: update in VBlank or timer; target 50/60 Hz
+- [x] **BGM Driver**: lightweight custom VBL note sequencer (`bgm.c`) using Pulse1; no external dependency
+- [x] **Tick timing**: `bgm_vbl_update()` registered via `add_VBL()` — fires every VBL (~60 Hz)
 - [ ] **Panning/stereo** for CGB and DMG fallback; master volume consistent with `settings.sound_on`
 - [ ] **ROM banking management** for music patterns/instruments (banked audio assets)
 
 ### 9.2 Background Music (BGM)
 
-- [ ] API: `bgm_init()`, `bgm_play(track_id, loop)`, `bgm_stop()`, `bgm_pause/resume()`
+- [x] API: `bgm_init()`, `bgm_play(song)`, `bgm_stop()`, `bgm_pause()`, `bgm_resume()`
 - [ ] **Transitions**: non-blocking `bgm_fade_in/out(ms)`
-- [ ] **Channel allocation**: BGM primarily uses Pulse1+Wave; leaves Pulse2/Noise free for SFX
-- [ ] **Asset pipeline**: conversion from tracker (DefleMask/Famitracker-like) → driver format
+- [x] **Channel allocation**: BGM uses Pulse1 (NR10-NR14); leaves Pulse2/Noise free for SFX
+- [ ] **Asset pipeline**: richer song format (tracker-style, banked)
 - [ ] Minimum tracks:
   - [ ] Short Splash/Intro
-  - [ ] Title loop
+  - [x] Title loop (`demo_song` — C-major arpeggio, plays on title screen)
   - [ ] Options ambience
   - [ ] Gameplay loop
   - [ ] Game Over sting
-- [ ] **Budget**: ≤ ~6% CPU for driver update; ROM for tracks 8–24 KB banked
+- [x] **Budget**: VBL update < 1% CPU; song data in ROM as `const BgmNote[]`
 
 ### 9.3 Sound Effects (SFX)
 
-- [ ] API: `sfx_play(id, prio)` with small queue and priority
+- [x] API: `sfx_play(id)` — Pulse2-only, no priority queue (Phase 1)
+- [ ] Priority queue: `sfx_play(id, prio)` with preemption
 - [ ] **Channel policy**:
   - [ ] Noise: hits/steps
-  - [ ] Pulse2: UI click/confirm
-  - [ ] Wave (occasional): short special effects; requires saving/restoring Wave RAM if BGM uses it
+  - [x] Pulse2: UI click/confirm, gameplay SFX
+  - [ ] Wave (occasional): short special effects
 - [ ] **Interaction with BGM**:
   - [ ] Light ducking of BGM during high-priority SFX
-  - [ ] Temporary lock of stolen channel (e.g., Pulse2) with ADSR restore
-- [ ] **Preset instruments** (ADSR, duty, sweep) for common SFX
-- [ ] **SFX table**: UI click, step, pickup, error/buzz, confirm, alert
+- [x] **Preset instruments**: UI (move, select, back), gameplay (step, pickup, error)
+- [ ] **SFX table**: alert, more gameplay variants
 
 ### 9.4 State/Configuration
 
-- [ ] `settings.sound_on` turns APU on/off: fast muting (NR52) + channel state restore
+- [x] `settings.sound_on` turns APU on/off: fast muting (NR52) + channel state restore
 - [ ] **DEBUG mode**: overlay with channel levels, simplified VU, FPS vs audio tick
-- [ ] **Failsafe**: if driver not initialized → API no-op
+- [x] **Failsafe**: if driver not initialized → API no-op
 
 ### 9.5 Flow Integration
 
 - [ ] Splash: short jingle
-- [ ] Title: BGM loop; pause when entering options, resume on exit (or soft track change)
-- [ ] Options menu: SFX for move/confirm/back
-- [ ] Gameplay: main BGM; cue SFX on events; sting on Game Over
+- [x] Title: BGM loop (`demo_song`); pauses when entering options, resumes on exit
+- [x] Options menu: SFX for move/confirm/back
+- [x] Gameplay: SFX on step (throttled), pickup, life lost/error
 
 ### 9.6 Performance & Safety
 
 - [ ] Audio update **outside** critical DMA/OAM sections
 - [ ] Avoid APU writes during STAT mode 3 (if using LCD ISR)
-- [ ] No heap usage; `const` tables in ROM; audio state ≤ 64 B in WRAM
+- [x] No heap usage; `const` tables in ROM; audio state ≤ 64 B in WRAM
 
 ## 10. Multilanguage
 

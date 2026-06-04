@@ -1,3 +1,4 @@
+#include "audio.h"
 #include "game_objects.h"
 #include "game_state.h"
 #include "dialogue.h"
@@ -109,6 +110,7 @@ GameObject* check_object_collision(uint8_t x, uint8_t y, uint8_t width, uint8_t 
 uint8_t game_lose_life(void) {
     if (game_state.lives > 0) {
         game_state.lives--;
+        sfx_play(SFX_ERROR);
         if (game_state.lives == 0) {
             gameplay_signal_game_over();
         }
@@ -126,7 +128,8 @@ void handle_object_interaction(GameObject* obj) {
                 uint8_t choice = dialogue_show_yes_no("You found a treasure!\nTake it?");
                 if (choice == DIALOGUE_RESULT_YES) {
                     game_state.has_treasure = 1;
-                    obj->active = 0;  // Remove treasure
+                    obj->active = 0;
+                    sfx_play(SFX_PICKUP);
                     dialogue_show_text("You got the treasure!");
                 }
             }

@@ -12,6 +12,8 @@ set(ROM_PATH "${ROM_DIR}/${ROM_NAME}")
 # (sprite.c and background.c are unused — excluded to save ~400 bytes WRAM + ROM)
 set(SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/audio.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/bgm.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/game_system.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/game_settings.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/game_state.c"
@@ -72,6 +74,7 @@ list(APPEND LCC_FLAGS -I${GBDK_INCLUDE_DIR})
 list(APPEND LCC_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/include)
 list(APPEND LCC_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/res/sprites)
 list(APPEND LCC_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/res/tiles)
+list(APPEND LCC_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR}/res/music)
 
 # --- ROM banking ---
 list(APPEND LCC_FLAGS -Wm-yo8)   # 8 ROM banks = 128 KB

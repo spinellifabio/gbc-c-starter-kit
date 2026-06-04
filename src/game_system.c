@@ -8,6 +8,8 @@
 #include "player_run.h"
 #include "cat_idle.h"
 #include "dialogue.h"
+#include "audio.h"
+#include "bgm.h"
 #include "game_objects.h"
 #include "game_settings.h"
 #include "game_system.h"
@@ -71,12 +73,14 @@ void game_system_init(void) {
         set_sprite_palette(player_idle_PALETTE_COUNT, player_run_PALETTE_COUNT, player_run_palettes);
     }
 
+    add_VBL(bgm_vbl_update);
+
     CRITICAL {
         LYC_REG  = 0u;
         STAT_REG |= STATF_LYC;
         add_LCD(LCD_ISR);
     }
-    set_interrupts(IE_REG | LCD_IFLAG);
+    set_interrupts(IE_REG | VBL_IFLAG | LCD_IFLAG);
 
     SPRITES_8x16;
     SHOW_SPRITES;
@@ -84,4 +88,6 @@ void game_system_init(void) {
     DISPLAY_ON;
 
     lang_init(g_settings.language);
+    audio_init();
+    if (!g_settings.sound_on) audio_set_enabled(0u);
 }
