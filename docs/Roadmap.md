@@ -46,23 +46,23 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
 
 ## 7. Save System (3 Slots) and Game Resume
 
-- [ ] **SRAM Map**: define `SaveSlot` with header, version, checksum, language, difficulty, lives, progress flags, seed, etc.
-  - [ ] Header: magic `"GBCP"`, version `u8`, slot_id `u8`
-  - [ ] Checksum CRC16 or 16-bit sum
-  - [ ] Padding for 16/32 B alignment
-- [ ] **3 Slots**: contiguous layout in SRAM (e.g., 0xA000–...) with 256–1024 B/slot
-- [ ] **Pre-Game Slot Menu**:
-  - [ ] 3 slots with state: `EMPTY` / timestamp / summary (lives, diff, %)
-  - [ ] Actions: `CONTINUE`, `NEW GAME`, `OVERWRITE` (confirm), `ERASE` (double confirm)
-- [ ] **Title Flow**: START → slot menu; select/continue/new
-- [ ] **Save API**:
-  - [ ] `save_init()`, `save_slot_read(i, out)`, `save_slot_write(i, in)`, `save_slot_erase(i)`
-  - [ ] `save_autosave(i)` at checkpoints/events
-- [ ] **Compatibility & Safety**:
-  - [ ] Format versioning; safe invalidation
-  - [ ] Checksum validation; `CORRUPTED` state
-- [ ] **Multilingual UI/UX**: localized labels for slot menu
-- [ ] **Performance**: SRAM writes outside vblank; input blocked during I/O
+- [x] **SRAM Map**: define `SaveSlot` with header, version, checksum, language, difficulty, lives, progress flags, seed, etc. (`include/save.h`)
+  - [x] Header: magic `"GBCP"`, version `u8`, slot_id `u8`
+  - [x] Checksum CRC16 or 16-bit sum (16-bit sum over first 30 bytes)
+  - [x] Padding for 16/32 B alignment (32 B/slot, `reserved[13]`)
+- [x] **3 Slots**: contiguous layout in SRAM (0xA000, 32 B/slot)
+- [x] **Pre-Game Slot Menu** (`src/slot_menu.c`):
+  - [x] 3 slots with state: `EMPTY` / summary (lives, diff, score); `play_count` as timestamp stand-in
+  - [x] Actions: `CONTINUE`, `NEW GAME`, `OVERWRITE` (confirm), `ERASE` (double confirm)
+- [x] **Title Flow**: START → slot menu; select/continue/new (`src/main.c`)
+- [x] **Save API** (`src/save.c`):
+  - [x] `save_init()`, `save_slot_read(i, out)`, `save_slot_write(i, in)`, `save_slot_erase(i)`
+  - [x] `save_autosave(i)` at checkpoints/events
+- [x] **Compatibility & Safety**:
+  - [x] Format versioning; safe invalidation
+  - [x] Checksum validation; `CORRUPTED` state
+- [x] **Multilingual UI/UX**: localized labels for slot menu (`STR_SLOT_*`, EN/IT)
+- [x] **Performance**: SRAM writes bracketed `ENABLE_RAM`/`DISABLE_RAM` + `__critical`; input flushed during I/O
 
 ## 8. Gameplay Test / Mini RPG
 
@@ -72,7 +72,7 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
   - [x] leads to `game_over_screen` (hazard depletes lives)
   - [x] leads to completion (credits) (treasure secured → win)
 - [x] Update of global state (e.g., lives, score, language)
-- [ ] **Save integration**: optional checkpoint/autosave, restore state from slot
+- [x] **Save integration**: autosave on win; restore state from slot on CONTINUE (`src/main.c`)
 
 ## 8. Game Completion / Credits
 
@@ -140,7 +140,7 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
 - [ ] All texts: splash, title, options, dialogue, game over, credits
 - [x] Real-time language switch via options menu
 - [x] Prepared for more than two languages (scalable)
-- [ ] **New slot menu entries** (see Section 6) integrated in `lang.h/.c`
+- [x] **New slot menu entries** (see Section 6) integrated in `lang.h/.c` (`STR_SLOT_*`)
 
 ## 11. Refactoring and Optimization
 

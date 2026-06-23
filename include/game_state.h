@@ -15,6 +15,10 @@ typedef struct {
 // Global game state
 extern GameState game_state;
 
+/* Slot index (0..SAVE_SLOT_COUNT-1) the current run reads from / autosaves to.
+ * Set by the slot menu before gameplay starts. */
+extern uint8_t g_active_slot;
+
 /**
  * @brief Initialize the game state with default values
  */

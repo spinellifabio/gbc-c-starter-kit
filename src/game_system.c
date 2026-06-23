@@ -14,6 +14,7 @@
 #include "game_settings.h"
 #include "game_system.h"
 #include "lang.h"
+#include "save.h"
 #include "tileset.h"
 #include "world_defs.h"
 
@@ -88,6 +89,7 @@ void game_system_init(void) {
     DISPLAY_ON;
 
     lang_init(g_settings.language);
+    save_init();
     audio_init();
     if (!g_settings.sound_on) audio_set_enabled(0u);
 }

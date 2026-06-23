@@ -3,6 +3,9 @@
 // Global game state
 GameState game_state;
 
+// Slot the current run is bound to (default 0; overwritten by the slot menu).
+uint8_t g_active_slot = 0u;
+
 void game_state_init(void) {
     // Initialize with default values
     game_state.lives = 1;          // Single attempt

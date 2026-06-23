@@ -61,6 +61,18 @@ typedef enum {
     STR_NPC_GREETING,           /* "Hello traveler!" / "Ciao viaggiatore!" */
     STR_NPC_CAT_MEOW,           /* "Meow!" / "Miao!" */
 
+    /* Save / Slot menu */
+    STR_SLOT_TITLE,             /* "SLOT SELECT" / "SELEZIONA SLOT" */
+    STR_SLOT_LABEL,             /* "SLOT" / "SLOT" */
+    STR_SLOT_EMPTY,             /* "EMPTY" / "VUOTO" */
+    STR_SLOT_CORRUPTED,         /* "CORRUPTED" / "CORROTTO" */
+    STR_SLOT_NEW,               /* "NEW GAME" / "NUOVA PARTITA" */
+    STR_SLOT_CONTINUE,          /* "CONTINUE" / "CONTINUA" */
+    STR_SLOT_OVERWRITE,         /* "OVERWRITE" / "SOVRASCRIVI" */
+    STR_SLOT_ERASE,             /* "ERASE" / "CANCELLA" */
+    STR_SLOT_CONFIRM,           /* "ARE YOU SURE?" / "SEI SICURO?" */
+    STR_SLOT_FOOTER,            /* "A=OK B=BACK" / "A=OK B=INDIETRO" */
+
     STR__COUNT                  /* sempre ultimo */
 } LangStringId;
 

@@ -17,6 +17,8 @@ set(SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/game_system.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/game_settings.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/game_state.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/save.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/slot_menu.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/gameplay.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/game_objects.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/npc.c"
@@ -82,8 +84,9 @@ list(APPEND LCC_FLAGS -Wm-yo8)   # 8 ROM banks = 128 KB
 # list(APPEND LCC_FLAGS -Wm-yo32)  # 32 ROM banks = 512 KB
 # list(APPEND LCC_FLAGS -Wm-yo64)  # 64 ROM banks = 1 MB
 # list(APPEND LCC_FLAGS -Wm-yo128) # 128 ROM banks = 2 MB
-list(APPEND LCC_FLAGS -Wm-yc5)   # header: cart type = MBC5
-list(APPEND LCC_FLAGS -Wl-yt5)   # linker: force cart type = 0x19 (MBC5, no RAM, no batt)
+list(APPEND LCC_FLAGS -Wm-yc)        # GameBoy Color compatible header
+list(APPEND LCC_FLAGS -Wm-yt0x1B)    # makebin: cart type 0x1B = MBC5 + RAM + BATTERY
+list(APPEND LCC_FLAGS -Wm-ya1)       # makebin: 1 RAM bank = 8 KB battery-backed SRAM
 
 # === Build ROM ===
 add_custom_command(

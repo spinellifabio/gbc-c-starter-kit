@@ -47,7 +47,18 @@ static const char* const STRINGS_EN[STR__COUNT] = {
 
     /* STR_NPC_GREETING         */ "Hello traveler!",
 
-    /* STR_NPC_CAT_MEOW         */ "Meow!"
+    /* STR_NPC_CAT_MEOW         */ "Meow!",
+
+    /* STR_SLOT_TITLE           */ "SLOT SELECT",
+    /* STR_SLOT_LABEL           */ "SLOT",
+    /* STR_SLOT_EMPTY           */ "EMPTY",
+    /* STR_SLOT_CORRUPTED       */ "CORRUPTED",
+    /* STR_SLOT_NEW             */ "NEW GAME",
+    /* STR_SLOT_CONTINUE        */ "CONTINUE",
+    /* STR_SLOT_OVERWRITE       */ "OVERWRITE",
+    /* STR_SLOT_ERASE           */ "ERASE",
+    /* STR_SLOT_CONFIRM         */ "ARE YOU SURE?",
+    /* STR_SLOT_FOOTER          */ "A=OK B=BACK"
 };
 
 static const char* const STRINGS_IT[STR__COUNT] = {
@@ -91,7 +102,18 @@ static const char* const STRINGS_IT[STR__COUNT] = {
 
     /* STR_NPC_GREETING         */ "Ciao viaggiatore!",
 
-    /* STR_NPC_CAT_MEOW         */ "Miao!"
+    /* STR_NPC_CAT_MEOW         */ "Miao!",
+
+    /* STR_SLOT_TITLE           */ "SELEZIONA SLOT",
+    /* STR_SLOT_LABEL           */ "SLOT",
+    /* STR_SLOT_EMPTY           */ "VUOTO",
+    /* STR_SLOT_CORRUPTED       */ "CORROTTO",
+    /* STR_SLOT_NEW             */ "NUOVA PARTITA",
+    /* STR_SLOT_CONTINUE        */ "CONTINUA",
+    /* STR_SLOT_OVERWRITE       */ "SOVRASCRIVI",
+    /* STR_SLOT_ERASE           */ "CANCELLA",
+    /* STR_SLOT_CONFIRM         */ "SEI SICURO?",
+    /* STR_SLOT_FOOTER          */ "A=OK B=INDIETRO"
 };
 
 static const char* const* const STRINGS_ALL[LANG_COUNT] = {
