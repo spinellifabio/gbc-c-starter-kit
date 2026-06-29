@@ -61,3 +61,8 @@ CGB detected at runtime: `_cpu == CGB_TYPE`. DMG skips palettes gracefully.
 4. Resource headers last
 
 Use `#ifndef` guards, not `#pragma once`.
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
