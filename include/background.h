@@ -3,79 +3,99 @@
 
 #include <gb/gb.h>
 #include <stdint.h>
-/* No stdbool.h: GBDK/Z80 target uses uint8_t as boolean (0/1) */
 
-// Background layer IDs
-#define BG_LAYER_BG0 0
-#define BG_LAYER_BG1 1
-#define BG_LAYER_UI  2
+/* Background layer IDs */
+#define BG_LAYER_BG0 0u  /* game background content */
+#define BG_LAYER_UI  1u  /* UI / text (managed by existing helpers; do not bg_load here) */
 
-// Background scrolling modes
+#define MAX_BG_LAYERS 2u
+
+/*
+ * BG tile-data partition (BG tile space is separate from sprite tile space).
+ *
+ * FONT_OFFSET = 128 (world_defs.h).  Tiles 128-255 are occupied by font and
+ * the decorative tileset loaded in game_system_init().  Background content
+ * tiles must live in 0-127 so they never overwrite the UI/font tiles — FR-006.
+ */
+#define BG_CONTENT_TILE_START 0u
+#define BG_CONTENT_TILE_LIMIT 128u   /* exclusive upper bound; matches FONT_OFFSET */
+
+/* Background scrolling modes */
 typedef enum {
-    BG_SCROLL_NONE,     // No scrolling
-    BG_SCROLL_X,        // Horizontal only
-    BG_SCROLL_Y,        // Vertical only
-    BG_SCROLL_XY        // Both directions
+    BG_SCROLL_NONE = 0,
+    BG_SCROLL_X,
+    BG_SCROLL_Y,
+    BG_SCROLL_XY
 } bg_scroll_mode_t;
 
-// Background definition structure
+/* Background layer descriptor */
 typedef struct {
-    uint8_t* data;          // Tile data
-    uint8_t* map;           // Map data
-    uint8_t* attrmap;       // Attribute map (CGB only)
-    uint8_t width;          // Width in tiles
-    uint8_t height;         // Height in tiles
-    uint8_t x;              // X position
-    uint8_t y;              // Y position
-    uint8_t scroll_x;       // X scroll offset
-    uint8_t scroll_y;       // Y scroll offset
-    bg_scroll_mode_t scroll_mode;  // Scroll mode
-    uint8_t palette;        // Background palette (DMG) / palette bank (CGB)
-    uint8_t visible;        /* 0=hidden, 1=visible */
+    const uint8_t* data;      /* tile data (ROM) */
+    const uint8_t* map;       /* tile map (ROM) */
+    const uint8_t* attrmap;   /* CGB attribute map (ROM, may be NULL) */
+    uint8_t width;            /* map width in tiles */
+    uint8_t height;           /* map height in tiles */
+    uint8_t scroll_x;
+    uint8_t scroll_y;
+    bg_scroll_mode_t scroll_mode;
+    uint8_t palette;          /* BG palette slot (0-7) */
+    uint8_t visible;          /* 0 = hidden, 1 = visible */
+    uint8_t loaded;           /* 1 = tile data is in VRAM */
 } background_t;
 
-// Initialize background system
+/*
+ * bg_init — reset layer descriptors (no display or VRAM side-effects).
+ * Call once from game_system_init().
+ */
 void bg_init(void);
 
-// Load a background from ROM
-void bg_load(background_t* bg, uint8_t layer, 
-             const uint8_t* tiles, const uint8_t* map, 
-             const uint8_t* attrmap, uint8_t width, uint8_t height);
+/*
+ * bg_load — load a background into the content tile range (0..127).
+ *   layer    : BG_LAYER_BG0 (do not use BG_LAYER_UI).
+ *   tiles    : ROM tile data; tile_count must be <= BG_CONTENT_TILE_LIMIT.
+ *   tile_count : number of tiles in `tiles`.
+ *   map      : ROM tile-index map (values are offsets into this bg's tiles).
+ *   attrmap  : ROM CGB attribute map, or NULL.
+ *   w, h     : map dimensions in tiles.
+ *
+ * Loads tile data at BG_CONTENT_TILE_START; writes via wait_vbl_done() — FR-008.
+ * CGB attrmap loaded via VBK_REG bank 1 only when _cpu == CGB_TYPE — FR-007.
+ */
+void bg_load(uint8_t layer,
+             const uint8_t* tiles, uint8_t tile_count,
+             const uint8_t* map, const uint8_t* attrmap,
+             uint8_t w, uint8_t h);
 
-// Set background position
-void bg_set_pos(background_t* bg, uint8_t x, uint8_t y);
+/*
+ * bg_get — return the background_t* for the given layer, or NULL if invalid.
+ * Used by the effects module to look up a layer by id.
+ */
+background_t* bg_get(uint8_t layer);
 
-// Set background scroll offset
+/* Scroll helpers (safe to call each frame; writes SCX/SCY in VBL window). */
 void bg_set_scroll(background_t* bg, int8_t dx, int8_t dy);
-
-// Set background visibility
-void bg_set_visible(background_t* bg, uint8_t visible);
-
-// Set background scroll mode
 void bg_set_scroll_mode(background_t* bg, bg_scroll_mode_t mode);
 
-// Update background (call once per frame)
-void bg_update(void);
+/* Visibility (toggles BG hardware show/hide for BG_LAYER_BG0). */
+void bg_set_visible(background_t* bg, uint8_t visible);
 
-// Set background palette (DMG) or palette bank (CGB)
-void bg_set_palette(background_t* bg, uint8_t palette);
-
-// Set CGB attributes for a tile
-void bg_set_tile_attr(background_t* bg, uint8_t x, uint8_t y, uint8_t attr);
-
-// Get CGB attributes for a tile
-uint8_t bg_get_tile_attr(background_t* bg, uint8_t x, uint8_t y);
-
-// Set a tile at the specified position
+/* Write a single tile to the map (deferred write, call inside VBL window). */
 void bg_set_tile(background_t* bg, uint8_t x, uint8_t y, uint8_t tile);
 
-// Get a tile at the specified position
-uint8_t bg_get_tile(background_t* bg, uint8_t x, uint8_t y);
+/*
+ * bg_set_palette — delegate to palette_alloc_bkg / palette_set_bkg.
+ * On DMG, no-op for the color path.
+ */
+void bg_set_palette(background_t* bg, uint8_t palette);
 
-// Check if coordinates are within background bounds
-uint8_t bg_in_bounds(const background_t* bg, uint8_t x, uint8_t y);
+/*
+ * bg_clear — fill the BG map with tile 0 and reset the layer descriptor.
+ * Does NOT touch font/UI tiles (>= BG_CONTENT_TILE_LIMIT) — FR-007.
+ * Detaches any scroll effects targeting this layer.
+ */
+void bg_clear(uint8_t layer);
 
-// Set CGB background palette colors
-void bg_set_cgb_palette(uint8_t palette, uint16_t* colors);
+/* Update scroll registers (call once per frame from main loop if not in ISR). */
+void bg_update(void);
 
-#endif // BACKGROUND_H
+#endif /* BACKGROUND_H */
