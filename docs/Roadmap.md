@@ -25,10 +25,10 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
 
 ## 4. Sprites and Visual Content
 
-- [ ] Sprite management (OAM, tile reuse)
-- [ ] Background layer management separate from UI
-- [ ] Dynamic palette and DMG/CGB compatibility
-- [ ] Visual effects: blink, fade, scroll, basic animations
+- [x] Sprite management (OAM, tile reuse) — `sprite.c`: ref-counted tile alloc, OAM bitmap, 16 sprite handles
+- [x] Background layer management separate from UI — `background.c`: content tiles 0–127, font disjoint at 128+
+- [x] Dynamic palette and DMG/CGB compatibility — `palette.c`: alloc/free slots 0–7, grayscale fallback
+- [x] Visual effects: blink, fade, scroll, basic animations — `effects.c`: `EffectState[4]` = 44 B WRAM
 
 ## 5. Intro Video / Cutscene
 
@@ -218,7 +218,7 @@ Tracks which visual assets still need custom artwork to replace placeholders.
 128-147 : cutscene_player   (20 tiles, placeholder)
 148-167 : cutscene_npc      (20 tiles, placeholder)
 ```
-168 of 256 VRAM sprite tiles used. 88 tiles free for future sprites.
+168 of 256 VRAM sprite tiles used. 88 tiles free (indices 168–255) — managed by `sprite_alloc` via `TileAlloc` ref-count table (`SPRITE_FIRST_FREE_TILE = 168`).
 
 ### Background / Tileset Assets
 
