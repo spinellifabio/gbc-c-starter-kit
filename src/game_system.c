@@ -17,6 +17,10 @@
 #include "save.h"
 #include "tileset.h"
 #include "world_defs.h"
+#include "sprite.h"
+#include "background.h"
+#include "palette.h"
+#include "effects.h"
 
 static void LCD_ISR(void) {
     /* Stub: add per-scanline work here (palette swaps, VRAM copy, wobble, etc.)
@@ -27,6 +31,12 @@ void game_system_init(void) {
     cgb_compatibility();
 
     DISPLAY_OFF;
+
+    /* Visual content layer — init data structures before any VRAM work. */
+    sprite_init();
+    bg_init();
+    palette_init();
+    effects_init();
 
     VBK_REG = 0u;
 
@@ -75,6 +85,7 @@ void game_system_init(void) {
     }
 
     add_VBL(bgm_vbl_update);
+    add_VBL(effects_vbl_tick);
 
     CRITICAL {
         LYC_REG  = 0u;

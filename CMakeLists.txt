@@ -9,7 +9,6 @@ set(ROM_PATH "${ROM_DIR}/${ROM_NAME}")
 
 # === Source files ===
 # Explicit list preferred over glob: avoids compiling dead-code modules
-# (sprite.c and background.c are unused — excluded to save ~400 bytes WRAM + ROM)
 set(SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/audio.c"
@@ -33,8 +32,11 @@ set(SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/credits.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/game_over.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/win_screen.c"
-    # sprite.c   — excluded: dead code, 352 bytes WRAM wasted
-    # background.c — excluded: dead code, ~48 bytes WRAM wasted
+    # Visual content layer (feature 001-visual-content-layer)
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/sprite.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/background.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/palette.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/effects.c"
 )
 file(GLOB RES_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/res/**/*.c")
 
@@ -87,6 +89,7 @@ list(APPEND LCC_FLAGS -Wm-yo8)   # 8 ROM banks = 128 KB
 list(APPEND LCC_FLAGS -Wm-yc)        # GameBoy Color compatible header
 list(APPEND LCC_FLAGS -Wm-yt0x1B)    # makebin: cart type 0x1B = MBC5 + RAM + BATTERY
 list(APPEND LCC_FLAGS -Wm-ya1)       # makebin: 1 RAM bank = 8 KB battery-backed SRAM
+list(APPEND LCC_FLAGS -Wl-m)         # lkgb: emit .map file for WRAM budget inspection (T027)
 
 # === Build ROM ===
 add_custom_command(
