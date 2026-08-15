@@ -4,7 +4,7 @@
 #include <gb/gb.h>
 #include <stdint.h>
 
-/* OAM slots 24-39: 4 slots per NPC (2x2 sprite) */
+/* OAM slots 24-31: 2 slots per NPC (8x16 mode — one entry per 8px column). */
 #define NPC_OAM_BASE  24u
 #define MAX_NPCS       4u
 

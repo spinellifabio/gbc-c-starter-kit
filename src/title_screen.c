@@ -13,6 +13,7 @@
 #include "options_screen.h"
 #include "title_screen.h"
 #include "utils.h"
+#include "logo.h"
 
 static void draw_blink_line(uint8_t x, uint8_t y, LangStringId id, uint8_t visible) {
     gotoxy(x, y);
@@ -33,8 +34,19 @@ void title_screen(void) {
     cls();
     clear_attr_map();
 
-    set_bkg_tiles(5u, 6u, (uint8_t)strlen(g_settings.game_name), 1u, (uint8_t *)g_settings.game_name);
-    set_bkg_tiles(7u, 7u, (uint8_t)strlen(g_settings.version), 1u, (uint8_t *)g_settings.version);
+    /* Logo banner: explicit tile-index map (never a raw char*) — see
+     * contracts/text_rendering.md. The previous code wrote g_settings.game_name
+     * straight into set_bkg_tiles(), treating ASCII bytes as BG tile indices;
+     * since the font loads at first_tile 0, not 32, that produced a garbled
+     * off-by-'@' render (research.md R0). */
+    uint8_t banner_row[LOGO_BANNER_WIDTH];
+    for (uint8_t i = 0u; i < LOGO_BANNER_WIDTH; i++) {
+        banner_row[i] = (uint8_t)(LOGO_TILE_BASE + logo_banner_map[i]);
+    }
+    set_bkg_tiles((uint8_t)((20u - LOGO_BANNER_WIDTH) / 2u), 4u, LOGO_BANNER_WIDTH, 1u, banner_row);
+
+    print_centered(g_settings.game_name, 6u);
+    print_centered(g_settings.version, 7u);
 
     while (1) {
         if (++frame_counter >= 30u) {

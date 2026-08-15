@@ -29,11 +29,14 @@ void npc_init_all(void) {
     for (i = 0u; i < MAX_NPCS; i++) {
         npcs[i].active = 0u;
     }
-    /* World NPC definitions */
-    npc_init(0u, 120u,  60u, 0u,           2u, (uint8_t)STR_NPC_GREETING);
+    /* World NPC definitions. tile_base 0u intentionally reuses player_idle's
+     * own tiles, so it also uses player_idle's own OBJ palette slot 0 — not
+     * a bug: matching graphic, matching palette. (All 8 OBJ slots are
+     * otherwise assigned; see data-model.md E4.) */
+    npc_init(0u, 120u,  60u, 0u,           0u, (uint8_t)STR_NPC_GREETING);
 
-    /* Slot 1: cat NPC */
-    npc_init(1u,  50u, 120u, CAT_IDLE_TILE, 3u, (uint8_t)STR_NPC_CAT_MEOW);
+    /* Slot 1: cat NPC — OBJ palette slot 5 (cat_idle_palettes, game_system.c) */
+    npc_init(1u,  50u, 120u, CAT_IDLE_TILE, 5u, (uint8_t)STR_NPC_CAT_MEOW);
     npcs[1].npc_type = NPC_TYPE_CAT;
 }
 
@@ -75,20 +78,18 @@ void npc_update(uint8_t idx) {
     }
 }
 
-/* Full 16x16 render. OAM base = NPC_OAM_BASE + (idx * 4). */
+/* Full 16x16 render. OAM base = NPC_OAM_BASE + (idx * 2). */
 void npc_draw(uint8_t idx, uint16_t cam_x, uint16_t cam_y) {
     uint8_t oam;
     int16_t sx, sy;
     uint8_t dx, dy, t, p;
 
     if (idx >= MAX_NPCS) return;
-    oam = (uint8_t)(NPC_OAM_BASE + (idx * 4u));
+    oam = (uint8_t)(NPC_OAM_BASE + (idx * 2u));
 
     if (!npcs[idx].active) {
         move_sprite(oam + 0u, 0u, 0u);
         move_sprite(oam + 1u, 0u, 0u);
-        move_sprite(oam + 2u, 0u, 0u);
-        move_sprite(oam + 3u, 0u, 0u);
         return;
     }
 
@@ -99,8 +100,6 @@ void npc_draw(uint8_t idx, uint16_t cam_x, uint16_t cam_y) {
         sy < -16 || sy > (SCREENHEIGHT + 16)) {
         move_sprite(oam + 0u, 0u, 0u);
         move_sprite(oam + 1u, 0u, 0u);
-        move_sprite(oam + 2u, 0u, 0u);
-        move_sprite(oam + 3u, 0u, 0u);
         return;
     }
 
@@ -109,21 +108,18 @@ void npc_draw(uint8_t idx, uint16_t cam_x, uint16_t cam_y) {
     t  = npcs[idx].sprite_tile;
     p  = npcs[idx].palette;
 
-    /* 2x2 tile layout: top-left, top-right, bottom-left, bottom-right */
+    /* SPRITES_8x16: hardware ignores bit 0 of the tile index and always
+     * shows the pair [index & 0xFE, index | 0x01], so the left column
+     * addresses t (pair t, t+1) and the right column addresses t+2
+     * (pair t+2, t+3) — one OAM entry per 8px-wide column. */
     set_sprite_tile(oam + 0u, t);
-    set_sprite_tile(oam + 1u, t + 1u);
-    set_sprite_tile(oam + 2u, t + 2u);
-    set_sprite_tile(oam + 3u, t + 3u);
+    set_sprite_tile(oam + 1u, (uint8_t)(t + 2u));
 
     move_sprite(oam + 0u, dx,      dy);
     move_sprite(oam + 1u, dx + 8u, dy);
-    move_sprite(oam + 2u, dx,      dy + 8u);
-    move_sprite(oam + 3u, dx + 8u, dy + 8u);
 
     set_sprite_prop(oam + 0u, p);
     set_sprite_prop(oam + 1u, p);
-    set_sprite_prop(oam + 2u, p);
-    set_sprite_prop(oam + 3u, p);
 }
 
 /* AABB collision: NPC hitbox 16x16 */

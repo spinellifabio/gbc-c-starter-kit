@@ -8,11 +8,20 @@
 
 #include "player_idle.h"
 #include "player_run.h"
+#include "cutscene_player.h"
+#include "cutscene_npc.h"
+#include "game_objects.h"
 #include "dialogue.h"
 #include "input.h"
 #include "intro.h"
 #include "lang.h"
 #include "utils.h"
+
+/* OBJ palette slots for the cutscene actors (game_system.c). Distinct
+ * palettes so the lead and buddy no longer render as two identical copies
+ * of the gameplay player (research.md R7). */
+#define CUTSCENE_LEAD_PALETTE  6u
+#define CUTSCENE_BUDDY_PALETTE 7u
 
 #define RUN_FRAMES_PER_DIR 6u
 #define DIR_RIGHT 0u
@@ -88,20 +97,25 @@ void intro_cut_scene(void) {
                 anim_tick = 0u;
                 run_frame = (uint8_t)((run_frame + 1u) % RUN_FRAMES_PER_DIR);
             }
+            /* Walking frames: only player_run has run-cycle art today, so
+             * both actors still share that tile data, but each keeps its
+             * own palette (base_prop) so they render as distinct
+             * characters, not two identical copies. */
             uint8_t run_idx = (uint8_t)(DIR_RIGHT * RUN_FRAMES_PER_DIR + run_frame);
             move_metasprite_ex(player_run_metasprites[run_idx],
-                               player_idle_TILE_COUNT, 0u, 0u,
+                               player_idle_TILE_COUNT, CUTSCENE_LEAD_PALETTE, 0u,
                                lead_x, LEAD_Y);
             move_metasprite_ex(player_run_metasprites[run_idx],
-                               player_idle_TILE_COUNT, 0u, 4u,
+                               player_idle_TILE_COUNT, CUTSCENE_BUDDY_PALETTE, 4u,
                                buddy_x, BUDDY_Y);
             idle_hold = 0u;
         } else {
-            move_metasprite_ex(player_idle_metasprites[DIR_FRONT],
-                               0u, 0u, 0u,
+            /* Idle hold: dedicated cutscene_player/cutscene_npc art + palette. */
+            move_metasprite_ex(cutscene_player_metasprites[DIR_FRONT],
+                               CUTSCENE_PLAYER_TILE, CUTSCENE_LEAD_PALETTE, 0u,
                                lead_x, LEAD_Y);
-            move_metasprite_ex(player_idle_metasprites[DIR_FRONT],
-                               0u, 0u, 4u,
+            move_metasprite_ex(cutscene_npc_metasprites[DIR_FRONT],
+                               CUTSCENE_NPC_TILE, CUTSCENE_BUDDY_PALETTE, 4u,
                                buddy_x, BUDDY_Y);
             if (idle_hold >= CUTSCENE_IDLE_HOLD_FRAMES) {
                 break;

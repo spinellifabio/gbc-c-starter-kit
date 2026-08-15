@@ -425,11 +425,16 @@ void draw_player(void) {
     }
 
     /* OAM layout: indices 0-19 reserved for game objects (10 objects × 2 sprites),
-     * player occupies indices 20-23 to avoid collision. */
+     * player occupies indices 20-21 to avoid collision.
+     * SPRITES_8x16 is set (game_system.c), so hardware ignores bit 0 of the
+     * tile index and always shows the pair [index & 0xFE, index | 0x01].
+     * Each 4-tile frame is a 2-column x 2-row grid (player_idle/player_run
+     * assets, TILE_H=16): the left OAM entry addresses tile+0 (shows the
+     * left column's top+bottom pair) and the right entry addresses tile+2
+     * (shows the right column's pair) — one entry per 8px-wide column, not
+     * one entry per 8x8 quadrant. */
     set_sprite_tile(20, tile);
-    set_sprite_tile(21, tile + 1);
-    set_sprite_tile(22, tile + 2);
-    set_sprite_tile(23, tile + 3);
+    set_sprite_tile(21, (uint8_t)(tile + 2u));
 
     // Position sprites (adjust for camera)
     int16_t screen_x = (int16_t)player.x - (int16_t)cam_x;
@@ -437,8 +442,6 @@ void draw_player(void) {
 
     move_sprite(20, screen_x, screen_y);
     move_sprite(21, screen_x + 8, screen_y);
-    move_sprite(22, screen_x, screen_y + 8);
-    move_sprite(23, screen_x + 8, screen_y + 8);
 }
 
 

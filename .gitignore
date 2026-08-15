@@ -34,8 +34,12 @@ Thumbs.db
 # === Examples build artifacts ===
 examples/**/obj/
 
-# CocoIndex Code (ccc)
+# === CocoIndex Code (ccc) ===
 /.cocoindex_code/*
 !/.cocoindex_code/settings.yml
 
+# === Stackdumps ===
 bash.exe.stackdump
+
+# === Screenshots ===
+/docs/screenshots

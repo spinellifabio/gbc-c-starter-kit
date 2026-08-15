@@ -29,7 +29,7 @@ static uint8_t char_to_tile(char c) {
     if ((c >= 'a') && (c <= 'z')) {
         c = (char)(c - ('a' - 'A'));
     }
-    if ((uint8_t)c < ' ' || (uint8_t)c > 'Z') {
+    if ((uint8_t)c < ' ' || (uint8_t)c > '~') {
         c = ' ';
     }
     return (uint8_t)((uint8_t)c - ' ');

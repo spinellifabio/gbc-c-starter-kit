@@ -5,6 +5,84 @@
 #include <gb/metasprites.h>
 #include <stdint.h>
 
+static uint8_t font_first_tile;
+
+void text_set_font_base(uint8_t first_tile) {
+    font_first_tile = first_tile;
+}
+
+uint8_t text_font_base(void) {
+    return font_first_tile;
+}
+
+uint8_t text_char_tile(char c) {
+    if ((uint8_t)c < ' ' || (uint8_t)c > '~') {
+        c = ' ';
+    }
+    return (uint8_t)(font_first_tile + (uint8_t)((uint8_t)c - ' '));
+}
+
+void wait_any_key(void) {
+    waitpad(J_START | J_A | J_B | J_UP | J_DOWN | J_LEFT | J_RIGHT);
+    waitpadup();
+}
+
+/* CGB is never defined by the build (only -O2 in GBDK_CFLAGS); this project's
+ * convention is runtime detection via _cpu (see game_system.c), which is
+ * what this uses instead of the old always-false #ifdef CGB. */
+void clear_attr_map(void) {
+    if (_cpu == CGB_TYPE) {
+        uint8_t old_vbk = VBK_REG;
+        VBK_REG = 1u;
+        fill_bkg_rect(0u, 0u, 20u, 18u, 0u);
+        VBK_REG = old_vbk;
+    }
+}
+
+void clear_screen(void) {
+    fill_bkg_rect(0u, 0u, 20u, 18u, text_char_tile(' '));
+    clear_attr_map();
+}
+
+void int_to_str(uint16_t value, char *buffer, uint8_t min_digits) {
+    uint8_t i = 0;
+    uint8_t digits = 1;
+    uint16_t temp = value / 10;
+
+    while (temp > 0) {
+        temp /= 10;
+        digits++;
+    }
+
+    while (digits < min_digits) {
+        buffer[i++] = '0';
+        min_digits--;
+    }
+
+    uint16_t divisor = 1;
+    for (uint8_t j = 1; j < digits; j++) {
+        divisor *= 10;
+    }
+
+    while (divisor > 0) {
+        buffer[i++] = '0' + (value / divisor) % 10;
+        divisor /= 10;
+    }
+    buffer[i] = '\0';
+}
+
+void print_centered(const char *text, uint8_t row) {
+    uint8_t len = 0;
+    const char *p = text;
+    while (*p++) len++;
+
+    uint8_t x = (20 - len) / 2;
+    gotoxy(x, row);
+    while (*text) {
+        printf("%c", *text++);
+    }
+}
+
 /**
  * @brief Initializes a clean scene by disabling LCD, clearing OAM, clearing VRAM,
  * resetting display layers, and restoring default palettes.

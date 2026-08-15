@@ -12,6 +12,16 @@
 // Scene transition utilities
 void scene_init_clean(void);
 
+/* Font base-tile derivation (Constitution III — no ad-hoc char->tile writes).
+ * font_load() picks the tile the font actually loads at; callers that turn a
+ * character into a BG tile index MUST go through text_char_tile() instead of
+ * assuming ASCII == tile index. Storage lives in utils.c (single instance);
+ * text_font_base() is the only way to read it, so every translation unit
+ * observes the same value. */
+void text_set_font_base(uint8_t first_tile);
+uint8_t text_font_base(void);
+uint8_t text_char_tile(char c);
+
 /* Sets CGB background palette 0 to a solid color (no-op on DMG).
  * Call before cls()/clear_screen() in scenes without custom BG art. */
 void set_solid_bkg(palette_color_t color);
@@ -29,34 +39,19 @@ void fade_from_black(uint8_t frames);
 /**
  * @brief Waits for any button press and clears the input buffer
  */
-static inline void wait_any_key(void) {
-    waitpad(J_START | J_A | J_B | J_UP | J_DOWN | J_LEFT | J_RIGHT);
-    waitpadup();
-}
+void wait_any_key(void);
 
-#ifdef CGB
 /**
  * @brief Clears the background attribute map (CGB palettes/tiles) to prevent bleed between scenes.
- * Uses a single fill_bkg_rect call per row instead of 20 individual set_bkg_tiles calls.
+ * No-op on DMG.
  */
-static inline void clear_attr_map(void) {
-    uint8_t old_vbk = VBK_REG;
-    VBK_REG = 1u;
-    fill_bkg_rect(0u, 0u, 20u, 18u, 0u);
-    VBK_REG = old_vbk;
-}
-#else
-static inline void clear_attr_map(void) { /* DMG: nothing to do */ }
-#endif
+void clear_attr_map(void);
 
 /**
  * @brief Clears the screen by filling it with space characters.
  * Uses fill_bkg_rect (single DMA-friendly call) instead of 360 individual tile writes.
  */
-static inline void clear_screen(void) {
-    fill_bkg_rect(0u, 0u, 20u, 18u, (uint8_t)' ');
-    clear_attr_map();
-}
+void clear_screen(void);
 
 /**
  * @brief Converts a number to a string
@@ -65,35 +60,7 @@ static inline void clear_screen(void) {
  * @param buffer Buffer to store the result (must be large enough)
  * @param min_digits Minimum number of digits (will be padded with zeros)
  */
-static inline void int_to_str(uint16_t value, char *buffer, uint8_t min_digits) {
-    uint8_t i = 0;
-    uint8_t digits = 1;
-    uint16_t temp = value / 10;
-
-    // Count digits
-    while (temp > 0) {
-        temp /= 10;
-        digits++;
-    }
-
-    // Add leading zeros if needed
-    while (digits < min_digits) {
-        buffer[i++] = '0';
-        min_digits--;
-    }
-
-    // Convert number to string (backwards)
-    uint16_t divisor = 1;
-    for (uint8_t j = 1; j < digits; j++) {
-        divisor *= 10;
-    }
-
-    while (divisor > 0) {
-        buffer[i++] = '0' + (value / divisor) % 10;
-        divisor /= 10;
-    }
-    buffer[i] = '\0';
-}
+void int_to_str(uint16_t value, char *buffer, uint8_t min_digits);
 
 /**
  * @brief Prints text centered on a specific row
@@ -101,16 +68,6 @@ static inline void int_to_str(uint16_t value, char *buffer, uint8_t min_digits) 
  * @param text The text to print
  * @param row The row to print on (0-17)
  */
-static inline void print_centered(const char *text, uint8_t row) {
-    uint8_t len = 0;
-    const char *p = text;
-    while (*p++) len++;
-
-    uint8_t x = (20 - len) / 2;
-    gotoxy(x, row);  // Position cursor at calculated x and given row
-    while (*text) {
-        printf("%c", *text++);
-    }
-}
+void print_centered(const char *text, uint8_t row);
 
 #endif // UTILS_H

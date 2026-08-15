@@ -73,38 +73,73 @@ static MenuItem option_items[] = {
 
 #define OPTION_COUNT (sizeof(option_items) / sizeof(MenuItem))
 
-static void draw_option_line(uint8_t i, uint8_t cursor) {
-    gotoxy(2u, (uint8_t)(6u + i * 2u));
-    printf("%s", (i == cursor) ? ">" : " ");
-    printf(" %s: ", lang_str(option_items[i].label_id));
+/* Row layout: cursor glyph at column OPT_ROW_X, row content clipped to
+ * OPT_ROW_WIDTH columns so cursor+label+": "+value can never wrap past the
+ * 20-column screen (FR-008). A longer localized value is truncated, not
+ * wrapped (spec Edge Cases). */
+#define OPT_ROW_X     1u
+#define OPT_ROW_WIDTH 19u /* columns 1..19 inclusive, right up to the screen edge */
 
+static void print_clipped(const char *s, uint8_t max_len) {
+    uint8_t len = (uint8_t)strlen(s);
+    if (len > max_len) {
+        len = max_len;
+    }
+    for (uint8_t i = 0u; i < len; i++) {
+        printf("%c", s[i]);
+    }
+}
+
+static void draw_option_line(uint8_t i, uint8_t cursor) {
+    uint8_t row = (uint8_t)(6u + i * 2u);
+
+    /* Clear the row's content span first so a shorter new value never
+     * leaves a stale tail from a longer previous one. */
+    fill_bkg_rect(OPT_ROW_X, row, OPT_ROW_WIDTH, 1u, text_char_tile(' '));
+    gotoxy(OPT_ROW_X, row);
+    printf("%c", (i == cursor) ? '>' : ' ');
+
+    char value[10];
     switch (i) {
     case 0u:
-        printf("%s", lang_str(g_settings.sound_on ? STR_VAL_ON : STR_VAL_OFF));
-        printf("   ");
+        strcpy(value, lang_str(g_settings.sound_on ? STR_VAL_ON : STR_VAL_OFF));
         break;
     case 1u:
         switch (g_settings.difficulty) {
-        case 0u: printf("%s", lang_str(STR_VAL_EASY));   break;
-        case 1u: printf("%s", lang_str(STR_VAL_NORMAL)); break;
-        default: printf("%s", lang_str(STR_VAL_HARD));   break;
+        case 0u: strcpy(value, lang_str(STR_VAL_EASY));   break;
+        case 1u: strcpy(value, lang_str(STR_VAL_NORMAL)); break;
+        default: strcpy(value, lang_str(STR_VAL_HARD));   break;
         }
-        printf("      ");
         break;
     case 2u:
-        printf("%d   ", g_settings.lives);
+        int_to_str(g_settings.lives, value, 1u);
         break;
     case 3u:
-        printf("%s", lang_str(g_settings.mode == MODE_RELEASE ? STR_VAL_MODE_RELEASE : STR_VAL_MODE_DEBUG));
-        printf("     ");
+        strcpy(value, lang_str(g_settings.mode == MODE_RELEASE ? STR_VAL_MODE_RELEASE : STR_VAL_MODE_DEBUG));
         break;
     case 4u:
-        printf("%s", lang_str(g_settings.language == LANG_EN ? STR_VAL_LANG_EN : STR_VAL_LANG_IT));
-        printf("  ");
+        strcpy(value, lang_str(g_settings.language == LANG_EN ? STR_VAL_LANG_EN : STR_VAL_LANG_IT));
         break;
     default:
+        value[0] = '\0';
         break;
     }
+
+    const char *label = lang_str(option_items[i].label_id);
+    uint8_t budget = (uint8_t)(OPT_ROW_WIDTH - 1u); /* minus the cursor glyph */
+    uint8_t label_len = (uint8_t)strlen(label);
+    if (label_len > budget) {
+        label_len = budget;
+    }
+    print_clipped(label, label_len);
+    budget = (uint8_t)(budget - label_len);
+
+    if (budget >= 2u) {
+        printf(": ");
+        budget = (uint8_t)(budget - 2u);
+        print_clipped(value, budget);
+    }
+    /* budget < 2: no room even for ": " — label alone already fills the row. */
 }
 
 static void draw_options(uint8_t cursor) {
@@ -112,8 +147,26 @@ static void draw_options(uint8_t cursor) {
     clear_attr_map();
     gotoxy(6u, 1u);
     printf("%s", lang_str(STR_OPTIONS_TITLE));
-    gotoxy(2u, 3u);
-    printf(lang_str(STR_OPTIONS_BUILD), g_settings.game_name, g_settings.version);
+
+    /* Build-info line: print+clip directly (no sprintf into a fixed buffer —
+     * g_settings.game_name/version are unbounded const char*) so a long
+     * name/version pair truncates instead of overflowing a stack buffer or
+     * wrapping past column 19. STR_OPTIONS_BUILD is "%s %s" in every
+     * language, so the space separator is safe to hardcode here. */
+    gotoxy(OPT_ROW_X, 3u);
+    uint8_t build_budget = OPT_ROW_WIDTH;
+    uint8_t name_len = (uint8_t)strlen(g_settings.game_name);
+    if (name_len > build_budget) {
+        name_len = build_budget;
+    }
+    print_clipped(g_settings.game_name, name_len);
+    build_budget = (uint8_t)(build_budget - name_len);
+    if (build_budget >= 1u) {
+        printf(" ");
+        build_budget--;
+        print_clipped(g_settings.version, build_budget);
+    }
+
     for (uint8_t i = 0u; i < OPTION_COUNT; i++) {
         draw_option_line(i, cursor);
     }
