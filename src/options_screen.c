@@ -76,9 +76,10 @@ static MenuItem option_items[] = {
 /* Row layout: cursor glyph at column OPT_ROW_X, row content clipped to
  * OPT_ROW_WIDTH columns so cursor+label+": "+value can never wrap past the
  * 20-column screen (FR-008). A longer localized value is truncated, not
- * wrapped (spec Edge Cases). */
-#define OPT_ROW_X     1u
-#define OPT_ROW_WIDTH 19u /* columns 1..19 inclusive, right up to the screen edge */
+ * wrapped (spec Edge Cases). 2-column margin on each side so text doesn't
+ * sit flush against the screen edge. */
+#define OPT_ROW_X     2u
+#define OPT_ROW_WIDTH 16u /* columns 2..17 inclusive */
 
 static void print_clipped(const char *s, uint8_t max_len) {
     uint8_t len = (uint8_t)strlen(s);
@@ -140,6 +141,8 @@ static void draw_option_line(uint8_t i, uint8_t cursor) {
         print_clipped(value, budget);
     }
     /* budget < 2: no room even for ": " — label alone already fills the row. */
+
+    bg_row_highlight(row, OPT_ROW_X, OPT_ROW_WIDTH, (i == cursor) ? 1u : 0u);
 }
 
 static void draw_options(uint8_t cursor) {
@@ -170,8 +173,8 @@ static void draw_options(uint8_t cursor) {
     for (uint8_t i = 0u; i < OPTION_COUNT; i++) {
         draw_option_line(i, cursor);
     }
-    gotoxy(2u, 16u);
-    printf("%s", lang_str(STR_OPTIONS_FOOTER_BACK));
+    gotoxy(OPT_ROW_X, 16u);
+    print_clipped(lang_str(STR_OPTIONS_FOOTER_BACK), OPT_ROW_WIDTH);
 }
 
 void options_screen(void) {
@@ -181,6 +184,7 @@ void options_screen(void) {
     HIDE_WIN;
     set_solid_bkg(BKG_COLOR_OPTIONS);
     draw_options(cursor);
+    flush_input();
     while (1) {
         wait_vbl_done();
         uint8_t pressed = get_pressed();

@@ -35,6 +35,13 @@ static const palette_color_t hazard_palette[4] = {
     RGB8(  0,  0,  0), RGB8(255,220,  0), RGB8(200, 40,  0), RGB8(255,255,255)
 };
 
+/* BG palette slot 1 — cursor-row highlight for menu screens (options/slot
+ * select). Slot 0 is claimed per-scene by set_solid_bkg(); this is the
+ * project's first use of a second BG slot. */
+static const palette_color_t highlight_bkg_palette[4] = {
+    RGB8(255,215, 80), RGB8(200,150, 40), RGB8( 90, 60, 10), RGB8(255,255,255)
+};
+
 static void LCD_ISR(void) {
     /* Stub: add per-scanline work here (palette swaps, VRAM copy, wobble, etc.)
      * See examples/hblank_copy for a full usage example. */
@@ -112,6 +119,7 @@ void game_system_init(void) {
         palette_set_obj(5u, cat_idle_palettes);
         palette_set_obj(6u, cutscene_player_palettes);
         palette_set_obj(7u, cutscene_npc_palettes);
+        palette_set_bkg(1u, highlight_bkg_palette);
     }
 
     add_VBL(bgm_vbl_update);

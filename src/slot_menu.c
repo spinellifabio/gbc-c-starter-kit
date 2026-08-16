@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "audio.h"
 #include "input.h"
@@ -32,8 +33,14 @@ static char diff_char(uint8_t difficulty) {
     }
 }
 
+/* Clears columns 2..17 — a 2-column margin on each side so text doesn't sit
+ * flush against the screen edge. Uses text_char_tile() — a raw ' ' (0x20) is
+ * the wrong tile index whenever the font doesn't load at tile 0, which is
+ * what produced the garbled/junk tiles on this screen (font base is
+ * runtime-determined; see include/utils.h). */
 static void clear_row(uint8_t row) {
-    fill_bkg_rect(0u, row, 20u, 1u, (uint8_t)' ');  /* single DMA-friendly fill */
+    fill_bkg_rect(2u, row, 16u, 1u, text_char_tile(' '));
+    bg_row_highlight(row, 2u, 16u, 0u);
 }
 
 static void clear_rows(uint8_t start, uint8_t count) {
@@ -42,39 +49,74 @@ static void clear_rows(uint8_t start, uint8_t count) {
     }
 }
 
-/* Draw one slot row with its cursor marker and status summary. */
+static void print_clipped(const char *s, uint8_t max_len) {
+    uint8_t len = (uint8_t)strlen(s);
+    if (len > max_len) {
+        len = max_len;
+    }
+    for (uint8_t i = 0u; i < len; i++) {
+        printf("%c", s[i]);
+    }
+}
+
+/* Draw one slot row with its cursor marker and status summary. Status text is
+ * clipped to the remaining row budget (16-col margin, see clear_row) — a
+ * high score (up to 5 digits) must never push text past col 17. */
 static void draw_slot_line(uint8_t i, uint8_t cursor) {
     SaveSlot s;
     SaveStatus status = save_slot_read(i, &s);
     uint8_t row = (uint8_t)(SLOT_ROW0 + i * SLOT_ROW_STEP);
+    const char *label = lang_str(STR_SLOT_LABEL);
 
     clear_row(row);
-    gotoxy(1u, row);
-    printf("%c %s %d ", (i == cursor) ? '>' : ' ', lang_str(STR_SLOT_LABEL), (int)(i + 1u));
+    gotoxy(2u, row);
+    printf("%c %s %d ", (i == cursor) ? '>' : ' ', label, (int)(i + 1u));
 
+    uint8_t prefix_len = (uint8_t)(3u + strlen(label) + 3u); /* "> "+label+" N " */
+    uint8_t budget = (prefix_len < 16u) ? (uint8_t)(16u - prefix_len) : 0u;
+
+    char status_buf[16];
     switch (status) {
-    case SAVE_VALID:
-        printf("L%d %c S%04d", (int)s.lives, diff_char(s.difficulty), (int)s.score);
-        break;
-    case SAVE_CORRUPTED:
-        printf("%s", lang_str(STR_SLOT_CORRUPTED));
-        break;
-    default:
-        printf("%s", lang_str(STR_SLOT_EMPTY));
+    case SAVE_VALID: {
+        char lives_buf[4];
+        char score_buf[6];
+        int_to_str(s.lives, lives_buf, 1u);
+        int_to_str(s.score, score_buf, 1u);
+        uint8_t p = 0u;
+        status_buf[p++] = 'L';
+        for (uint8_t k = 0u; lives_buf[k]; k++) status_buf[p++] = lives_buf[k];
+        status_buf[p++] = ' ';
+        status_buf[p++] = diff_char(s.difficulty);
+        status_buf[p++] = ' ';
+        status_buf[p++] = 'S';
+        for (uint8_t k = 0u; score_buf[k]; k++) status_buf[p++] = score_buf[k];
+        status_buf[p] = '\0';
         break;
     }
+    case SAVE_CORRUPTED:
+        strcpy(status_buf, lang_str(STR_SLOT_CORRUPTED));
+        break;
+    default:
+        strcpy(status_buf, lang_str(STR_SLOT_EMPTY));
+        break;
+    }
+    print_clipped(status_buf, budget);
+
+    bg_row_highlight(row, 2u, 16u, (i == cursor) ? 1u : 0u);
 }
 
 /* Repaint only the cursor marker on a slot row (no SRAM re-read). */
 static void draw_cursor(uint8_t i, uint8_t cursor) {
-    gotoxy(1u, (uint8_t)(SLOT_ROW0 + i * SLOT_ROW_STEP));
+    uint8_t row = (uint8_t)(SLOT_ROW0 + i * SLOT_ROW_STEP);
+    gotoxy(2u, row);
     printf("%c", (i == cursor) ? '>' : ' ');
+    bg_row_highlight(row, 2u, 16u, (i == cursor) ? 1u : 0u);
 }
 
 static void draw_footer(void) {
     clear_row(FOOTER_ROW);
-    gotoxy(1u, FOOTER_ROW);
-    printf("%s", lang_str(STR_SLOT_FOOTER));
+    gotoxy(2u, FOOTER_ROW);
+    print_clipped(lang_str(STR_SLOT_FOOTER), 16u);
 }
 
 static void draw_all(uint8_t cursor) {
@@ -105,8 +147,9 @@ static void draw_actions(uint8_t cursor) {
     for (uint8_t a = 0u; a < ACT_COUNT; a++) {
         uint8_t row = (uint8_t)(ACTION_ROW0 + a);
         clear_row(row);
-        gotoxy(3u, row);
+        gotoxy(4u, row);
         printf("%c %s", (a == cursor) ? '>' : ' ', lang_str(ACTION_LABELS[a]));
+        bg_row_highlight(row, 2u, 16u, (a == cursor) ? 1u : 0u);
     }
 }
 

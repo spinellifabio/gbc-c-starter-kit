@@ -70,4 +70,10 @@ void int_to_str(uint16_t value, char *buffer, uint8_t min_digits);
  */
 void print_centered(const char *text, uint8_t row);
 
+/**
+ * @brief Sets the BG attribute-map palette index for a row span (CGB only;
+ * no-op on DMG). Used to highlight the cursor's row on menu screens.
+ */
+void bg_row_highlight(uint8_t row, uint8_t x, uint8_t width, uint8_t palette_idx);
+
 #endif // UTILS_H
