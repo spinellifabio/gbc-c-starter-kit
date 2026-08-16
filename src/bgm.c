@@ -61,7 +61,10 @@ void bgm_stop(void) {
     silence_pulse1();
 }
 
-void bgm_pause(void)  { bgm_paused = 1u; }
+/* Silence the channel too — otherwise a note with no length/envelope decay
+ * (see play_note()) keeps sounding indefinitely while paused, producing a
+ * stuck drone on any screen that pauses BGM (e.g. options). */
+void bgm_pause(void)  { bgm_paused = 1u; silence_pulse1(); }
 void bgm_resume(void) { bgm_paused = 0u; }
 
 void bgm_vbl_update(void) {

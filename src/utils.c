@@ -134,6 +134,15 @@ void scene_init_clean(void) {
     wait_vbl_done();  /* Trigger DMA so cleared shadow OAM reaches hardware */
 }
 
+/* CGB-only BG attribute write (VRAM bank 1) — same technique as clear_attr_map. */
+void bg_row_highlight(uint8_t row, uint8_t x, uint8_t width, uint8_t palette_idx) {
+    if (_cpu != CGB_TYPE) return;
+    uint8_t old_vbk = VBK_REG;
+    VBK_REG = 1u;
+    fill_bkg_rect(x, row, width, 1u, palette_idx);
+    VBK_REG = old_vbk;
+}
+
 /**
  * @brief Fades the display to black over the specified number of frames.
  * 
