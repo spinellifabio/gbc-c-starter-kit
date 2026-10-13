@@ -56,5 +56,15 @@ class Utils(RomCase):
     )
 
 
+class World(RomCase):
+    rom = "test_world"
+    checks = (
+        "lose life 2->1", "lose life 1->0 signals game over", "no underflow, no repeat signal",
+        "npc overlap", "npc left edge touch", "npc right edge touch", "npc 1px inside",
+        "npc inactive slot", "npc index out of range", "npc_solid_at",
+        "object hit", "inactive object ignored", "empty space no hit",
+    )
+
+
 if __name__ == "__main__":
     unittest.main()
