@@ -41,5 +41,7 @@ examples/**/obj/
 # === Stackdumps ===
 bash.exe.stackdump
 
+
 # === Screenshots ===
 /docs/screenshots
+/docs/gbc-c-starter-kit.dump
