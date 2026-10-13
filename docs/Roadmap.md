@@ -40,7 +40,7 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
 ## 6. Advanced Title Screen
 
 - [ ] Display game_name + version + optional logo
-- [ ] START → **Slot Selection / Continue** (see Section 6)
+- [ ] START → **Slot Selection / Continue** (see Section 7; slot menu in `src/slot_menu.c`)
 - [ ] SELECT → options menu
 - [ ] Multilanguage options working also in UI messages
 
@@ -74,7 +74,7 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
 - [x] Update of global state (e.g., lives, score, language)
 - [x] **Save integration**: autosave on win; restore state from slot on CONTINUE (`src/main.c`)
 
-## 8. Game Completion / Credits
+## 8b. Game Completion / Credits
 
 - [x] Scrolling or static credits screen
 - [x] Ability to return to title or full reset
@@ -151,6 +151,7 @@ This roadmap defines the steps to complete the text-based prototype on GameBoy C
 
 ## 12. Testing & Debug
 
+- [x] Headless ROM tests for `save`, `utils`, `world` (`tests/rom/`, run by `tests/test_rom.py`) and Python tests for the asset pipeline
 - [ ] Test on emulators (BGB, SameBoy) and real hardware
 - [ ] Edge cases: simultaneous input, frame_counter overflow, incompatible palettes
 - [ ] Verify complete multilanguage behavior

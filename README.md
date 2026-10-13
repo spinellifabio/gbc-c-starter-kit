@@ -9,7 +9,7 @@
 ![Windows](https://img.shields.io/badge/OS-Windows-blue.svg)
 ![VS Code](https://img.shields.io/badge/Editor-VS%20Code-blue.svg)
 ![coverage](https://img.shields.io/badge/coverage-15%25-red)
-![version](https://img.shields.io/badge/version-0.1.0-blue)
+![version](https://img.shields.io/badge/version-0.2.0-blue)
 
 A starter kit for developing **Game Boy Color** games in **C**, powered by **gbdk-2020**, **CMake**, and **Ninja**.
 Provides a clean project structure and build setup to jumpstart your homebrew development.
@@ -33,9 +33,11 @@ Make sure the following tools are installed:
 - [**gbdk-2020**](https://github.com/gbdk-2020/gbdk-2020) – C compiler and libraries for Game Boy / Game Boy Color development
 - [**CMake**](https://cmake.org/download/) (version 3.16 or higher) – project configuration and build system generator
 - [**Ninja**](https://ninja-build.org/) – fast, portable build system
-- A standard C compiler (e.g., GCC or Clang)
+- [**Python 3**](https://www.python.org/) – runs the test suite and the asset pipeline (`tools/gen_assets.py`)
 - [**Visual Studio Code**](https://code.visualstudio.com/) with CMake Tools extension (recommended)
-- [**bgbw64**](https://bgb.bircd.org/) – Game Boy / Game Boy Color emulator used to run the compiled ROMs
+- [**bgbw64**](https://bgb.bircd.org/) – Game Boy / Game Boy Color emulator used to run the compiled ROMs (also required by the headless tests)
+
+The C compiler is provided by gbdk-2020 (`lcc`); no separate GCC/Clang is needed.
 
 ## Features
 
@@ -49,6 +51,9 @@ Make sure the following tools are installed:
   - Centralized game state tracking (lives, score, level)
   - Easy state initialization and reset
   - Extensible structure for future game mechanics
+- Save system with 3 SRAM slots (checksum validation, `CORRUPTED` detection) and a pre-game slot menu
+- Background music (custom Pulse1 driver) and sound effects (Pulse2)
+- English / Italian UI, switchable at runtime
 - Clean folder layout for source code, headers, and assets
 - Easy to extend for larger projects
 
@@ -90,27 +95,33 @@ git clone https://github.com/spinellifabio/gbc-c-starter-kit.git
 cd gbc-c-starter-kit
 ```
 
-2. **Generate the build files with CMake**
+2. **Configure with the CMake preset** (uses `cmake/gbdk-toolchain.cmake`, Ninja generator)
 
 ```bash
-cmake -B build -G Ninja
+cmake --preset ninja-gbdk
 ```
 
-3. **Compile the project**
+3. **Build the ROM**
 
 ```bash
-ninja -C build
+cmake --build --preset build-rom
 ```
 
-After compilation, the `.gbc` ROM file will be generated inside the `rom/` directory.
+The ROM is written to `rom/gbc-c-starter-kit.gbc`.
 
-4. **Run the ROM with bgbw64**
+4. **Run the ROM in bgbw64**
 
 ```bash
-start bgbw64.exe rom/your-game.gbc
+cmake --build build --target run
 ```
 
-By default the prototype runs through splash, intro cutscene, title, gameplay test loop, then shows the credits scene (skippable with START/SELECT) before returning to the title screen.
+By default the prototype runs through splash, intro, title, and the pre-game slot menu (CONTINUE / NEW GAME), then gameplay. Winning or losing leads to the win/game-over screen, then credits (skippable with START/SELECT) before returning to the title screen.
+
+### Tests and asset pipeline
+
+- Unit-style checks for the asset pipeline and `tools/gen_assets.py`: `python -m unittest discover -s tests`
+- Headless ROM checks (`save`, `utils`, `world`), run in bgbw64 via `tests/test_rom.py`: `cmake --build build --target test_rom`, then the same unittest command
+- Regenerate `res/` from `assets/assets.json` (requires gbdk-2020 `png2asset`): `cmake --build build --target assets`
 
 ### Prototype controls
 
@@ -132,6 +143,8 @@ Some paths in this template are **preconfigured for Windows** and may need to be
 
 ### 1. gbdk-2020 include path
 
+The CMake toolchain (`cmake/gbdk-toolchain.cmake`) reads `GBDK_ROOT` from the environment, from `-DGBDK_ROOT=...`, or defaults to `C:/gbdk`. Set it to your gbdk-2020 install.
+
 In `.vscode/settings.json`, update the `C_Cpp.default.includePath` entry to match where you installed **gbdk-2020**:
 
 ```json
@@ -143,32 +156,32 @@ In `.vscode/settings.json`, update the `C_Cpp.default.includePath` entry to matc
 
 ### 2. BGB Emulator path
 
-Both `.vscode/tasks.json` and `.vscode/launch.json` reference the path to **bgbw64**. Update these to point to your emulator location:
+The emulator is expected at `../emulator/bgbw64/bgb64.exe`, relative to the project folder. `.vscode/tasks.json` and `.vscode/launch.json` use the same relative path. Update these if your emulator lives elsewhere.
 
 **tasks.json**
 
 ```json
-"command": "\"C:/path/to/bgbw64/bgb64.exe\" \"${workspaceFolder}/rom/${workspaceFolderBasename}.gb\""
+"command": "\"${workspaceFolder}/../emulator/bgbw64/bgb64.exe\" \"${workspaceFolder}/rom/${workspaceFolderBasename}.gbc\""
 ```
 
 **launch.json**
 
 ```json
-"program": "C:/path/to/bgbw64/bgb64.exe",
+"program": "${workspaceFolder}/../emulator/bgbw64/bgb64.exe",
 "args": [
-    "${workspaceFolder}/rom/${workspaceFolderBasename}.gb"
+    "${workspaceFolder}/rom/${workspaceFolderBasename}.gbc"
 ]
 ```
 
 ### 3. CMake run target
 
-In `CMakeLists.txt`, the path to the emulator is set in the `BGB_EXE` variable:
+In `CMakeLists.txt`, the emulator path is set in the `BGB_EXE` variable:
 
 ```cmake
-set(BGB_EXE "C:/path/to/bgbw64/bgb64.exe")
+set(BGB_EXE "${CMAKE_CURRENT_SOURCE_DIR}/../emulator/bgbw64/bgb64.exe")
 ```
 
-Adjust this path to match your system, so the `run` target can launch the ROM automatically after building.
+Adjust this path to match your system, so the `run` target can launch the ROM automatically after building. The headless tests also honour a `BGB_EXE` environment variable.
 
 > **Tip:** If you move your emulator or gbdk installation in the future, make sure to update all relevant paths in these files to avoid build or launch errors. ⚠️
 
@@ -187,31 +200,14 @@ gbc-c-starter-kit/
 │── cmake/                      # CMake scripts
 │   └── gbdk-toolchain.cmake    # Toolchain configuration
 │── docs/                       # Project documentation
-│── include/                    # Header files
-│   │── sprite.h                # Sprite management system
-│   │── game_settings.h         # Game settings and configuration
-│   │── game_system.h           # Core game system functions
-│   └── input.h                 # Input handling
-│── res/                        # Resource files
-│   ├── sprites/                # Sprite graphics
-│   │   ├── Alex_idle_16x16.c   # Character sprite data
-│   │   └── Alex_run_16x16.c    # Character run animation
-│   └── tiles/                  # Tile graphics
-│       └── tileset.c           # Game tileset data
-│── rom/                        # Compiled ROMs
-│── src/                        # C source code
-│   │── credits.c               # Credits screen implementation
-│   │── dialogue.c              # Dialogue system
-│   │── game_settings.c         # Game settings implementation
-│   │── game_system.c           # Core game system
-│   │── gameplay.c              # Main game logic
-│   │── input.c                 # Input handling
-│   │── intro.c                 # Intro sequence
-│   │── lang.c                  # Language support
-│   │── main.c                  # Entry point
-│   │── options_screen.c        # Options menu
-│   │── sprite.c                # Sprite management
-│   └── title_screen.c          # Title screen
+│── assets/                     # Art sources (PNG) and assets.json manifest
+│── include/                    # Header files (one per module, e.g. sprite.h, save.h, palette.h)
+│── lib/gbt_player/             # Vendored GBT player (MOD playback)
+│── res/                        # Generated C resources (sprites/, tiles/, music/)
+│── rom/                        # Compiled ROMs (generated)
+│── src/                        # C source code (one module per screen/system)
+│── tests/                      # Headless ROM tests (rom/) and Python tests
+│── tools/                      # gen_assets.py (asset pipeline), mod2gbt
 │── .gitignore                  # Ignored files
 │── AGENTS.md                   # AI agent configuration
 │── CMakeLists.txt              # Main build configuration
@@ -255,7 +251,7 @@ It is designed for developers who want to:
 
 This template is meant to reduce setup time, allowing developers to focus on **creating games** rather than configuring the build environment.
 
-See the **[Roadmap](docs/roadmap.md)** for planned features and updates.
+See the **[Roadmap](docs/Roadmap.md)** for planned features and updates.
 
 ## Keywords
 
@@ -288,5 +284,5 @@ $$ |  $$ |$$ |  $$ |$$ |  $$\       $$ |  $$\       $$\   $$ |  $$ |$$\ $$  __$$
 \$$$$$$  |$$$$$$$  |\$$$$$$  |      \$$$$$$  |      \$$$$$$  |  \$$$$  |\$$$$$$$ |$$ |       \$$$$  |\$$$$$$$\ $$ |            $$ | \$$\ $$ |  \$$$$  |
  \______/ \_______/  \______/        \______/        \______/    \____/  \_______|\__|        \____/  \_______|\__|            \__|  \__|\__|   \____/
 
-                                                                                                       v1.0.0 - Code assembled in spare time by Fabio
+                                                                                                       v0.2.0 - Code assembled in spare time by Fabio
 ```
