@@ -1,0 +1,22 @@
+{
+  "sprites": {
+    "player_idle": {
+      "src": "sprites/Alex_idle_16x16.png",
+      "frame": [16, 32],
+      "pivot": [8, 32],
+      "hitbox": [16, 32]
+    },
+    "player_run": {
+      "src": "sprites/Alex_run_16x16.png",
+      "frame": [16, 32],
+      "pivot": [8, 32],
+      "hitbox": [16, 32]
+    }
+  },
+  "tilesets": {
+    "tileset": {
+      "src": "tileset/tileset_temp.png",
+      "flags": ["-map", "-use_map_attributes", "-noflip"]
+    }
+  }
+}
