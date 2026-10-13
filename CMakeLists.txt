@@ -103,6 +103,19 @@ add_custom_command(
 
 add_custom_target(rom ALL DEPENDS "${ROM_PATH}")
 
+# === Regenerate res/ from assets/assets.json (manual: cmake --build build --target assets) ===
+find_package(Python3 QUIET COMPONENTS Interpreter)
+if(Python3_FOUND)
+  add_custom_target(assets
+    COMMAND "${Python3_EXECUTABLE}" tools/gen_assets.py
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    COMMENT "Generating res/ from assets/assets.json"
+    VERBATIM
+  )
+else()
+  message(STATUS "Python3 not found: 'assets' target disabled")
+endif()
+
 # === Run in BGB ===
 set(BGB_EXE "${CMAKE_CURRENT_SOURCE_DIR}/../emulator/bgbw64/bgb64.exe")
 add_custom_target(run
