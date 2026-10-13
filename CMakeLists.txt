@@ -103,6 +103,27 @@ add_custom_command(
 
 add_custom_target(rom ALL DEPENDS "${ROM_PATH}")
 
+# === Test ROM: save-system checks, run headless by tests/test_save_rom.py ===
+set(TEST_DIR "${CMAKE_BINARY_DIR}/test")
+set(TEST_ROM "${TEST_DIR}/test_save.gbc")
+set(TEST_SRCS
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/rom/test_save.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/save.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/game_state.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/game_settings.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/lang.c"
+)
+file(MAKE_DIRECTORY "${TEST_DIR}")
+add_custom_command(
+  OUTPUT "${TEST_ROM}"
+  COMMAND "${LCC}" ${LCC_FLAGS} -o "${TEST_ROM}" ${TEST_SRCS}
+  DEPENDS ${TEST_SRCS}
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  COMMENT "Building test_save.gbc"
+  VERBATIM
+)
+add_custom_target(test_rom DEPENDS "${TEST_ROM}")
+
 # === Regenerate res/ from assets/assets.json (manual: cmake --build build --target assets) ===
 find_package(Python3 QUIET COMPONENTS Interpreter)
 if(Python3_FOUND)

@@ -8,7 +8,7 @@ cmake --build --preset build-rom   # build → rom/gbc-c-starter-kit.gbc
 cmake --build build --target run   # launch in BGB
 ```
 
-No automated tests. Verify manually in BGB or SameBoy.
+Tests: `python -m unittest discover -s tests` (asset pipeline + `save.c` run headless in BGB). Everything else: verify manually in BGB or SameBoy.
 
 ## Architecture
 
