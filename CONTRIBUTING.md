@@ -1,17 +1,26 @@
 # GBC C Starter Kit
 
-## Build
+Game Boy Color starter kit in C on gbdk-2020. Status and structure: `README.md`.
 
+## Read first
+- `.specify/memory/constitution.md` for project principles.
+- `docs/Roadmap.md` for planned work; items there are not requirements until built.
+- `specs/` for per-feature specs and plans (latest: `specs/002-vram-scene-polish/plan.md`).
+
+## Priorities
+CPU cycles first (target 60 FPS) → RAM/ROM → battery → maintainability.
+Treat WRAM/VRAM/ROM as a budget and report the RAM cost of each feature.
+
+## Commands
 ```bash
 cmake --preset ninja-gbdk          # configure
 cmake --build --preset build-rom   # build → rom/gbc-c-starter-kit.gbc
 cmake --build build --target run   # launch in BGB
 ```
-
-Tests: `python -m unittest discover -s tests` (asset pipeline + `save.c` run headless in BGB). Everything else: verify manually in BGB or SameBoy.
+Tests: `python -m unittest discover -s tests` (asset pipeline + `save.c` run headless in BGB).
+Everything else: verify manually in BGB or SameBoy.
 
 ## Architecture
-
 Screen flow: splash → intro → title → [options] → gameplay → game over/win → credits → title
 
 | File | Purpose |
@@ -26,18 +35,30 @@ Screen flow: splash → intro → title → [options] → gameplay → game over
 | `src/utils.c` | `fade_to_black()`, `clear_screen()`, `print_centered()`, `int_to_str()` |
 | `include/world_defs.h` | `MAP_WIDTH`, `TILE_SIZE`, `FONT_OFFSET` |
 
-`sprite.c` / `background.c` excluded from build (dead code, saves ~400 B WRAM).
+`sprite.c` / `background.c` are excluded from the build (dead code, saves ~400 B WRAM).
 
 VRAM sprites: 0–19 Alex idle, 20–99 Alex run, 100–103 treasure, 104–107 hazard.
 
 CGB detected at runtime: `_cpu == CGB_TYPE`. DMG skips palettes gracefully.
 
-## Code Style
+## Examples
+`examples/` is the canonical reference for GBDK techniques: follow the matching sample, and never
+edit it to fit the game.
 
+| Project | Purpose |
+|---------|---------|
+| `template_minimal` | Minimal game loop, scaffold for a new project |
+| `colorbar` | CGB palettes, dual-bank VRAM tile/attribute split |
+| `hblank_copy` | HBlank ISR, fast VRAM animation with dual banking |
+| `sound` | All 4 audio channels, direct register control |
+| `space` | Sprites, scrolling, input, complete mini-game |
+
+## Code style
 - C99, no heap, no `<stdbool.h>`. `uint8_t` as bool.
 - `uint8_t`/`uint16_t` preferred; explicit narrowing casts: `(uint8_t)(x + y)`.
 - Hardware registers use unsigned literals: `0u`, `0xFFu`.
 - 4-space indent, brace on same line, `static` all private symbols, ROM data `const`.
+- Do not use multi-module `#pragma bank N`: it corrupts the ROM in GBDK. Single-module banks only.
 
 ### Naming
 | Kind | Convention | Example |
@@ -62,8 +83,7 @@ CGB detected at runtime: `_cpu == CGB_TYPE`. DMG skips palettes gracefully.
 
 Use `#ifndef` guards, not `#pragma once`.
 
-<!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan:
-`specs/002-vram-scene-polish/plan.md`
-<!-- SPECKIT END -->
+## Workflow
+- Git Flow: `feature/*` from `develop`, releases from `release/*`, tags on `master`.
+- Commits: Conventional Commits (`fix`, `feat`, `perf`, `refactor`, `docs`, `chore`); ask before committing.
+- Changelog is generated with git-cliff (`cliff.toml`).
