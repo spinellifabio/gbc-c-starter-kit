@@ -2,8 +2,9 @@
 /build/
 /CMakeFiles/
 /rom/
+CMakeUserPresets.json
 
-# === Compilazione intermedia ===
+# === Intermediate build output ===
 *.o
 *.obj
 *.lst
@@ -16,9 +17,16 @@
 *.lk
 *.noi
 
-# === ROM finali ===
+# === Final ROMs ===
 *.gb
 *.gbc
+
+# === Examples build artifacts ===
+examples/**/obj/
+
+# === Python ===
+__pycache__/
+*.pyc
 
 # === VS Code ===
 .vscode/*
@@ -28,20 +36,34 @@
 !.vscode/settings.json
 !.vscode/tasks.json
 
-# === OS cruft ===
-.DS_Store
-Thumbs.db
-# === Examples build artifacts ===
-examples/**/obj/
-
-# === CocoIndex Code (ccc) ===
+# === CocoIndex Code (ccc): keep only the settings ===
 /.cocoindex_code/*
 !/.cocoindex_code/settings.yml
 
-# === Stackdumps ===
-bash.exe.stackdump
+# === Local link to CONTRIBUTING.md for Claude Code ===
+# recreate: New-Item -ItemType SymbolicLink CLAUDE.md -Target CONTRIBUTING.md
+/CLAUDE.md
 
+# === Claude Code: local tooling, only the project-owned skill is shared ===
+/.claude/*
+!/.claude/skills/
+/.claude/skills/*
+!/.claude/skills/gbc-assets/
 
-# === Screenshots ===
+# === Spec Kit: track only the constitution; the rest comes from the Specify CLI ===
+/.specify/*
+!/.specify/memory/
+/.specify/memory/*
+!/.specify/memory/constitution.md
+
+# === Logs and crash dumps ===
+*.log
+*.stackdump
+
+# === Screenshots and dumps ===
 /docs/screenshots
 /docs/gbc-c-starter-kit.dump
+
+# === OS cruft ===
+.DS_Store
+Thumbs.db
