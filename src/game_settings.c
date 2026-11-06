@@ -7,5 +7,5 @@ GameSettings g_settings = {
     MODE_DEBUG,      /* mode */
     LANG_EN,         /* language */
     "GBC Prototype", /* game_name */
-    "v0.2.0"         /* version */
+    "v0.1.0"         /* version */
 };
