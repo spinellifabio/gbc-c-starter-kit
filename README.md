@@ -209,9 +209,10 @@ gbc-c-starter-kit/
 │── tests/                      # Headless ROM tests (rom/) and Python tests
 │── tools/                      # gen_assets.py (asset pipeline), mod2gbt
 │── .gitignore                  # Ignored files
-│── AGENTS.md                   # AI agent configuration
+│── CHANGELOG.md                # Release notes (generated with git-cliff)
 │── CMakeLists.txt              # Main build configuration
 │── CMakePresets.json           # CMake presets
+│── CONTRIBUTING.md             # Contributor and coding-style guide
 └── README.md                   # Project documentation
 ```
 
