@@ -33,7 +33,7 @@ Follow-up TODOs: none
 
 ### I. Code Quality Discipline
 
-All code MUST conform to the project Code Style in `CLAUDE.md`: C99, no heap,
+All code MUST conform to the project Code Style in `CONTRIBUTING.md`: C99, no heap,
 no `<stdbool.h>` (`uint8_t` as bool), 4-space indent, brace on same line.
 Private symbols MUST be `static`; ROM data MUST be `const`. Naming follows the
 documented table (snake_case functions, PascalCase types, UPPER_SNAKE_CASE
@@ -147,7 +147,7 @@ Target is Game Boy Color via GBDK (gbdk-2020). Priority order is CPU cycles
   single-module banks only.
 - WRAM is scarce (~8 KB): track and minimize per-feature RAM cost.
 
-The example projects under `examples/` (per `AGENTS.md`) are the canonical
+The example projects under `examples/` (per `CONTRIBUTING.md`) are the canonical
 reference for GBDK techniques — palettes (`apa_image`, `colorbar`, `dscan`,
 `hicolor`), scrolling (`galaxy`), VRAM/H-Blank (`hblank_copy`), interrupts
 (`irq`, `lcd_isr_wobble`), banking (`linkerfile`, `ram_function`), link cable
@@ -178,7 +178,7 @@ templates. Versioning is semantic — MAJOR for backward-incompatible principle
 removals/redefinitions, MINOR for a new principle or materially expanded
 guidance, PATCH for clarifications and wording fixes.
 
-Runtime development guidance lives in `CLAUDE.md` and `AGENTS.md`; this
-constitution governs the non-negotiable rules those documents elaborate.
+Runtime development guidance lives in `CONTRIBUTING.md`; this
+constitution governs the non-negotiable rules that document elaborates.
 
 **Version**: 1.1.0 | **Ratified**: 2026-06-29 | **Last Amended**: 2026-10-13

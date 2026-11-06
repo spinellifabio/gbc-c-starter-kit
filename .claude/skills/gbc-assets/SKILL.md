@@ -54,7 +54,7 @@ Frames are indexed into `<name>_metasprites[]` (from `res/sprites/<name>.h`).
   Palettes: 8 total, slots 0-2 already used (player_idle, player_run) - check the comment there.
 - Banking: never use multi-module `#pragma bank N` (corrupts ROM). Keep assets in the fixed bank.
 - New `.c` under `res/<dir>/` is picked up by CMake glob (`res/*/*.c`); re-run configure for new files.
-- Code style: see `CLAUDE.md` (C99, `uint8_t`, `static` privates, `g_` globals).
+- Code style: see `CONTRIBUTING.md` (C99, `uint8_t`, `static` privates, `g_` globals).
 
 ## Not built yet (do when real material arrives)
 

@@ -2,11 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.1.0] - 2026-11-06
 
 ### 🚀 Features
 
-- *(assets)* Add asset manifest and generator pipeline ([`50cd6b1`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/50cd6b1e427008767c45e7bc3df5d31c04d709a6))
+- *(assets)* Add asset manifest and generator pipeline ([`a8c610e`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/a8c610e465160f25c5e7abe2df6fc65f25b3291c))
 - *(build)* Wire visual content layer into CMakeLists and game_system init ([`b374b9d`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/b374b9d6edc210ba5f7d53492daa9731d5132c3b))
 - *(visual-content-layer)* Add effects engine with 4 reusable effects ([`00f1a90`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/00f1a907c8ac6fb12a52d328a5791a521d4fd84a))
 - *(visual-content-layer)* Add palette allocation with CGB + DMG fallback ([`bb31cd6`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/bb31cd6ad899aeca46eafc9d1b949dcf00d56e1b))
@@ -29,7 +29,7 @@ All notable changes to this project will be documented in this file.
 
 ### 🐛 Bug Fixes
 
-- Stop options/slot-menu sound drone and dead B button ([`00dd17d`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/00dd17dab8f7329924ea33284edd9a7e599ebac0))
+- Stop options/slot-menu sound drone and dead B button ([`256c327`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/256c327d394001aeb6a74119795a391a48eb8454))
 - Correct VRAM/sprite/palette usage across all screens ([`f8ffed8`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/f8ffed854d22791b3da029b5f52c200bd1d3cb0d))
 - Minor adjustment ([`a40d0ef`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/a40d0ef8a1a39bde6dabb9679bb2730211563261))
 - *(utils)* Put font ink color at palette index 3 in set_solid_bkg ([`20e247c`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/20e247c1667e01544003f4c1d5a1d6c99520d31b))
@@ -76,9 +76,11 @@ All notable changes to this project will be documented in this file.
 
 ### 📚 Documentation
 
-- Sync README and roadmap with codebase ([`13f92ec`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/13f92ec9615edbc0adca04845f7b20fd3cbcf4be))
-- Minor adjustment ([`93c0ae3`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/93c0ae37c5968430159a5c1d64b5c637e299dcd3))
-- *(constitution)* Add scope and context rules ([`976464b`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/976464b78d74165246820e3328319a3158602d90))
+- Replace CLAUDE.md and AGENTS.md with CONTRIBUTING.md ([`8eb46d5`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/8eb46d5f544ab2d426a46c5fb2ff2f6baab35652))
+- *(readme)* Fix credits banner alignment ([`16072cc`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/16072cc06061ec73114b9ee648881160f3d3b1c5))
+- Sync README and roadmap with codebase ([`b35c051`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/b35c05191e1d810f5c15f9953605cc024ae43b3a))
+- Minor adjustment ([`4723935`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/4723935052da0bb449547cd9fbd986161e2110e8))
+- *(constitution)* Add scope and context rules ([`5418796`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/5418796e4c92116643b6225c4d962f7b29b67472))
 - *(spec)* Add VRAM & scene visual polish spec/plan/tasks ([`4539653`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/4539653510928d2642528088bff14e84188c398b))
 - Mark visual content layer (section 4) complete ([`c72ee9c`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/c72ee9cb1594718ad7d9590c125fec7f34d64e95))
 - Ratify project constitution v1.0.0 ([`f6b82f9`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/f6b82f9934cfbde16b5583bc1153bf9375a29233))
@@ -93,10 +95,12 @@ All notable changes to this project will be documented in this file.
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(tests)* Add lives and collision headless checks ([`a6f770d`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/a6f770dde137c28ab56596c4a32fdadaa26c01f5))
-- *(tests)* Add utils.c headless checks and share test harness ([`bfac194`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/bfac194bbce3f067673c4ba646b6cf4050ef00c5))
-- *(tests)* Add headless BGB test ROM for save system ([`4b412e0`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/4b412e092cb4b8a65301751daec9f82d4eef9f26))
-- *(tests)* Add stdlib unittest checks for asset pipeline ([`e158181`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/e158181e5ac743f80d598ea8732015ff9ae038d4))
+- *(release)* Bump version to 0.1.0 ([`2ec7e2e`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/2ec7e2e3a7cc93bb73c00bd043798562ba3abcf0))
+- Untrack build output and local tooling state ([`90565c6`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/90565c60fdc006d26dbaf7a97ad9b4237c34aa8c))
+- *(tests)* Add lives and collision headless checks ([`b575166`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/b5751666ed491394c428f70907b5721dfb44e8c7))
+- *(tests)* Add utils.c headless checks and share test harness ([`330e71c`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/330e71c07b77a74fd2e72c5da721531e5ae4d42f))
+- *(tests)* Add headless BGB test ROM for save system ([`44989c8`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/44989c8968c111719a638d666d1c5660313c8397))
+- *(tests)* Add stdlib unittest checks for asset pipeline ([`67b4ef9`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/67b4ef980d2618e2a4108493f93491ec4276cf48))
 - *(claude)* Replace vexp with ccc, slim agent docs ([`c6f6e3f`](https://github.com/spinellifabio/gbc-c-starter-kit/commit/c6f6e3f76719e8365e91d0d19cdee52b49b6283c))
 
 ## Credits
@@ -111,6 +115,6 @@ $$ |  $$ |$$ |  $$ |$$ |  $$\       $$ |  $$\       $$\   $$ |  $$ |$$\ $$  __$$
 \$$$$$$  |$$$$$$$  |\$$$$$$  |      \$$$$$$  |      \$$$$$$  |  \$$$$  |\$$$$$$$ |$$ |       \$$$$  |\$$$$$$$\ $$ |            $$ | \$$\ $$ |  \$$$$  |
  \______/ \_______/  \______/        \______/        \______/    \____/  \_______|\__|        \____/  \_______|\__|            \__|  \__|\__|   \____/
 
-                                                                                                         v0.2.0 - Code assembled in spare time by Fabio
+                                                                                                         v0.1.0 - Code assembled in spare time by Fabio
 ```
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(gbc-c-starter-kit VERSION 1.0 LANGUAGES NONE)
+project(gbc-c-starter-kit VERSION 0.1.0 LANGUAGES NONE)
 
 # === Paths ===
 set(ROM_DIR "${CMAKE_CURRENT_SOURCE_DIR}/rom")
